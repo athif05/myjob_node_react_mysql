@@ -1,0 +1,15 @@
+{
+  "name": "job_portal_with_node_react_mysql",
+  "version": "1.0.0",
+  "description": "Job Portal with node, react and mysql",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Athif Hussain",
+  "license": "ISC",
+  "dependencies": {
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.15"
+  }
+}
