@@ -4,7 +4,6 @@ import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 
 const AboutUs = () => {
-
     return (
 
         <div className="container-scroller">
