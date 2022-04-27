@@ -58,7 +58,7 @@ const BlogLists = () => {
                                                     <td>4 blog</td>
                                                     <td>Contrary to popular belief, Lorem Ipsum is not simply random text.</td>
                                                     <td>
-                                                        <img src="assests/images/bvc-logo.png" alt="blog-image"/>
+                                                        <img src="assests/images/bvc-logo.png" alt="blog"/>
                                                     </td>
                                                     <td>Blue coller job</td>
                                                     <td>Sunny</td>

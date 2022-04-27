@@ -50,7 +50,7 @@ const EmployersList = () => {
                                     <tr>
                                     <td>1.</td>
                                     <td>
-                                        <img src="assests/images/bvc-logo.png"/> 
+                                        <img src="assests/images/bvc-logo.png" alt="logo"/> 
                                     </td>
                                     <td>
                                        <a href="/single-employers-details" target="_blank">ITG</a>

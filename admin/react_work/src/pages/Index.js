@@ -1,8 +1,52 @@
-import React from "react";
-//import { useNavigate } from 'react-router-dom';
+import React, {useState, useEffect} from "react";
+import { useNavigate } from 'react-router-dom';
 
 
 const Index = () => {
+
+  //set state
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  //set error message state
+  const [errorMessage, setErrorMessage] = useState("");
+
+  //create navigation
+  const navigate = useNavigate();
+
+  //check auth.
+  useEffect(()=>{
+    const auth = localStorage.getItem('react_user');
+    if(auth){
+        navigate('/dashboard');
+    }
+  });
+
+  /* login function, start here */
+  const handleLogin = async() =>{
+    console.log('login api call here...');
+
+    let result = await fetch('http://localhost:12345/login',{
+      method: 'post',
+      body: JSON.stringify({email, password}),
+      headers:{
+        'Content-Type': 'application/json'
+      },
+    });
+
+    result = await result.json();
+    console.warn(result);
+
+    if(result[0].name!='No record found'){
+      console.log(result[0].name);
+      localStorage.setItem('react_user',JSON.stringify(result));
+      navigate('/dashboard');
+    }  else {
+      setErrorMessage("Please enter correct details..");
+    }
+
+  }
+  /* login function, end here */
 
     return(
         <div className="container-scroller">
@@ -16,17 +60,21 @@ const Index = () => {
                   </div>
                   <h4>Hello! let's get started</h4>
                   <h6 className="font-weight-light">Sign in to continue.</h6>
-    
-                  <form className="pt-3" method="post">
-    
+
+                  {errorMessage && (
+                    <div class="alert alert-danger text-center">
+                      {errorMessage}
+                    </div>
+                  )}
+
                     <div className="form-group">
-                      <input type="email" name="email" className="form-control form-control-lg" id="exampleInputEmail1" placeholder="Username"/>
+                      <input type="email" name="email" value={email} onChange={(e)=>setEmail(e.target.value)} className="form-control form-control-lg" id="exampleInputEmail1" placeholder="Username"/>
                     </div>
                     <div className="form-group">
-                      <input type="password" name="password" className="form-control form-control-lg" id="exampleInputPassword1" placeholder="Password"/>
+                      <input type="password" name="password" value={password} onChange={(e)=>setPassword(e.target.value)} className="form-control form-control-lg" id="exampleInputPassword1" placeholder="Password"/>
                     </div>
                     <div className="mt-3">
-                      <input type="submit" name="submit" value="Sign In" className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn"/>
+                      <input type="submit" name="submit" value="Sign In" onClick={handleLogin} className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn"/>
                     </div>
                     <div className="my-2 d-flex justify-content-between align-items-center">
                       <div className="form-check">
@@ -36,7 +84,7 @@ const Index = () => {
                         </label>
                       </div>
                     </div>
-                  </form>
+                  
                 </div>
               </div>
             </div>

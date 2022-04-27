@@ -1,9 +1,54 @@
-import React from "react";
-import Header from './../components/Header';
-import Sidebar from './../components/Sidebar';
-import Footer from './../components/Footer';
+import React, {useEffect, useState} from "react";
+import { useParams} from 'react-router-dom';
+import Header from '../components/Header';
+import Sidebar from '../components/Sidebar';
+import Footer from '../components/Footer';
+import ReactTooltip from 'react-tooltip'; //use for show tooltip/title on href
 
-const SingleCandidateDetails = () => {
+const CandidateDetails = () => {
+
+    //set state for show all jobs
+    const [candidate_detials, setCandidateDetials] = useState([]);
+    const [work_experience, setWorkExperience] = useState([]);
+    const [qualification, setQualification] = useState([]);
+
+    const params = useParams();
+    useEffect(()=>{
+        getCandidateDeatils();
+    },[]);
+
+    //call candidate details api
+    const getCandidateDeatils = async () => {
+
+        /* candidate details api, start here */
+        let result = await fetch(`http://localhost:12345/candidate-details/${params.id}`);
+
+        result = await result.json();
+
+        let user_id=result[0]['user_id'];
+
+        setCandidateDetials(result);
+        /* candidate details api, end here */
+
+        
+        /* call work experience api, start here */
+        let user_work_experience = await fetch(`http://localhost:12345/candidate-work-experience/${user_id}`);
+
+        user_work_experience = await user_work_experience.json();
+
+        setWorkExperience(user_work_experience);
+        /* call work experience api, end here */
+
+
+        /* call qualification api, start here */
+        let user_qualification = await fetch(`http://localhost:12345/candidate-qualifications/${user_id}`);
+
+        user_qualification = await user_qualification.json();
+
+        setQualification(user_qualification);
+        /* call qualification api, end here */
+    }
+
     return(
 
         <div className="container-scroller">
@@ -17,6 +62,9 @@ const SingleCandidateDetails = () => {
                 <div className="main-panel text-left">
                     <div className="content-wrapper">
 
+{
+    ((candidate_detials.length>0) && (candidate_detials[0].name!='No record found') ? candidate_detials.map((item, index) =>
+
                         <div className="row">
 
                         <div className="col-lg-6 grid-margin stretch-card">
@@ -25,35 +73,35 @@ const SingleCandidateDetails = () => {
                                 <h4 className="card-title">Personal Information</h4>
                                 
                                 <div className="form-group">
-                                    <label for="Name"><strong>Name : </strong> Rohan Bhalla</label>
+                                    <label for="Name"><strong>Name : </strong> {item.name}</label>
                                 </div>
                                 
                                 <div className="form-group">
-                                    <label for="Name"><strong>Email : </strong> rohan@gmail.com</label>
+                                    <label for="Name"><strong>Email : </strong> {item.email}</label>
                                 </div>
                                 
                                 <div className="form-group">
-                                    <label for="Name"><strong>Mobile Number : </strong> 8899889900</label>
+                                    <label for="Name"><strong>Mobile Number : </strong> {item.mobile_number}</label>
                                 </div>
                                 
                                 <div className="form-group">
-                                    <label for="Name"><strong>Alternate Number : </strong> 6677889900</label>
+                                    <label for="Name"><strong>Alternate Number : </strong> {item.alternate_number}</label>
                                 </div>
                                 
                                 <div className="form-group">
-                                    <label for="Name"><strong>Permanent Address : </strong> Ashram, Delhi</label>
+                                    <label for="Name"><strong>Permanent Address : </strong> {item.permanent_address}</label>
                                 </div>
                                 
                                 <div className="form-group">
-                                    <label for="Name"><strong>Current Address : </strong> sector 18, gurugram</label>
+                                    <label for="Name"><strong>Current Address : </strong> {item.current_address}</label>
                                 </div>
                                 
                                 <div className="form-group">
-                                    <label for="Name"><strong>State Name : </strong> Delhi</label>
+                                    <label for="Name"><strong>State Name : </strong> {item.state_name}</label>
                                 </div>
                                 
                                 <div className="form-group">
-                                    <label for="Name"><strong>City Name : </strong> New Delhi</label>
+                                    <label for="Name"><strong>City Name : </strong> {item.citie_name}</label>
                                 </div>
 
                             </div>
@@ -66,27 +114,32 @@ const SingleCandidateDetails = () => {
                                 <h4 className="card-title">Other Information</h4>
                                 
                                 <div className="form-group">
-                                    <label for="Name"><strong>Describe Job Profile : </strong> web developer</label>
+                                    <label for="Name"><strong>Describe Job Profile : </strong> {item.describe_job_profile}</label>
                                 </div>
                                 
                                 <div className="form-group">
-                                    <label for="Name"><strong>Skills : </strong> php, ci, html, js</label>
+                                    <label for="Name"><strong>Skills : </strong> {item.skills}</label>
                                 </div>
                                 
                                 <div className="form-group">
-                                    <label for="Name"><strong>Notice Period : </strong>  1 Month</label>
+                                    <label for="Name"><strong>Notice Period : </strong>  {item.notice_period}</label>
                                 </div>
                                 
                                 <div className="form-group">
-                                    <label for="Name"><strong>Last CTC : </strong> 5L</label>
+                                    <label for="Name"><strong>Last CTC : </strong> {item.last_ctc}</label>
                                 </div>
                                                     
                                 <div className="form-group">
                                     <label for="Name">
                                         <strong>Resume : </strong> 
-                                        
-                                        Download Resume
-                                        
+                                        {
+                                            (item.resume_file) ? 
+                                            <a href="" download data-tip="Click Here For Download Resume">Download Resume</a>
+                                            
+                                            :
+                                            <></>
+                                        }
+                                       
                                     </label>
                                 </div>
                                 
@@ -94,12 +147,12 @@ const SingleCandidateDetails = () => {
                                     <label for="Name"><strong>Profile Image : </strong> 
                                     
                                         <br/><img src="assests/images/bvc-logo.png" alt="profile"/>
-                                        <br/><a href="assests/images/bvc-logo.png" download title="Click here for download image.">Download Profile Image</a>
+                                        <br/><a href="assests/images/bvc-logo.png" download data-tip="Click Here For Download Profile Image.">Download Profile Image</a>
                                     
                                     
                                     </label>
                                 </div>
-                                
+                                <ReactTooltip />
                             </div>
                             </div>
                         </div>
@@ -110,7 +163,7 @@ const SingleCandidateDetails = () => {
                                 <h4 className="card-title">Work Experience</h4>
                                 
                                 <div className="form-group">
-                                    <label for="Name"><strong>Experience: </strong> 5+ Year Experience</label>
+                                    <label for="Name"><strong>Experience: </strong> {item.work_experience_name}</label>
                                 </div>
                                 
                                 
@@ -126,21 +179,28 @@ const SingleCandidateDetails = () => {
                                         </thead>
                                         
                                         <tbody>
-                                        
+                                            
+                                        {
+    ((work_experience.length>0) && (work_experience[0].name!='No record found') ? work_experience.map((item_work, index) =>
                                             <tr>
-                                                <td>Web Dessigner</td>  
-                                                <td>ITG</td>  
-                                                <td>2021-10-01</td> 
-                                                <td>2021-10-31</td> 
-                                                <td>Booking Engine</td>   
+                                                <td>{item_work.designation_name}</td>  
+                                                <td>{item_work.organization_name}</td>  
+                                                <td>{item_work.date_from}</td> 
+                                                <td>{item_work.date_to}</td> 
+                                                <td>{item_work.describe_role}</td>   
                                             </tr>
-                                        
+                                            )
+                                            :
+                                            <tr>
+                                                <td colSpan={5}>No work experience added by candidate...</td>
+                                            </tr>)
+                                        }
+                                                
+                                            
                                         </tbody>
                                         
                                     </table>
-                                    
-                                        <span className="danger">No work experience added by candidate...</span>
-                                        
+                                                                            
                                 </div>
                                 
                             </div>
@@ -163,19 +223,22 @@ const SingleCandidateDetails = () => {
                                         </thead>
                                         
                                         <tbody>
-                                        
+                                        {
+                                            ((qualification.length>0) && (qualification[0].name!='No record found') ? qualification.map((item_qualification, index) =>
                                             <tr>
-                                                <td>mbc</td>  
-                                                <td>MTU, Gautam Budh Nagar</td>  
-                                                <td>2013</td> 
-                                                <td>74</td>  
+                                                <td>{item_qualification.qualification.toUpperCase()}</td>  
+                                                <td>{item_qualification.college_university}</td>  
+                                                <td>{item_qualification.year}</td> 
+                                                <td>{item_qualification.marks}</td>  
+                                            </tr>)
+                                            :
+                                            <tr>
+                                                <td colSpan={4}>No qualification added by candidate...</td>
                                             </tr>
-                                        
+                                        )}
                                         </tbody>
                                         
                                     </table>
-                                    
-                                        <span className="danger">No qualification added by candidate...</span>
                                         
                                 </div>
                                 
@@ -183,7 +246,9 @@ const SingleCandidateDetails = () => {
                             </div>
                         </div>			
                         
-                        </div>
+                        </div>)
+                        :
+                        null)}
 
                         </div>
                     <Footer />
@@ -195,4 +260,4 @@ const SingleCandidateDetails = () => {
 
 }
 
-export default SingleCandidateDetails;
+export default CandidateDetails;

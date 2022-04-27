@@ -1,9 +1,44 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
+import { Link } from 'react-router-dom';
 import Header from './../components/Header';
 import Sidebar from './../components/Sidebar';
 import Footer from './../components/Footer';
+import Pagination from './../components/Pagination';
+import Moment from 'moment'; //use for convert date format.
+import ReactTooltip from 'react-tooltip'; //use for show tooltip/title on href
 
 const AllAppliedJobs = () => {
+
+    //set state for show all jobs
+    const [applied_jobs, setAppliedJob] = useState([]);
+
+    //call all jobs
+    useEffect( () => {
+        getAppliedJobs();
+    },[]);
+
+    
+    //fetch all applied jobs list
+    const getAppliedJobs = async () => {
+        let result = await fetch("http://localhost:12345/applied-jobs");
+        //console.warn(result);
+        result = await result.json();
+
+        setAppliedJob(result);
+    }
+
+    /* Pagination, start here */
+    const [showPerPage, setShowPerPage] = useState(10);
+    const [pagination, setPagination] = useState({
+        start: 0,
+        end: showPerPage,
+    });
+
+    const onPaginationChange = (start, end) => {
+        setPagination({ start: start, end: end});
+    };
+    /* Pagination, end here */
+
     return(
 
         <div className="container-scroller">
@@ -48,16 +83,23 @@ const AllAppliedJobs = () => {
                                             </thead>
                                             <tbody>
 
+                                                {
+                                                    ((applied_jobs.length>0) && (applied_jobs[0].name!='No job found') ? applied_jobs.slice(pagination.start, pagination.end).map((item, index) =>
                                                 <tr>
-                                                    <td>1.</td>
-                                                    <td>Sunny</td>
-                                                    <td>sunny@gmail.com</td>
-                                                    <td>6789098778</td>
-                                                    <td>Developer</td>
-                                                    <td>4L</td>
-                                                    <td>Delhi</td>
-                                                    <td>BVC</td>
-                                                    <td>12-Apr-2022</td>
+                                                    <td>{index+1}.</td>
+                                                    <td>
+                                                        <Link to={"/candidate-details/"+item.user_id} data-tip="Click Here For Show Candidate Details" className="text-decoration-none">{item.candidate_name}</Link>
+                                                    </td>
+                                                    <td>{item.candidate_email}</td>
+                                                    <td>{item.candidate_mobile_number}</td>
+                                                    <td>
+                                                        <Link to={"/job-details/"+item.job_id} data-tip="Click Here For Show Job Details" className="text-decoration-none">{item.job_title}</Link>
+                                                        <ReactTooltip delayHide={1000}/>
+                                                    </td>
+                                                    <td>{item.ctc}</td>
+                                                    <td>{item.job_location_name}</td>
+                                                    <td>{item.company_name}</td>
+                                                    <td>{Moment(item.applied_date).format('DD-MM-YYYY')}</td>
                                                     <td>
 
                                                         <div className="btn-group-vertical" role="group" aria-label="Basic example">
@@ -76,23 +118,27 @@ const AllAppliedJobs = () => {
                                                         </div>
                                                     </td>					
                                                 </tr>
+                                                )
+                                                :
+                                                <tr>
+                                                    <td colSpan={10}>No job found...</td>
+                                                </tr>
+                                                    )
+                                                    }
                                             </tbody>
                                         </table>
-
-                                        <div className="row">
+                                        {
+                                        ((applied_jobs.length>0) && (applied_jobs[0].name!='No job found')) ? 
+                                        <div className="row paging_gap">
                                             <div className="col-lg-12 text-center">
                                                 <div className="pagination-area">
-                                                    <nav>
-                                                        <ul className="page-numbers d-inline-flex">
-
-                                                            paging
-
-                                                        </ul>
-                                                    </nav>
+                                                    <Pagination showPerPage={showPerPage} onPaginationChange={onPaginationChange} total={applied_jobs.length}/>
                                                 </div>
                                             </div>
                                         </div>
-
+                                        :
+                                        <></>
+                                        }
                                     </div>
                                 </div>
                             </div>

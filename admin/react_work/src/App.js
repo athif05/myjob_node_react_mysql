@@ -1,12 +1,12 @@
 import './App.css';
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route} from 'react-router-dom';
 //import PrivateComponent from './components/PrivateComponent';
 import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
 import AllAppliedJobs from './pages/All-applied-jobs';
 import EmployesList from './pages/Employes-list';
-import SingleCandidateDetails from './pages/Single-candidate-details';
+import CandidateDetails from './pages/Candidate-details';
 import ManageQualifications from './pages/Manage-qualifications';
 import AddNewQualification from './pages/Add-new-qualification';
 import EditQualification from './pages/Edit-qualification';
@@ -59,98 +59,112 @@ import EditBlogCategory from './pages/Edit-blog-category';
 import ManageBlogAuthors from './pages/Manage-blog-authors';
 import AddNewBlogAuthor from './pages/Add-new-blog-author';
 import EditBlogAuthor from './pages/Edit-blog-author';
+import PrivateComponent from './components/PrivateComponent';
 
 
 function App() {
+
+  //const navigate = useNavigate();
+
+  //get item from local storage
+  //const auth = localStorage.getItem('react_user');
+  
   return (
     <div className="App">
       <BrowserRouter>
 
-        <Routes>
+          <Routes>
+            
+            <Route element={<PrivateComponent />}>
+              <Route path='/dashboard' element={ <Dashboard /> }/>
 
-          <Route path='/' element={ <Index /> } />
+              <Route path='/all-applied-jobs' element={ <AllAppliedJobs /> }/>
 
-          <Route path='/dashboard' element={ <Dashboard /> }/>
+              <Route path='/employes-list' element={ <EmployesList /> }/>
+              <Route path='/candidate-details/:id' element={ <CandidateDetails /> }/>
 
-          <Route path='/all-applied-jobs' element={ <AllAppliedJobs /> }/>
+              <Route path='/manage-qualifications' element={ <ManageQualifications /> }/>
+              <Route path='/add-new-qualification' element={ <AddNewQualification /> }/>
+              <Route path='/edit-qualification' element={ <EditQualification /> }/>
 
-          <Route path='/employes-list' element={ <EmployesList /> }/>
-          <Route path='/single-candidate-details' element={ <SingleCandidateDetails /> }/>
+              <Route path='/single-employers-details' element={ <SingleEmployersDetails /> }/>
+              <Route path='/employers-list' element={ <EmployersList /> }/>
+              <Route path='/job-details/:id' element={ <SingleJobDetails /> }/>
+              
+              <Route path='/manage-company-domains' element={ <ManageCompanyDomains /> }/>
+              <Route path='/add-new-company-domain' element={ <AddNewCompanyDomain /> }/>
+              <Route path='/edit-company-domain' element={ <EditCompanyDomain /> }/>
+              
+              <Route path='/all-job-lists' element={ <AllJobLists /> }/>
 
-          <Route path='/manage-qualifications' element={ <ManageQualifications /> }/>
-          <Route path='/add-new-qualification' element={ <AddNewQualification /> }/>
-          <Route path='/edit-qualification' element={ <EditQualification /> }/>
+              <Route path='/manage-job-categories' element={ <ManageJobCategories /> }/>
+              <Route path='/add-new-job-categories' element={ <AddNewJobCategories /> }/>
+              <Route path='/edit-job-category' element={ <EditJobCategory /> }/>
 
-          <Route path='/single-employers-details' element={ <SingleEmployersDetails /> }/>
-          <Route path='/employers-list' element={ <EmployersList /> }/>
-          <Route path='/single-job-details' element={ <SingleJobDetails /> }/>
-          
-          <Route path='/manage-company-domains' element={ <ManageCompanyDomains /> }/>
-          <Route path='/add-new-company-domain' element={ <AddNewCompanyDomain /> }/>
-          <Route path='/edit-company-domain' element={ <EditCompanyDomain /> }/>
-          
-          <Route path='/all-job-lists' element={ <AllJobLists /> }/>
+              <Route path='/manage-job-domains' element={ <ManageJobDomains /> }/>
+              <Route path='/add-new-main-job-domain' element={ <AddNewMainJobDomain /> }/>
+              <Route path='/edit-main-job-domain' element={ <EditMainJobDomain /> }/>
 
-          <Route path='/manage-job-categories' element={ <ManageJobCategories /> }/>
-          <Route path='/add-new-job-categories' element={ <AddNewJobCategories /> }/>
-          <Route path='/edit-job-category' element={ <EditJobCategory /> }/>
+              <Route path='/manage-notice-periods' element={ <ManageNoticePeriods /> }/>
+              <Route path='/add-new-notice-period' element={ <AddNewNoticePeriod /> }/>
+              <Route path='/edit-notice-period' element={ <EditNoticePeriod /> }/>
 
-          <Route path='/manage-job-domains' element={ <ManageJobDomains /> }/>
-          <Route path='/add-new-main-job-domain' element={ <AddNewMainJobDomain /> }/>
-          <Route path='/edit-main-job-domain' element={ <EditMainJobDomain /> }/>
+              <Route path='/manage-fee-charge-reasons' element={ <ManageFeeChargeReasons /> }/>
+              <Route path='/add-new-fee-charge-reason' element={ <AddNewFeeChargeReason /> }/>
+              <Route path='/edit-fee-charge-reason' element={ <EditFeeChargeReason /> }/>
 
-          <Route path='/manage-notice-periods' element={ <ManageNoticePeriods /> }/>
-          <Route path='/add-new-notice-period' element={ <AddNewNoticePeriod /> }/>
-          <Route path='/edit-notice-period' element={ <EditNoticePeriod /> }/>
+              <Route path='/manage-working-days' element={ <ManageWorkingDays /> }/>
+              <Route path='/add-new-working-day' element={ <AddNewWorkingDay /> }/>
+              <Route path='/edit-working-day' element={ <EditWorkingDay /> }/>
 
-          <Route path='/manage-fee-charge-reasons' element={ <ManageFeeChargeReasons /> }/>
-          <Route path='/add-new-fee-charge-reason' element={ <AddNewFeeChargeReason /> }/>
-          <Route path='/edit-fee-charge-reason' element={ <EditFeeChargeReason /> }/>
+              <Route path='/manage-work-experiance' element={ <ManageWorkExperiance /> }/>
+              <Route path='/add-new-work-experiance' element={ <AddNewWorkExperiance /> }/>
+              <Route path='/edit-work-experiance' element={ <EditWorkExperiance /> }/>
 
-          <Route path='/manage-working-days' element={ <ManageWorkingDays /> }/>
-          <Route path='/add-new-working-day' element={ <AddNewWorkingDay /> }/>
-          <Route path='/edit-working-day' element={ <EditWorkingDay /> }/>
+              <Route path='/states' element={ <ManageStates /> }/>
+              <Route path='/add-new-state' element={ <AddNewState /> }/>
+              <Route path='/edit-state' element={ <EditState /> }/>
 
-          <Route path='/manage-work-experiance' element={ <ManageWorkExperiance /> }/>
-          <Route path='/add-new-work-experiance' element={ <AddNewWorkExperiance /> }/>
-          <Route path='/edit-work-experiance' element={ <EditWorkExperiance /> }/>
+              <Route path='/cities' element={ <ManageCities /> }/>
+              <Route path='/add-new-city' element={ <AddNewCity /> }/>
+              <Route path='/edit-city' element={ <EditCity /> }/>
 
-          <Route path='/states' element={ <ManageStates /> }/>
-          <Route path='/add-new-state' element={ <AddNewState /> }/>
-          <Route path='/edit-state' element={ <EditState /> }/>
+              <Route path='/manage-role' element={ <ManageRole /> }/>
+              <Route path='/add-new-role' element={ <AddNewRole /> }/>
+              <Route path='/edit-role' element={ <EditRole /> }/>
 
-          <Route path='/cities' element={ <ManageCities /> }/>
-          <Route path='/add-new-city' element={ <AddNewCity /> }/>
-          <Route path='/edit-city' element={ <EditCity /> }/>
+              <Route path='/manage-admin-account' element={ <ManageAdminAccount /> }/>
+              <Route path='/add-new-admin-account' element={ <AddNewAdminAccount /> }/>
+              <Route path='/edit-admin-account' element={ <EditAdminAccount /> }/>
 
-          <Route path='/manage-role' element={ <ManageRole /> }/>
-          <Route path='/add-new-role' element={ <AddNewRole /> }/>
-          <Route path='/edit-role' element={ <EditRole /> }/>
+              <Route path='/contact-us-emails' element={ <ContactUsEmails /> }/>
 
-          <Route path='/manage-admin-account' element={ <ManageAdminAccount /> }/>
-          <Route path='/add-new-admin-account' element={ <AddNewAdminAccount /> }/>
-          <Route path='/edit-admin-account' element={ <EditAdminAccount /> }/>
+              <Route path='/about-us' element={ <AboutUs /> }/>
+              
+              <Route path='/contact-us' element={ <ContactUs /> }/>
 
-          <Route path='/contact-us-emails' element={ <ContactUsEmails /> }/>
+              <Route path='/blog-lists' element={ <BlogLists /> }/>
+              <Route path='/add-new-blog' element={ <AddNewBlog /> }/>
+              <Route path='/edit-blog' element={ <EditBlog /> }/>
 
-          <Route path='/about-us' element={ <AboutUs /> }/>
-          
-          <Route path='/contact-us' element={ <ContactUs /> }/>
+              <Route path='/manage-blog-categories' element={ <ManageBlogCategories /> }/>
+              <Route path='/add-new-blog-category' element={ <AddNewBlogCategory /> }/>
+              <Route path='/edit-blog-category' element={ <EditBlogCategory /> }/>
 
-          <Route path='/blog-lists' element={ <BlogLists /> }/>
-          <Route path='/add-new-blog' element={ <AddNewBlog /> }/>
-          <Route path='/edit-blog' element={ <EditBlog /> }/>
+              <Route path='/manage-blog-authors' element={ <ManageBlogAuthors /> }/>
+              <Route path='/add-new-blog-author' element={ <AddNewBlogAuthor /> }/>
+              <Route path='/edit-blog-author' element={ <EditBlogAuthor /> }/>
+            </Route>
+          </Routes>
 
-          <Route path='/manage-blog-categories' element={ <ManageBlogCategories /> }/>
-          <Route path='/add-new-blog-category' element={ <AddNewBlogCategory /> }/>
-          <Route path='/edit-blog-category' element={ <EditBlogCategory /> }/>
+        
 
-          <Route path='/manage-blog-authors' element={ <ManageBlogAuthors /> }/>
-          <Route path='/add-new-blog-author' element={ <AddNewBlogAuthor /> }/>
-          <Route path='/edit-blog-author' element={ <EditBlogAuthor /> }/>
+          <Routes>
+            
+            <Route path='/' element={ <Index /> } />
 
-
-        </Routes>
+          </Routes>
+        
 
       </BrowserRouter>
     </div>
