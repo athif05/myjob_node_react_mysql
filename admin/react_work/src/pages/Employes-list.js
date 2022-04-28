@@ -1,9 +1,38 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
+import { Link } from "react-router-dom";
+import ReactTooltip from "react-tooltip";//use for show tooltip/title on href
 import Header from './../components/Header';
 import Sidebar from './../components/Sidebar';
 import Footer from './../components/Footer';
+import Pagination from './../components/Pagination';
 
 const EmployesList = () => {
+
+    const [all_candidates, setAllCandidates] = useState([]);
+
+    useEffect(()=>{
+        getAllCandidates();
+    });
+
+    //fetch all candidate list by api
+    const getAllCandidates = async () =>{
+        let result = await fetch("http://localhost:12345/all-candidates");
+        result = await result.json();
+        setAllCandidates(result);
+    }
+
+    /* Pagination, start here */
+    const [showPerPage, setShowPerPage] = useState(10);
+    const [pagination, setPagination] = useState({
+        start: 0,
+        end: showPerPage,
+    });
+
+    const onPaginationChange = (start, end) => {
+        setPagination({ start: start, end: end});
+    };
+    /* Pagination, end here */
+
     return(
 
         <div className="container-scroller">
@@ -50,23 +79,27 @@ const EmployesList = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-
+{
+    ((all_candidates.length>0) && (all_candidates[0].name!=='No job found') ? all_candidates.slice(pagination.start, pagination.end).map((item, index) =>
                                                 <tr>
-                                                    <td>1.</td>
-                                                    <td>Rohan link for details</td>
-                                                    <td>rohan@gmail.com</td>
-                                                    <td>8998889988</td>
-                                                    <td>Writer</td>
-                                                    <td>Content</td>
-                                                    <td>Delhi</td>
-                                                    <td>2 years</td>
-                                                    <td>Content</td>
-                                                    <td>1 Month</td>
+                                                    <td>{index+1}.</td>
+                                                    <td>
+                                                    <Link to={"/candidate-details/"+item.user_id} target="_blank" data-tip="Click Here For Show Candidate Details" className="text-decoration-none">{item.name}</Link>
+                                                    <ReactTooltip />
+                                                    </td>
+                                                    <td>{item.email}</td>
+                                                    <td>{item.mobile_number}</td>
+                                                    <td>{item.job_title}</td>
+                                                    <td>{item.job_keywords}</td>
+                                                    <td>{item.city_name}</td>
+                                                    <td>{item.work_experience_name}</td>
+                                                    <td>{item.skills}</td>
+                                                    <td>{item.notice_period_name}</td>
                                                     <td>Download</td>
                                                     <td>
 
                                                         <label class="toggle-switch toggle-switch-success">
-                                                            <input type="checkbox" id="employer_detail_id"/>
+                                                            <input type="checkbox" checked />
                                                             <span class="toggle-slider round"></span>												  
                                                         </label>
 
@@ -75,28 +108,31 @@ const EmployesList = () => {
                                                     <td>
 
                                                         <label class="toggle-switch toggle-switch-success">
-                                                            <input type="checkbox" id="employer_detail_del_id"/>
+                                                            <input type="checkbox" checked/>
                                                             <span class="toggle-slider round"></span>
                                                         </label> 
 
                                                     </td>					
-                                                </tr>
+                                                </tr>)
+                                                :
+                                                null)
+                                                }
                                             </tbody>
+                                            
                                         </table>
 
-                                        <div className="row">
+                                        {
+                                        (((Math.ceil(all_candidates.length/showPerPage))>1) && (all_candidates[0].name!=='No job found')) ? 
+                                        <div className="row paging_gap">
                                             <div className="col-lg-12 text-center">
                                                 <div className="pagination-area">
-                                                    <nav>
-                                                        <ul className="page-numbers d-inline-flex">
-
-                                                            paging
-
-                                                        </ul>
-                                                    </nav>
+                                                    <Pagination showPerPage={showPerPage} onPaginationChange={onPaginationChange} total={all_candidates.length}/>
                                                 </div>
                                             </div>
                                         </div>
+                                        :
+                                        <></>
+                                        }
 
                                     </div>
                                 </div>

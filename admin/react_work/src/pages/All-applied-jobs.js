@@ -39,6 +39,14 @@ const AllAppliedJobs = () => {
     };
     /* Pagination, end here */
 
+    /* update job status, start here */
+    const jobStatus = async (val, id) => {
+        let result_status = await fetch(`http://localhost:12345/update-applied-jobs-status/${val}/${id}`);
+
+        getAppliedJobs();
+    }
+    /* update job status, end here */
+
     return(
 
         <div className="container-scroller">
@@ -84,7 +92,7 @@ const AllAppliedJobs = () => {
                                             <tbody>
 
                                                 {
-                                                    ((applied_jobs.length>0) && (applied_jobs[0].name!='No job found') ? applied_jobs.slice(pagination.start, pagination.end).map((item, index) =>
+                                                    ((applied_jobs.length>0) && (applied_jobs[0].name!=='No job found') ? applied_jobs.slice(pagination.start, pagination.end).map((item, index) =>
                                                 <tr>
                                                     <td>{index+1}.</td>
                                                     <td>
@@ -105,15 +113,18 @@ const AllAppliedJobs = () => {
                                                         <div className="btn-group-vertical" role="group" aria-label="Basic example">
 
                                                             <div className="btn-group">
-                                                                <button type="button" className="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" id="job_status_id_{{$all_applied_job['id']}}">
-                                                                New
+                                                                <button type="button" className="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" id="job_status_id_{item.id}">
+                                                                {(item.job_status==='0') ? "Rejected" :null}
+                                                                {(item.job_status==='1') ? "New":null}
+                                                                {(item.job_status==='2') ? "Progress" :null}
+                                                                {(item.job_status==='3') ? "Selected" :null}
                                                                 </button>
-                                                                {/* <div className="dropdown-menu" style="font-size:13px;">
-                                                                <a className="dropdown-item">New</a>
-                                                                <a className="dropdown-item" onclick="job_status('2','{{$all_applied_job['id']}}')">Progress</a>
-                                                                <a className="dropdown-item" onclick="job_status('3','{{$all_applied_job['id']}}')">Selected</a>
-                                                                <a className="dropdown-item" onclick="job_status('0','{{$all_applied_job['id']}}')">Rejected</a>
-                                                                </div>   */}                        
+                                                                <div className="dropdown-menu">
+                                                                    <a className="dropdown-item" onClick={()=>jobStatus('1',item.id)}>New</a>
+                                                                    <a className="dropdown-item" onClick={()=>jobStatus('2',item.id)}>Progress</a>
+                                                                    <a className="dropdown-item" onClick={()=>jobStatus('3',item.id)}>Selected</a>
+                                                                    <a className="dropdown-item" onClick={()=>jobStatus('0',item.id)}>Rejected</a>
+                                                                </div>                       
                                                             </div>
                                                         </div>
                                                     </td>					
@@ -127,8 +138,9 @@ const AllAppliedJobs = () => {
                                                     }
                                             </tbody>
                                         </table>
+                                        
                                         {
-                                        ((applied_jobs.length>0) && (applied_jobs[0].name!='No job found')) ? 
+                                        (((Math.ceil(applied_jobs.length/showPerPage))>1) && (applied_jobs[0].name!=='No job found')) ? 
                                         <div className="row paging_gap">
                                             <div className="col-lg-12 text-center">
                                                 <div className="pagination-area">

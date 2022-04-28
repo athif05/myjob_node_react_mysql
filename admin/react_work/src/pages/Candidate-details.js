@@ -62,8 +62,8 @@ const CandidateDetails = () => {
                 <div className="main-panel text-left">
                     <div className="content-wrapper">
 
-{
-    ((candidate_detials.length>0) && (candidate_detials[0].name!='No record found') ? candidate_detials.map((item, index) =>
+                        {
+                            ((candidate_detials.length>0) && (candidate_detials[0].name!=='No record found') ? candidate_detials.map((item, index) =>
 
                         <div className="row">
 
@@ -170,18 +170,18 @@ const CandidateDetails = () => {
                                 <div className="form-group">
                                 
                                     <table className="table table-striped project-orders-table" id="my_datatable">
-                                        <thead >
-                                            <th >Designation</th>
-                                            <th >Company Name</th>
-                                            <th >Date From</th>
-                                            <th >Date To </th>
-                                            <th >Describe Role</th>
+                                        <thead>
+                                            <th>Designation</th>
+                                            <th>Company Name</th>
+                                            <th>Date From</th>
+                                            <th>Date To </th>
+                                            <th>Describe Role</th>
                                         </thead>
                                         
                                         <tbody>
                                             
                                         {
-    ((work_experience.length>0) && (work_experience[0].name!='No record found') ? work_experience.map((item_work, index) =>
+                                        ((work_experience.length>0) && (work_experience[0].name!=='No record found') ? work_experience.map((item_work, index) =>
                                             <tr>
                                                 <td>{item_work.designation_name}</td>  
                                                 <td>{item_work.organization_name}</td>  
@@ -215,16 +215,16 @@ const CandidateDetails = () => {
                                 <div className="form-group">
                                 
                                     <table className="table table-striped project-orders-table" id="my_datatable">
-                                        <thead >
-                                            <th >Course Name</th>
-                                            <th >College/University</th>
-                                            <th >Year</th>
-                                            <th >Marks</th>
+                                        <thead>
+                                            <th>Course Name</th>
+                                            <th>College/University</th>
+                                            <th>Year</th>
+                                            <th>Marks</th>
                                         </thead>
                                         
                                         <tbody>
                                         {
-                                            ((qualification.length>0) && (qualification[0].name!='No record found') ? qualification.map((item_qualification, index) =>
+                                            ((qualification.length>0) && (qualification[0].name!=='No record found') ? qualification.map((item_qualification, index) =>
                                             <tr>
                                                 <td>{item_qualification.qualification.toUpperCase()}</td>  
                                                 <td>{item_qualification.college_university}</td>  
