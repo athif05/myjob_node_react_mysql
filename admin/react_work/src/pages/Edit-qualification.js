@@ -1,9 +1,55 @@
-import React from "react";
+import React, { useEffect, useState} from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 
 const EditQualification = () => {
+
+    const [name, setName] = useState("");
+    const [error, setError] = useState(false);
+
+    const params = useParams();
+
+    useEffect(()=>{
+		getEditProduct();
+	},[]);
+
+    const getEditProduct = async () => {
+
+        let result = await fetch(`http://localhost:12345/edit-qualification/${params.id}`);
+
+		result = await result.json();
+		console.warn(result);
+		setName(result[0].name);
+
+    }
+
+    const navigate = useNavigate();
+
+    const updateQualification = async () => {
+        console.warn(name);
+        if(!name) {
+            setError(true);
+            return false;
+        }
+
+        let result = await fetch(`http://localhost:12345/update-qualification/${params.id}`,{
+            method:'put',
+            body:JSON.stringify({name}),
+            headers:{
+                "Content-Type":"application/json"
+            }
+        });
+
+        result = await result.json();
+
+        console.warn(result);
+
+        navigate('/manage-qualifications');
+
+    }
+
 
     return(
 
@@ -24,22 +70,19 @@ const EditQualification = () => {
                             <div className="card-body text-left">
                             
                                 <h4 className="card-title">Edit Qualification</h4>
-                                <form method="post" action="" className="forms-sample">
                                 
-
                                 <div className="form-group">
                                     <label for="name">Qualification Name</label>
-                                    <input type="text" className="form-control" id="name" name="name" placeholder="Name" value=""/>
-                                    
+                                    <input type="text" onChange={(e)=>setName(e.target.value)} defaultValue={name} className="form-control" id="name" name="name" placeholder="Name" />
+                                    {error && !name && <span className="invalid-input">Enter valid name</span> }
                                 </div>
                                 
-                                <button type="submit" className="btn btn-primary mr-2">Update</button>
+                                <button type="submit" className="btn btn-primary mr-2" onClick={updateQualification}>Update</button>
                                 
                                 <a href="/manage-qualifications">
                                     <span className="btn btn-light">Cancel</span>
                                 </a>
                                 
-                                </form>
                             </div>
                             </div>
                         </div>

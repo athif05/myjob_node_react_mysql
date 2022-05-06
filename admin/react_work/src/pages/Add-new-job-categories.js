@@ -1,9 +1,36 @@
-import React from "react";
+import React, { useState, useEffect} from "react";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 
 const AddNewJobCategories = () => {
+
+    const [name, setName] = useState();
+    const [error, setError] = useState(false);
+    const [success, setSuccess] = useState(false);
+
+    const addJobCategory = async () => {
+        console.warn(name);
+        if(!name){
+            setError(true);
+            setSuccess(false);
+            return false;
+        }
+
+        let result = await fetch(`http://localhost:12345/add-job-categories-data`,{
+            method: "post",
+            body:JSON.stringify({name}),
+            headers:{
+                "Content-Type":"application/json"
+            }
+        });
+
+        result = await result.json();
+        setSuccess(true);
+        setError(false);
+        setName('');
+
+    }
 
     return(
 
@@ -24,22 +51,21 @@ const AddNewJobCategories = () => {
                             <div className="card-body text-left">
                             
                                 <h4 className="card-title">Add New Job Category</h4>
-                                <form method="post" action="" className="forms-sample">
+                                {success && <div class="alert alert-success" role="alert">Added Successfully</div>}
                                 
 
                                 <div className="form-group">
                                     <label for="name">Job Category Name</label>
-                                    <input type="text" className="form-control" id="name" name="name" placeholder="Name" value=""/>
-                                    
+                                    <input type="text" className="form-control" id="name" name="name" placeholder="Name" value={name} onChange={(e)=>setName(e.target.value)}/>
+                                    { error && !name && <span className="invalid-input">Enter valid name</span>}
                                 </div>
                                 
-                                <button type="submit" className="btn btn-primary mr-2">Submit</button>
+                                <button type="submit" className="btn btn-primary mr-2" onClick={addJobCategory}>Submit</button>
                                 
                                 <a href="/manage-job-categories">
                                     <span className="btn btn-light">Cancel</span>
                                 </a>
-                                
-                                </form>
+
                             </div>
                             </div>
                         </div>

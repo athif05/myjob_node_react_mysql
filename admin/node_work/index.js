@@ -16,12 +16,12 @@ app.get('/', (req, res)=>{
 app.post("/login", (req, res)=>{
 
 	const data = req.body;
-    console.warn(data);
+    /* console.warn(data); */
 
 	var email=req.body.email;
 	var password=req.body.password;
 
-	connection.query("SELECT id, name, email, role_id from admin_users where email=? and password=?",[email, password], (error, result)=>{
+	connection.query("SELECT id, name, email, role_id from admin_users where status='1' and is_deleted='0' and email=? and password=?",[email, password], (error, result)=>{
 		if(result.length > 0){
 			res.send(result);
 		} else {
@@ -67,13 +67,6 @@ app.get("/today-applied-jobs", (req, res)=>{
 /* show all aplied jobs api, start here */
 app.get("/applied-jobs", (req, res)=>{
 
-    //	let date_ob = new Date();
-
-    let date_ob = new Date().toISOString().
-  replace(/T/, ' ').      // replace T with a space
-  replace(/\..+/, '');     // delete the dot and everything after
-
-
 	connection.query("SELECT job_applied_by_employees.id as id, job_applied_by_employees.user_id as user_id, job_applied_by_employees.job_id as job_id, job_applied_by_employees.status as job_status, candidate_details.name as candidate_name, candidate_details.email as candidate_email, candidate_details.mobile_number as candidate_mobile_number, all_jobs.job_title as job_title, all_jobs.ctc as ctc, cities.name as job_location_name, employer_details.company_name as company_name, job_applied_by_employees.applied_date as applied_date FROM job_applied_by_employees LEFT JOIN candidate_details on candidate_details.user_id=job_applied_by_employees.user_id LEFT JOIN all_jobs on all_jobs.id=job_applied_by_employees.job_id LEFT JOIN employer_details on employer_details.employer_id=all_jobs.employer_id LEFT JOIN cities on cities.id=all_jobs.job_location_id where job_applied_by_employees.is_deleted='0' and job_applied_by_employees.is_deleted=?",['0'], (error, result)=>{
 		if(result.length > 0){
 			res.send(result);
@@ -88,7 +81,7 @@ app.get("/applied-jobs", (req, res)=>{
 /* update applied job status api, start here */
 app.get("/update-applied-jobs-status/:val/:id", (req, res) =>{
 
-	console.log(req.params.val+' / '+req.params.id);
+	//console.log(req.params.val+' / '+req.params.id);
 
 	connection.query("UPDATE job_applied_by_employees set status=? where id=?",[req.params.val,req.params.id], (error, result)=>{
 		if(error) throw error;
@@ -138,7 +131,7 @@ app.get("/candidate-details/:id", (req, res)=>{
 /* show single candidate work experience api, start here */
 app.get("/candidate-work-experience/:user_id", (req, res)=>{
 	
-	console.log(req.params.user_id);
+	//console.log(req.params.user_id);
 
 	connection.query("SELECT * from candidate_work_experiences where status='1' and is_deleted='0' and user_id="+req.params.user_id, (error, result)=>{
 		if(result.length > 0){
@@ -154,7 +147,7 @@ app.get("/candidate-work-experience/:user_id", (req, res)=>{
 /* show single candidate qualifications api, start here */
 app.get("/candidate-qualifications/:user_id", (req, res)=>{
 	
-	console.log(req.params.user_id);
+	//console.log(req.params.user_id);
 
 	connection.query("SELECT * from candidate_qualifications where user_id="+req.params.user_id, (error, result)=>{
 		if(result.length > 0){
@@ -250,5 +243,355 @@ app.get("/all-candidates", (req, res)=>{
 });
 /* fetch all candidates list api, end here */
 
+
+/* generic update status api, start here */
+app.get("/update-generic-status/:tbl/:val/:id", (req, res) =>{
+
+	//console.log(req.params.tbl+' / '+req.params.val+' / '+req.params.id);
+	var tbl_name = req.params.tbl;
+
+	connection.query("UPDATE "+tbl_name+" set status=? where id=?",[req.params.val,req.params.id], (error, result)=>{
+		if(error) throw error;
+			res.send(result);
+	});
+
+});
+/* generic update status api, end here */
+
+
+/* generic soft delete api, start here */
+app.get("/generic-soft-delete/:tbl/:val/:id", (req, res) =>{
+
+	//console.log(req.params.tbl+' / '+req.params.val+' / '+req.params.id);
+	var tbl_name = req.params.tbl;
+
+	connection.query("UPDATE "+tbl_name+" set is_deleted=? where id=?",[req.params.val,req.params.id], (error, result)=>{
+		if(error) throw error;
+			res.send(result);
+	});
+
+});
+/* generic soft delete api, end here */
+
+
+/* fetch all generic data list api, start here */
+app.get("/all-generic-data/:tbl", (req, res)=>{
+
+	var tbl_name = req.params.tbl;
+	const sql="SELECT * from "+tbl_name+" order by name asc";
+	connection.query(sql, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+});
+/* fetch all generic data list api, end here */
+
+
+/* add new data in qualifications table, start here */
+app.post('/add-qualifications-data', async (req, res)=>{
+    
+    const data = req.body;
+    var name=req.body.name;
+
+	var sql = `INSERT INTO qualifications (name, status) VALUES ("${name}","1")`;
+  	connection.query(sql, function(error, result) {
+		
+		if(error) throw error;
+		
+		res.send(result);
+
+		console.log("1 record inserted");
+
+	});
+
+});
+/* add new data in qualifications table, end here */
+
+
+/* edit qualifications data, start here */
+app.get('/edit-qualification/:id', async (req, res)=>{
+	
+	connection.query("SELECT * from qualifications where id="+req.params.id, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+
+});
+/* edit qualifications data, end here */
+
+/* update qualifications data, start here */
+app.put('/update-qualification/:id', async (req, res)=>{
+	
+	var name=req.body.name;
+	const sql = `UPDATE qualifications set name="${name}" where id="${req.params.id}"`;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(error) throw error;
+
+		res.send(result);
+	}); 
+
+});
+/* update qualifications data, end here */
+
+
+/* fetch all employers list api, start here */
+app.get("/all-employers-data", (req, res)=>{
+
+	connection.query("SELECT employer_details.*, employer_details.status as status, cities.name as city_name, company_domains.name as domain_name from employer_details LEFT JOIN cities on cities.id=employer_details.city_id LEFT JOIN company_domains on company_domains.id=employer_details.company_domain_id", (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+});
+/* fetch all employers list api, end here */
+
+/* fetch employers details api, start here */
+app.get("/employer-deatils/:id", (req, res)=>{
+
+	connection.query("SELECT employer_details.*, company_domains.name as domain_name, cities.name as city_name, states.name as state_name from employer_details LEFT JOIN company_domains on company_domains.id=employer_details.company_domain_id LEFT JOIN cities on cities.id=employer_details.city_id LEFT JOIN states on states.id=employer_details.state_id where employer_id=?",[req.params.id], (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+});
+/* fetch employers details api, end here */
+
+
+/* fetch employers posted jobs api, start here */
+app.get("/employer-post-jobs/:id", (req, res)=>{
+
+	connection.query("SELECT all_jobs.*, job_categories.name as job_types, working_days.name as working_days_name from all_jobs LEFT JOIN job_categories on job_categories.id=all_jobs.types_of_job_id LEFT JOIN working_days on working_days.id=all_jobs.working_days where all_jobs.employer_id=?",[req.params.id], (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+});
+/* fetch employers posted jobs api, end here */
+
+
+/* add new data in domain table, start here */
+app.post('/add-domian-data', async (req, res)=>{
+    
+    const data = req.body;
+    var name=req.body.name;
+
+	var sql = `INSERT INTO company_domains (name, status) VALUES ("${name}","1")`;
+  	connection.query(sql, function(error, result) {
+		
+		if(error) throw error;
+		
+		res.send(result);
+
+		console.log("1 record inserted");
+
+	});
+
+});
+/* add new data in domain table, end here */
+
+/* edit domain data, start here */
+app.get('/edit-domain/:id', async (req, res)=>{
+	
+	connection.query("SELECT * from company_domains where id="+req.params.id, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+
+});
+/* edit domain data, end here */
+
+/* update domain data, start here */
+app.put('/update-domain/:id', async (req, res)=>{
+	
+	var name=req.body.name;
+	const sql = `UPDATE company_domains set name="${name}" where id="${req.params.id}"`;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(error) throw error;
+
+		res.send(result);
+	}); 
+
+});
+/* update domain data, end here */
+
+
+/* update domain data, start here */
+app.get('/all-jobs', async (req, res)=>{
+	
+	connection.query("SELECT all_jobs.*, working_days.name as working_day_name, job_categories.name as job_type_name, employer_details.company_name as company_name from all_jobs LEFT JOIN working_days on working_days.id=all_jobs.working_days LEFT JOIN job_categories on job_categories.id=all_jobs.types_of_job_id LEFT JOIN employer_details on employer_details.employer_id=all_jobs.employer_id", (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+
+});
+/* update domain data, end here */
+
+/* add new data in job-categories table, start here */
+app.post('/add-job-categories-data', async (req, res)=>{
+    
+    const data = req.body;
+    var name=req.body.name;
+
+	var sql = `INSERT INTO job_categories (name, status) VALUES ("${name}","1")`;
+  	connection.query(sql, function(error, result) {
+		
+		if(error) throw error;
+		
+		res.send(result);
+
+		console.log("1 record inserted");
+
+	});
+
+});
+/* add new data in job-categories table, end here */
+
+/* edit job-categories data, start here */
+app.get('/edit-job-category/:id', async (req, res)=>{
+	
+	connection.query("SELECT * from job_categories where id="+req.params.id, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+
+});
+/* edit job-categories data, end here */
+
+/* update job-categories data, start here */
+app.put('/update-job-category/:id', async (req, res)=>{
+	
+	var name=req.body.name;
+	const sql = `UPDATE job_categories set name="${name}" where id="${req.params.id}"`;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(error) throw error;
+
+		res.send(result);
+	}); 
+
+});
+/* update job-categories data, end here */
+
+/* add new data in job-domain table, start here */
+app.post('/add-job-domain-data', async (req, res)=>{
+    
+    const data = req.body;
+    var name=req.body.name;
+
+	var sql = `INSERT INTO main_job_categories (name, status) VALUES ("${name}","1")`;
+  	connection.query(sql, function(error, result) {
+		
+		if(error) throw error;
+		
+		res.send(result);
+
+		console.log("1 record inserted");
+
+	});
+
+});
+/* add new data in job-domain table, end here */
+
+/* edit job-domain data, start here */
+app.get('/edit-job-domain/:id', async (req, res)=>{
+	
+	connection.query("SELECT * from main_job_categories where id="+req.params.id, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+
+});
+/* edit job-domain data, end here */
+
+/* update job-domain data, start here */
+app.put('/update-job-domain/:id', async (req, res)=>{
+	
+	var name=req.body.name;
+	const sql = `UPDATE main_job_categories set name="${name}" where id="${req.params.id}"`;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(error) throw error;
+
+		res.send(result);
+	}); 
+
+});
+/* update job-domain data, end here */
+
+
+/* add new data in notice_periods table, start here */
+app.post('/add-notice-period-data', async (req, res)=>{
+    
+    const data = req.body;
+    var name=req.body.name;
+
+	var sql = `INSERT INTO notice_periods (name, status) VALUES ("${name}","1")`;
+  	connection.query(sql, function(error, result) {
+		
+		if(error) throw error;
+		
+		res.send(result);
+
+		console.log("1 record inserted");
+
+	});
+
+});
+/* add new data in notice_periods table, end here */
+
+/* edit notice_periods data, start here */
+app.get('/edit-notice-period/:id', async (req, res)=>{
+	
+	connection.query("SELECT * from notice_periods where id="+req.params.id, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+
+});
+/* edit notice_periods data, end here */
+
+/* update notice_periods data, start here */
+app.put('/update-notice-period/:id', async (req, res)=>{
+	
+	var name=req.body.name;
+	const sql = `UPDATE notice_periods set name="${name}" where id="${req.params.id}"`;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(error) throw error;
+
+		res.send(result);
+	}); 
+
+});
+/* update notice_periods data, end here */
 
 app.listen(12345);

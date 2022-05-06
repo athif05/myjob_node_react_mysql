@@ -1,10 +1,63 @@
-import React from "react";
+import React, { useEffect, useState, useCallback} from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
+import Pagination from "../components/Pagination";
+import ReactTooltip from "react-tooltip";
 
 
 const AllJobLists = () => {
+
+    const [all_jobs, setAllJob] = useState([]);
+    const [cities, setCity] = useState([]);
+
+    useEffect(()=>{
+        getAllJob();
+        getCity();
+    });
+
+    const getAllJob = async ()=>{
+        let result = await fetch(`http://localhost:12345/all-jobs`);
+
+        result = await result.json();
+        setAllJob(result);
+    }
+
+    const getCity = async ()=>{
+        let result_city = await fetch(`http://localhost:12345/all-cities`);
+		result_city = await result_city.json();
+		setCity(result_city);
+    }
+
+    /* update status, start here */
+    const updateStatus = useCallback(async (tbl, val, id) => {
+        let result_status = await fetch(`http://localhost:12345/update-generic-status/${tbl}/${val}/${id}`);
+    }, getAllJob());
+    /* update status, end here */
+
+
+    /* soft delete, start here */
+    const softDelete = useCallback( async (tbl, val, id) => {
+        let result_soft_delete = await fetch(`http://localhost:12345/generic-soft-delete/${tbl}/${val}/${id}`);
+        result_soft_delete = await result_soft_delete.json();
+        console.log(result_soft_delete);
+    }, getAllJob());
+    /* soft delete, end here */
+
+
+    /* Pagination, start here */
+    const [showPerPage, setShowPerPage] = useState(10);
+    const [pagination, setPagination] = useState({
+        start: 0,
+        end: showPerPage,
+    });
+
+    const onPaginationChange = (start, end) => {
+        setPagination({ start: start, end: end });
+    };
+    /* Pagination, end here */
+
     return (
         <div className="container-scroller">
             <Header />
@@ -31,7 +84,6 @@ const AllJobLists = () => {
                                             <thead>
                                                 <tr>
                                                     <th className="ml-5">#</th>
-
                                                     <th>Company Name</th>
                                                     <th>Job Title</th>
                                                     <th>Salary</th>
@@ -45,41 +97,60 @@ const AllJobLists = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-
+                                            {
+                                                ((all_jobs.length>0) && (all_jobs[0].name!=='No record found') ? all_jobs.slice(pagination.start, pagination.end).map((item, index) =>
                                                 <tr>
-                                                    <td>1.</td>
+                                                    <td>{index+1}.</td>
                                                     <td>
-                                                        <a href="/single-employers-details">ITG</a>
-
+                                                        <Link to={"/employer-details/"+item.employer_id} target="_blank" data-tip="Click Here For Show Company Details" className="text-decoration-none">{item.company_name}</Link>
                                                     </td>
                                                     <td>
-                                                        <a href="/single-job-details"> Content Writer </a>
+                                                        <Link to={"/job-details/"+item.id} target="_blank" data-tip="Click Here For Show Job Details" className="text-decoration-none">{item.job_title}</Link>
+                                                        <ReactTooltip />
                                                     </td>
-                                                    <td>16K</td>
-                                                    <td>2</td>
+                                                    <td>{item.salary}</td>
+                                                    <td>{item.no_of_opening}</td>
                                                     <td>
-                                                        Noida
+                                                        {
+                                                            cities.map((item_city, index)=>
+                                                             (item_city.id===item.job_location_id) ? item_city.name : null
+                                                            )
+                                                        }
                                                     </td>
-                                                    <td>Noida</td>
-                                                    <td>Rotational Shift</td>
-                                                    <td>6 Days Working</td>
-                                                    <td>5+ Year Experience</td>
-                                                    <td>html,css,jquery,bootstrap</td>
-                                                </tr>
+                                                    <td>
+                                                        {
+                                                            cities.map((item_city, index)=>
+                                                             (item_city.id===item.city_id) ? item_city.name : null
+                                                            )
+                                                        }
+                                                    </td>
+                                                    <td>{item.job_type_name}</td>
+                                                    <td>{item.working_day_name}</td>
+                                                    <td>{item.experience_required}</td>
+                                                    <td>{item.skills}</td>
+                                                </tr>)
+                                                :
+                                                <tr>
+                                                    <td colspan={11}>No record found...</td>
+                                                </tr>)
+                                            }
                                             </tbody>
                                         </table>
 
                                         <div className="row">
                                             <div className="col-lg-12 text-center">
-                                                <div className="pagination-area">
-                                                    <nav>
-                                                        <ul className="page-numbers d-inline-flex">
-
-                                                            paging
-
-                                                        </ul>
-                                                    </nav>
-                                                </div>
+                                                {
+                                                    (((Math.ceil(all_jobs.length / showPerPage)) > 1) && (all_jobs[0].name !== 'No job found')) ?
+                                                        <div className="row paging_gap">
+                                                            <div className="col-lg-12 text-center">
+                                                                <div className="pagination-area">
+                                                                    <Pagination showPerPage={showPerPage} onPaginationChange={onPaginationChange} total={all_jobs.length} />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    :
+                                                    <></>
+                                                }  
                                             </div>
                                         </div>
 

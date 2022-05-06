@@ -25962,3 +25962,8 @@ div.tagsinput span.tag a {
 .paging_gap {
   margin-top:10px;
 }
+
+.invalid-input {
+  color: red;
+  font-size: 13px;
+}

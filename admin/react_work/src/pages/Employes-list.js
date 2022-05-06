@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import ReactTooltip from "react-tooltip";//use for show tooltip/title on href
 import Header from './../components/Header';
@@ -32,6 +32,21 @@ const EmployesList = () => {
         setPagination({ start: start, end: end});
     };
     /* Pagination, end here */
+
+
+    /* update status, start here */
+    const updateStatus = useCallback(async (tbl, val, id) => {
+        let result_status = await fetch(`http://localhost:12345/update-generic-status/${tbl}/${val}/${id}`);
+    }, getAllCandidates());
+    /* update status, end here */
+
+
+    /* soft delete, start here */
+    const softDelete = useCallback( async (tbl, val, id) => {
+        let result_soft_delete = await fetch(`http://localhost:12345/generic-soft-delete/${tbl}/${val}/${id}`);
+    }, getAllCandidates());
+    /* soft delete, end here */
+
 
     return(
 
@@ -98,19 +113,37 @@ const EmployesList = () => {
                                                     <td>Download</td>
                                                     <td>
 
+                                                        {
+                                                        (item.status==='1') ? 
+                                                            
                                                         <label class="toggle-switch toggle-switch-success">
-                                                            <input type="checkbox" checked />
+                                                            <input type="checkbox" onClick={()=>updateStatus('candidate_details','0',item.id)} checked/>
                                                             <span class="toggle-slider round"></span>												  
                                                         </label>
+                                                        : 
+                                                        <label class="toggle-switch toggle-switch-success">
+                                                            <input type="checkbox" onClick={()=>updateStatus('candidate_details','1',item.id)} />
+                                                            <span class="toggle-slider round"></span>												  
+                                                        </label>
+                                                        }
+                                                        
 
                                                     </td>
 
                                                     <td>
-
-                                                        <label class="toggle-switch toggle-switch-success">
-                                                            <input type="checkbox" checked/>
-                                                            <span class="toggle-slider round"></span>
-                                                        </label> 
+                                                        {
+                                                            (item.is_deleted==='1') ? 
+                                                            <label class="toggle-switch toggle-switch-success">
+                                                                <input type="checkbox"  onClick={()=>softDelete('candidate_details','0',item.id)} checked/>
+                                                                <span class="toggle-slider round"></span>
+                                                            </label>
+                                                            :
+                                                            <label class="toggle-switch toggle-switch-success">
+                                                                <input type="checkbox"  onClick={()=>softDelete('candidate_details','1',item.id)} />
+                                                                <span class="toggle-slider round"></span>
+                                                            </label>
+                                                        }
+                                                         
 
                                                     </td>					
                                                 </tr>)

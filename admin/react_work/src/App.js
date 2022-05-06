@@ -85,29 +85,29 @@ function App() {
 
               <Route path='/manage-qualifications' element={ <ManageQualifications /> }/>
               <Route path='/add-new-qualification' element={ <AddNewQualification /> }/>
-              <Route path='/edit-qualification' element={ <EditQualification /> }/>
+              <Route path='/edit-qualification/:id' element={ <EditQualification /> }/>
 
-              <Route path='/single-employers-details' element={ <SingleEmployersDetails /> }/>
+              <Route path='/employer-details/:id' element={ <SingleEmployersDetails /> }/>
               <Route path='/employers-list' element={ <EmployersList /> }/>
               <Route path='/job-details/:id' element={ <SingleJobDetails /> }/>
               
               <Route path='/manage-company-domains' element={ <ManageCompanyDomains /> }/>
               <Route path='/add-new-company-domain' element={ <AddNewCompanyDomain /> }/>
-              <Route path='/edit-company-domain' element={ <EditCompanyDomain /> }/>
+              <Route path='/edit-company-domain/:id' element={ <EditCompanyDomain /> }/>
               
               <Route path='/all-job-lists' element={ <AllJobLists /> }/>
 
               <Route path='/manage-job-categories' element={ <ManageJobCategories /> }/>
               <Route path='/add-new-job-categories' element={ <AddNewJobCategories /> }/>
-              <Route path='/edit-job-category' element={ <EditJobCategory /> }/>
+              <Route path='/edit-job-category/:id' element={ <EditJobCategory /> }/>
 
               <Route path='/manage-job-domains' element={ <ManageJobDomains /> }/>
               <Route path='/add-new-main-job-domain' element={ <AddNewMainJobDomain /> }/>
-              <Route path='/edit-main-job-domain' element={ <EditMainJobDomain /> }/>
+              <Route path='/edit-main-job-domain/:id' element={ <EditMainJobDomain /> }/>
 
               <Route path='/manage-notice-periods' element={ <ManageNoticePeriods /> }/>
               <Route path='/add-new-notice-period' element={ <AddNewNoticePeriod /> }/>
-              <Route path='/edit-notice-period' element={ <EditNoticePeriod /> }/>
+              <Route path='/edit-notice-period/:id' element={ <EditNoticePeriod /> }/>
 
               <Route path='/manage-fee-charge-reasons' element={ <ManageFeeChargeReasons /> }/>
               <Route path='/add-new-fee-charge-reason' element={ <AddNewFeeChargeReason /> }/>
