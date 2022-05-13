@@ -7,7 +7,7 @@ import Footer from "../components/Footer";
 const EditNoticePeriod = () => {
 
     const [name, setName] = useState();
-    const [error, setError] = useState();
+    const [error, setError] = useState(false);
 
     const params = useParams();
 

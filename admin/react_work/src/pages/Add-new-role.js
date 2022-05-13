@@ -1,9 +1,35 @@
-import React from "react";
+import React, {useState} from "react";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 
 const AddNewRole = () => {
+
+    const [name, setName] = useState();
+    const [error, setError] = useState(false);
+    const [success, setSuccess] = useState(false);
+
+    const addRole = async()=>{
+        if(!name){
+            setError(true);
+            setSuccess(false);
+            return false;
+        }
+
+        const tbl = 'roles';
+        let result = await fetch(`http://localhost:12345/add-generic-data/${tbl}`,{
+            method:"post",
+            body:JSON.stringify({name}),
+            headers:{
+                "Content-Type":"application/json"
+            }
+        });
+
+        result = await result.json();
+        setError(false);
+        setSuccess(true);
+        setName('');
+    }
 
     return (
 
@@ -23,22 +49,21 @@ const AddNewRole = () => {
 
                                 <div className="card-body">
 
-                                    <h4 className="card-title">Add New Role</h4>
-                                    <form method="post" action="" className="forms-sample">
-                                    
+                                    <h4 className="card-title">Add New Role</h4>                                    
+                                    {success && <div class="alert alert-success" role="alert">Added Successfully</div>}
 
                                         <div className="form-group">
                                             <label for="name">Role Name</label>
-                                            <input type="text" className="form-control" id="name" name="name" placeholder="Name" value="" />
+                                            <input type="text" className="form-control" id="name" name="name" placeholder="Name" value={name} onChange={(e)=>setName(e.target.value)}/>
+                                            {error && !name && <span className="invalid-input">Enter valid name</span> }
                                         </div>
 
-                                        <button type="submit" className="btn btn-primary mr-2">Submit</button>
+                                        <button type="submit" className="btn btn-primary mr-2" onClick={addRole}>Submit</button>
 
                                         <a href="/manage-role">
                                             <span className="btn btn-light">Cancel</span>
                                         </a>
 
-                                    </form>
                                 </div>
                             </div>
                         </div>

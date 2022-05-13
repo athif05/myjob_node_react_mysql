@@ -111,27 +111,27 @@ function App() {
 
               <Route path='/manage-fee-charge-reasons' element={ <ManageFeeChargeReasons /> }/>
               <Route path='/add-new-fee-charge-reason' element={ <AddNewFeeChargeReason /> }/>
-              <Route path='/edit-fee-charge-reason' element={ <EditFeeChargeReason /> }/>
+              <Route path='/edit-fee-charge-reason/:id' element={ <EditFeeChargeReason /> }/>
 
               <Route path='/manage-working-days' element={ <ManageWorkingDays /> }/>
               <Route path='/add-new-working-day' element={ <AddNewWorkingDay /> }/>
-              <Route path='/edit-working-day' element={ <EditWorkingDay /> }/>
+              <Route path='/edit-working-day/:id' element={ <EditWorkingDay /> }/>
 
               <Route path='/manage-work-experiance' element={ <ManageWorkExperiance /> }/>
               <Route path='/add-new-work-experiance' element={ <AddNewWorkExperiance /> }/>
-              <Route path='/edit-work-experiance' element={ <EditWorkExperiance /> }/>
+              <Route path='/edit-work-experiance/:id' element={ <EditWorkExperiance /> }/>
 
               <Route path='/states' element={ <ManageStates /> }/>
               <Route path='/add-new-state' element={ <AddNewState /> }/>
-              <Route path='/edit-state' element={ <EditState /> }/>
+              <Route path='/edit-state/:id' element={ <EditState /> }/>
 
               <Route path='/cities' element={ <ManageCities /> }/>
               <Route path='/add-new-city' element={ <AddNewCity /> }/>
-              <Route path='/edit-city' element={ <EditCity /> }/>
+              <Route path='/edit-city/:id' element={ <EditCity /> }/>
 
               <Route path='/manage-role' element={ <ManageRole /> }/>
               <Route path='/add-new-role' element={ <AddNewRole /> }/>
-              <Route path='/edit-role' element={ <EditRole /> }/>
+              <Route path='/edit-role/:id' element={ <EditRole /> }/>
 
               <Route path='/manage-admin-account' element={ <ManageAdminAccount /> }/>
               <Route path='/add-new-admin-account' element={ <AddNewAdminAccount /> }/>

@@ -278,7 +278,17 @@ app.get("/generic-soft-delete/:tbl/:val/:id", (req, res) =>{
 app.get("/all-generic-data/:tbl", (req, res)=>{
 
 	var tbl_name = req.params.tbl;
-	const sql="SELECT * from "+tbl_name+" order by name asc";
+
+	let sql="";
+
+	if(tbl_name==='states'){
+		sql="SELECT * from "+tbl_name+" where countries_id='101' order by name asc";
+	} else if(tbl_name==='cities'){
+		sql="SELECT * from "+tbl_name+" where country_id='101' order by name asc";
+	} else {
+		sql="SELECT * from "+tbl_name+" order by name asc";
+	}
+
 	connection.query(sql, (error, result)=>{
 		if(result.length > 0){
 			res.send(result);
@@ -593,5 +603,133 @@ app.put('/update-notice-period/:id', async (req, res)=>{
 
 });
 /* update notice_periods data, end here */
+
+
+/* add new data in fee-charge-reason table, start here */
+app.post('/add-fee-charge-reason', async (req, res)=>{
+    
+    const data = req.body;
+    var name=req.body.name;
+
+	var sql = `INSERT INTO fee_charged_reasons (name, status) VALUES ("${name}","1")`;
+  	connection.query(sql, function(error, result) {
+		
+		if(error) throw error;
+		
+		res.send(result);
+
+		console.log("1 record inserted");
+
+	});
+
+});
+/* add new data in fee-charge-reason table, end here */
+
+/* edit fee-charge-reason data, start here */
+app.get('/edit-fee-charge-reason/:id', async (req, res)=>{
+	
+	connection.query("SELECT * from fee_charged_reasons where id="+req.params.id, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+
+});
+/* edit fee-charge-reason data, end here */
+
+/* update fee-charge-reason data, start here */
+app.put('/update-fee-charge-reason/:id', async (req, res)=>{
+	
+	var name=req.body.name;
+	const sql = `UPDATE fee_charged_reasons set name="${name}" where id="${req.params.id}"`;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(error) throw error;
+
+		res.send(result);
+	}); 
+
+});
+/* update fee-charge-reason data, end here */
+
+
+/* add new generic data in table, start here */
+app.post('/add-generic-data/:tbl', async (req, res)=>{
+    
+    const data = req.body;
+    var name=req.body.name;
+
+	let sql="";
+
+	if(req.params.tbl==='states'){
+		sql = `INSERT INTO `+req.params.tbl+` (name, countries_id, status) VALUES ("${name}","101","1")`;
+	} else {
+		sql = `INSERT INTO `+req.params.tbl+` (name, status) VALUES ("${name}","1")`;
+	}
+
+	
+  	connection.query(sql, function(error, result) {
+		
+		if(error) throw error;
+		
+		res.send(result);
+
+		console.log("1 record inserted");
+
+	});
+
+});
+/* add new generic data in table, end here */
+
+/* edit generic table data, start here */
+app.get('/edit-generic-table/:tbl/:id', async (req, res)=>{
+	
+	connection.query("SELECT * from "+req.params.tbl+" where id="+req.params.id, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+
+});
+/* edit generic table data, end here */
+
+
+/* update generic table data, start here */
+app.put('/update-generic-table/:tbl/:id', async (req, res)=>{
+	
+	var name=req.body.name;
+	const sql = `UPDATE `+req.params.tbl+` set name="${name}" where id="${req.params.id}"`;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(error) throw error;
+
+		res.send(result);
+	}); 
+
+});
+/* update generic table data, end here */
+
+
+/* update cities data, start here */
+app.put('/update-city/:id', async (req, res)=>{
+	
+	var name=req.body.name;
+	var state_id=req.body.state_id;
+
+	const sql = `UPDATE cities set name="${name}",state_id="${state_id}" where id="${req.params.id}"`;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(error) throw error;
+
+		res.send(result);
+	}); 
+
+});
+/* update cities data, end here */
+
 
 app.listen(12345);

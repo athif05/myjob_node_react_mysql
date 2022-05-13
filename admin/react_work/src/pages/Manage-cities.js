@@ -1,10 +1,51 @@
-import React from "react";
+import React, {useEffect, useState, useCallback} from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
-
+import Pagination from "../components/Pagination";
 
 const ManageCities = () => {
+
+    const [cities, setCities] = useState([]);
+
+    useEffect(()=>{
+        getCities();
+    });
+
+    //fetch all data from DB table
+    const getCities = async()=>{
+        const tbl = 'cities';
+        let result = await fetch(`http://localhost:12345/all-generic-data/${tbl}`);
+        result = await result.json();
+        setCities(result);
+    }
+
+    /* update status, start here */
+    const updateStatus = useCallback(async (tbl, val, id) => {
+        let result_status = await fetch(`http://localhost:12345/update-generic-status/${tbl}/${val}/${id}`);
+    }, getCities());
+    /* update status, end here */
+
+
+    /* soft delete, start here */
+    const softDelete = useCallback( async (tbl, val, id) => {
+        let result_soft_delete = await fetch(`http://localhost:12345/generic-soft-delete/${tbl}/${val}/${id}`);
+    }, getCities());
+    /* soft delete, end here */
+
+    /* Pagination, start here */
+    const [showPerPage, setShowPerPage] = useState(10);
+    const [pagination, setPagination] = useState({
+        start: 0,
+        end: showPerPage,
+    });
+
+    const onPaginationChange = (start, end) => {
+        setPagination({ start: start, end: end });
+    };
+    /* Pagination, end here */
+
     return (
         <div className="container-scroller">
             <Header />
@@ -41,59 +82,84 @@ const ManageCities = () => {
                                             <thead>
                                                 <tr>
                                                     <th className="ml-5">#</th>
-                                                    <th>Name</th>
+                                                    <th>City Name</th>
                                                     <th>Actions</th>
                                                     <th>Status</th>
                                                     <th>Delete</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                
+                                            { ((cities.length>0) && (cities[0].name!=='No record found') ? cities.slice(pagination.start, pagination.end).map((item, index)=>
                                                 <tr>
-                                                    <td>1.</td>
-                                                    <td>Noida</td>
+                                                    <td>{index+1}.</td>
+                                                    <td>{item.name}</td>
                                                     <td>
                                                         <div className="d-flex align-items-center">
-                                                            <a href="/edit-city">
+                                                            <Link to={"/edit-city/"+item.id}>
                                                                 <button type="button" className="btn btn-success btn-sm btn-icon-text mr-3">
                                                                     Edit
                                                                     <i className="typcn typcn-edit btn-icon-append"></i>
                                                                 </button>
-                                                            </a>
+                                                            </Link>
                                                         </div>
                                                     </td>
                                                     <td>
 
-                                                        <label className="toggle-switch toggle-switch-success">
-                                                            <input type="checkbox" id="category_1" checked/>
-                                                            <span className="toggle-slider round"></span>
-                                                        </label>
+                                                    {
+                                                            (item.status==='1') ? 
+                                                                
+                                                            <label class="toggle-switch toggle-switch-success">
+                                                                <input type="checkbox" onClick={()=>updateStatus('cities','0',item.id)} checked/>
+                                                                <span class="toggle-slider round"></span>												  
+                                                            </label>
+                                                            : 
+                                                            <label class="toggle-switch toggle-switch-success">
+                                                                <input type="checkbox" onClick={()=>updateStatus('cities','1',item.id)} />
+                                                                <span class="toggle-slider round"></span>												  
+                                                            </label>
+                                                        }
 
                                                     </td>
                                                     <td>
 
-                                                        <label className="toggle-switch toggle-switch-success">
-                                                            <input type="checkbox" id="category_del_1" />
-                                                            <span className="toggle-slider round"></span>
-                                                        </label>
+                                                    {
+                                                            (item.is_deleted==='1') ? 
+                                                            <label class="toggle-switch toggle-switch-success">
+                                                                <input type="checkbox" onClick={()=>softDelete('cities','0',item.id)} checked/>
+                                                                <span class="toggle-slider round"></span>
+                                                            </label>
+                                                            :
+                                                            <label class="toggle-switch toggle-switch-success">
+                                                                <input type="checkbox" onClick={()=>softDelete('cities','1',item.id)} />
+                                                                <span class="toggle-slider round"></span>
+                                                            </label>
+                                                        }
 
                                                     </td>
-                                                </tr>
+                                                    </tr>)
+                                                :
+                                                <tr>
+                                                    <td colSpan={5}>No record found...</td>
+                                                </tr>)  
+                                                }
                                                                                                 
                                             </tbody>
                                         </table>
 
                                         <div className="row">
                                             <div className="col-lg-12 text-center">
-                                                <div className="pagination-area">
-                                                    <nav>
-                                                        <ul className="page-numbers d-inline-flex">
-
-                                                            paging
-
-                                                        </ul>
-                                                    </nav>
-                                                </div>
+                                                {
+                                                    (((Math.ceil(cities.length / showPerPage)) > 1) && (cities[0].name !== 'No record found')) ?
+                                                        <div className="row paging_gap">
+                                                            <div className="col-lg-12 text-center">
+                                                                <div className="pagination-area">
+                                                                    <Pagination showPerPage={showPerPage} onPaginationChange={onPaginationChange} total={cities.length} />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    :
+                                                    <></>
+                                                }  
                                             </div>
                                         </div>
 

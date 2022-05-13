@@ -1,9 +1,50 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 
 const EditState = () => {
+
+    const [name, setName] = useState();
+    const [error, setError] = useState(false);
+
+    const params = useParams();
+
+    useEffect(()=>{
+        getEditState();
+    },[]);
+
+    const getEditState = async()=>{
+        const tbl = 'states';
+        let result = await fetch(`http://localhost:12345/edit-generic-table/${tbl}/${params.id}`);
+        result = await result.json();
+        setName(result[0].name);
+    }
+
+    const navigate = useNavigate();
+
+    const updateState = async()=>{
+
+        if(!name){
+            setError(true);
+            return false;
+        }
+
+        const tbl = 'states';
+        let result = await fetch(`http://localhost:12345/update-generic-table/${tbl}/${params.id}`,{
+            method:"put",
+            body:JSON.stringify({name}),
+            headers:{
+                "Content-Type":"application/json"
+            }
+        });
+
+        result = await result.json();
+
+        navigate("/states");
+
+    }
 
     return(
 
@@ -23,23 +64,20 @@ const EditState = () => {
                         
                             <div className="card-body text-left">
                             
-                                <h4 className="card-title">Edit State</h4>
-                                <form method="post" action="" className="forms-sample">
-                                
+                                <h4 className="card-title">Edit State</h4>                                
 
                                 <div className="form-group">
                                     <label for="name">State Name</label>
-                                    <input type="text" className="form-control" id="name" name="name" placeholder="Name" value=""/>
-                                    
+                                    <input type="text" className="form-control" id="name" name="name" placeholder="Name"  defaultValue={name} onChange={(e)=>setName(e.target.value)}/>
+                                    {error && !name && <span className="invalid-input">Enter valid name</span> }
                                 </div>
                                 
-                                <button type="submit" className="btn btn-primary mr-2">Update</button>
+                                <button type="submit" className="btn btn-primary mr-2" onClick={updateState}>Update</button>
                                 
                                 <a href="/states">
                                     <span className="btn btn-light">Cancel</span>
                                 </a>
                                 
-                                </form>
                             </div>
                             </div>
                         </div>

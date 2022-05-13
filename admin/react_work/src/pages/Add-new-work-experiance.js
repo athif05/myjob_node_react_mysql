@@ -1,9 +1,35 @@
-import React from "react";
+import React, {useState} from "react";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 
 const AddNewWorkExperiance = () => {
+
+    const [name, setName] = useState();
+    const [error, setError] = useState(false);
+    const [success, setSuccess] = useState(false);
+
+    const addWorkExperiance = async()=>{
+        if(!name){
+            setError(true);
+            setSuccess(false);
+            return false;
+        }
+
+        const tbl = 'work_experiences';
+        let result = await fetch(`http://localhost:12345/add-generic-data/${tbl}`,{
+            method:"post",
+            body:JSON.stringify({name}),
+            headers:{
+                "Content-Type":"application/json"
+            }
+        });
+
+        result = await result.json();
+        setError(false);
+        setSuccess(true);
+        setName('');
+    }
 
     return(
 
@@ -24,22 +50,20 @@ const AddNewWorkExperiance = () => {
                             <div className="card-body text-left">
                             
                                 <h4 className="card-title">Add New Work Experiance</h4>
-                                <form method="post" action="" className="forms-sample">
-                                
+                                {success && <div class="alert alert-success" role="alert">Added Successfully</div>}
 
                                 <div className="form-group">
                                     <label for="name">Work Experiance Name</label>
-                                    <input type="text" className="form-control" id="name" name="name" placeholder="Fee Charge Reason" value=""/>
-                                    
+                                    <input type="text" className="form-control" id="name" name="name" placeholder="Fee Charge Reason" value={name} onChange={(e)=>setName(e.target.value)}/>
+                                    {error && !name && <span className="invalid-input">Enter valid name</span> }
                                 </div>
                                 
-                                <button type="submit" className="btn btn-primary mr-2">Submit</button>
+                                <button type="submit" className="btn btn-primary mr-2" onClick={addWorkExperiance}>Submit</button>
                                 
                                 <a href="/manage-work-experiance">
                                     <span className="btn btn-light">Cancel</span>
                                 </a>
                                 
-                                </form>
                             </div>
                             </div>
                         </div>
