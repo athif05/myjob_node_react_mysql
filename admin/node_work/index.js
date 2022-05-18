@@ -2,15 +2,23 @@ const express = require('express');
 const cors = require('cors');
 const connection = require('./db/config');
 const { application } = require('express');
+const path = require('path');
+const multer = require('multer'); //use for upload image/file
+const fileupload = require("express-fileupload");
+const bodyParser = require('body-parser');
+
 const app = express();
 
 app.use(express.json());
 app.use(cors());
+app.use(fileupload());
+app.use(express.static("./public_html"));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }))
 
 app.get('/', (req, res)=>{
     res.send('Node is working...');
 });
-
 
 /* login api, start here */
 app.post("/login", (req, res)=>{
@@ -216,6 +224,42 @@ app.get("/all-cities", (req, res)=>{
 /* fetch city api, end here */
 
 
+/* fetch city api, start here */
+app.get("/all-cities-data", (req, res)=>{
+
+	connection.query("SELECT cities.*, states.name as state_name from cities LEFT JOIN states on states.id=cities.state_id where cities.country_id='101' order by cities.name asc", (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+});
+/* fetch city api, end here */
+
+
+/* add new data in city table, start here */
+app.post('/add-new-city', async (req, res)=>{
+    
+    const data = req.body;
+    var name=req.body.name;
+	var state_id=req.body.state_id;
+
+	var sql = `INSERT INTO cities (name, state_id, country_id, status) VALUES ("${name}","${state_id}","101","1")`;
+  	connection.query(sql, function(error, result) {
+		
+		if(error) throw error;
+		
+		res.send(result);
+
+		console.log("1 record inserted");
+
+	});
+
+});
+/* add new data in city table, end here */
+
+
 /* fetch qualifications api, start here */
 app.get("/all-qualifications", (req, res)=>{
 
@@ -285,10 +329,12 @@ app.get("/all-generic-data/:tbl", (req, res)=>{
 		sql="SELECT * from "+tbl_name+" where countries_id='101' order by name asc";
 	} else if(tbl_name==='cities'){
 		sql="SELECT * from "+tbl_name+" where country_id='101' order by name asc";
+	} else if(tbl_name==='aboutuses'){
+		sql="SELECT * from "+tbl_name+" order by title asc";
 	} else {
 		sql="SELECT * from "+tbl_name+" order by name asc";
 	}
-
+	
 	connection.query(sql, (error, result)=>{
 		if(result.length > 0){
 			res.send(result);
@@ -731,5 +777,297 @@ app.put('/update-city/:id', async (req, res)=>{
 });
 /* update cities data, end here */
 
+
+/* show all admin accounts api, start here */
+app.get("/admin-accounts", (req, res)=>{
+
+	connection.query("SELECT admin_users.*, roles.name as role_name FROM admin_users LEFT JOIN roles on roles.id=admin_users.role_id", (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No job found"}]);
+		}
+	});
+});
+/* show all admin accounts api, end here */
+
+
+/* add new admin account in table, start here */
+app.post('/add-admin-account', async (req, res)=>{
+    
+    const data = req.body;
+    var name=req.body.name;
+	var email=req.body.email;
+	var mobile=req.body.mobile;
+	var password=req.body.password;
+	var role_id=req.body.role_id;
+	
+	sql = `INSERT INTO admin_users (name, email, mobile_number, password, role_id, status) VALUES ("${name}","${email}","${mobile}","${password}","${role_id}","1")`;
+	console.log(sql);
+  	connection.query(sql, function(error, result) {
+		
+		if(error) throw error;
+		
+		res.send(result);
+
+		console.log("1 record inserted");
+
+	});
+
+});
+/* add new admin account in table, end here */
+
+/* update admin account data, start here */
+app.put('/update-admin-account/:id', async (req, res)=>{
+	
+	var name=req.body.name;
+	var email=req.body.email;
+	var mobile=req.body.mobile;
+	var password=req.body.password;
+	var role_id=req.body.role_id;
+
+	const sql = `UPDATE admin_users set name="${name}",email="${email}",mobile_number="${mobile}",password="${password}",role_id="${role_id}" where id="${req.params.id}"`;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(error) throw error;
+
+		res.send(result);
+	}); 
+
+});
+/* update admin account data, end here */
+
+
+//! Use of Multer
+var storage = multer.diskStorage({
+    destination: (req, file, callBack) => {
+        callBack(null, './public_html/uploads/')     // directory name where save the file
+    },
+    filename: (req, file, callBack) => {
+        callBack(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+    }
+})
+ 
+var upload = multer({
+    storage: storage
+});
+
+/* update website about us, start here */
+app.post('/update-about-us', upload.single('image'), (req, res)=>{
+	console.log(req.body.title);
+	if (!req.file) {
+        console.log("No file upload");
+    } else {
+        console.log(req.file.filename)
+        var imgsrc = 'http://127.0.0.1:12345/images/' + req.file.filename
+        var insertData = "INSERT INTO aboutuses(image)VALUES(?)"
+        connection.query(insertData, [imgsrc], (err, result) => {
+            if (err) throw err
+            console.log("file uploaded")
+        })
+    }
+
+	
+	//var title=req.body.title;
+	//var description=req.body.description;
+	
+	
+	/* const sql = `UPDATE aboutuses set title="${title}",description="${description}" where id="1"`;
+	//console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(error) throw error;
+
+		res.send(result);
+	}); */
+	
+
+});
+/* update website about us, end here */
+
+
+/* edit blog category data, start here */
+app.get('/edit-blog-category/:id', async (req, res)=>{
+	
+	connection.query("SELECT * from blog_categories where id="+req.params.id, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+
+});
+/* edit blog category data, end here */
+
+/* update blog category data, start here */
+app.put('/update-blog-category/:id', async (req, res)=>{
+	
+	var name=req.body.name;
+
+	const sql = `UPDATE blog_categories set name="${name}" where id="${req.params.id}"`;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(error) throw error;
+
+		res.send(result);
+	}); 
+
+});
+/* update blog category data, end here */
+
+
+/* add new data in blog category table, start here */
+app.post('/add-blog-category', async (req, res)=>{
+    
+    const data = req.body;
+    var name=req.body.name;
+
+	var sql = `INSERT INTO blog_categories (name, status) VALUES ("${name}","1")`;
+  	connection.query(sql, function(error, result) {
+		
+		if(error) throw error;
+		
+		res.send(result);
+
+		console.log("1 record inserted");
+
+	});
+
+});
+/* add new data in blog category table, end here */
+
+/* show all authors api, start here */
+app.get("/all-authors-data", (req, res)=>{
+
+	connection.query("SELECT authors.*, blog_categories.name as blog_name FROM authors LEFT JOIN blog_categories on blog_categories.id=authors.blog_category_id", (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+});
+/* show all authors api, end here */
+
+/* add new author in table, start here */
+app.post('/add-author', async (req, res)=>{
+    
+    const data = req.body;
+    var name=req.body.name;
+	var email=req.body.email;
+	var mobile_number=req.body.mobile_number;
+	var alternate_number=req.body.alternate_number;
+	var address=req.body.address;
+	var blog_category_id=req.body.blog_category_id;
+	
+	sql = `INSERT INTO authors (name, email, mobile_number, alternate_number, address, blog_category_id, status) VALUES ("${name}","${email}","${mobile_number}","${alternate_number}","${address}","${blog_category_id}","1")`;
+	console.log(sql);
+  	connection.query(sql, function(error, result) {
+		
+		if(error) throw error;
+		
+		res.send(result);
+
+		console.log("1 record inserted");
+
+	});
+
+});
+/* add new author in table, end here */
+
+/* update author api, start here */
+app.put('/update-author/:id', async (req, res)=>{
+	
+	var name=req.body.name;
+	var email=req.body.email;
+	var mobile_number=req.body.mobile_number;
+	var alternate_number=req.body.alternate_number;
+	var address=req.body.address;
+	var blog_category_id=req.body.blog_category_id;
+
+	const sql = `UPDATE authors set name="${name}",email="${email}",mobile_number="${mobile_number}",alternate_number="${alternate_number}",address="${address}",blog_category_id="${blog_category_id}" where id="${req.params.id}"`;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(error) throw error;
+
+		res.send(result);
+	}); 
+
+});
+/* update author api, start here */
+
+
+/* show all blogs api, start here */
+app.get("/all-blogs-data", (req, res)=>{
+
+	const sql = "SELECT blogs.*, blog_categories.name as blog_category_name, authors.name as author_name FROM blogs LEFT JOIN blog_categories on blog_categories.id=blogs.blog_category_id LEFT JOIN authors on authors.id=blogs.author_id ";
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+});
+/* show all blogs api, end here */
+
+/* add new blog in table, start here */
+app.post('/add-blog', async (req, res)=>{
+    
+    const data = req.body;
+    var title=req.body.title;
+	var description=req.body.description;
+	var blog_category_id=req.body.blog_category_id;
+	var author_id=req.body.author_id;
+	
+	sql = `INSERT INTO blogs (title, description, author_id, blog_category_id, status) VALUES ("${title}","${description}","${author_id}","${blog_category_id}","1")`;
+	console.log(sql);
+  	connection.query(sql, function(error, result) {
+		
+		if(error) throw error;
+		
+		res.send(result);
+
+		console.log("1 record inserted");
+
+	});
+
+});
+/* add new blog in table, end here */
+
+/* edit blog data, start here */
+app.get('/edit-blog/:id', async (req, res)=>{
+	
+	connection.query("SELECT * from blogs where id="+req.params.id, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+
+});
+/* edit blog data, end here */
+
+
+/* update blog api, start here */
+app.put('/update-blog/:id', async (req, res)=>{
+	
+	var title=req.body.title;
+	var description=req.body.description;
+	var blog_category_id=req.body.blog_category_id;
+	var author_id=req.body.author_id;
+
+	const sql = `UPDATE blogs set title="${title}",description="${description}",blog_category_id="${blog_category_id}",author_id="${author_id}" where id="${req.params.id}"`;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(error) throw error;
+
+		res.send(result);
+	}); 
+
+});
+/* update blog api, start here */
 
 app.listen(12345);

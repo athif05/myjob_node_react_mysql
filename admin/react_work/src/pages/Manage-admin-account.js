@@ -1,10 +1,52 @@
-import React from "react";
+import React, { useState, useEffect, useCallback} from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
+import Pagination from "../components/Pagination";
 
 
 const ManageAdminAccount = () => {
+
+    const [admin_accounts, setAdminAccounts] = useState([]);
+
+    useEffect(()=>{
+        getAdminAccounts();
+    });
+
+    /* fetch all admin accounts from database, start here */
+    const getAdminAccounts = async()=>{
+        let result = await fetch(`http://localhost:12345/admin-accounts`);
+        result = await result.json();
+        setAdminAccounts(result);
+    }
+    /* fetch all admin accounts from database, end here */
+
+    /* update status, start here */
+    const updateStatus = useCallback(async (tbl, val, id) => {
+        let result_status = await fetch(`http://localhost:12345/update-generic-status/${tbl}/${val}/${id}`);
+    }, getAdminAccounts());
+    /* update status, end here */
+
+
+    /* soft delete, start here */
+    const softDelete = useCallback( async (tbl, val, id) => {
+        let result_soft_delete = await fetch(`http://localhost:12345/generic-soft-delete/${tbl}/${val}/${id}`);
+    }, getAdminAccounts());
+    /* soft delete, end here */
+
+    /* Pagination, start here */
+    const [showPerPage, setShowPerPage] = useState(10);
+    const [pagination, setPagination] = useState({
+        start: 0,
+        end: showPerPage,
+    });
+
+    const onPaginationChange = (start, end) => {
+        setPagination({ start: start, end: end });
+    };
+    /* Pagination, end here */
+
     return (
         <div className="container-scroller">
             <Header />
@@ -51,55 +93,81 @@ const ManageAdminAccount = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                
+                                                {
+                                                    (((admin_accounts.length>0) && admin_accounts[0].name!=='No record found') ? admin_accounts.slice(pagination.start, pagination.end).map((item, index)=>
                                                 <tr>
-                                                    <td>1.</td>
-                                                    <td>Admin</td>
-                                                    <td>admin@gmail.com</td>
-                                                    <td>7890898990</td>
-                                                    <td>Admin</td>
+                                                    <td>{index+1}.</td>
+                                                    <td>{item.name}</td>
+                                                    <td>{item.email}</td>
+                                                    <td>{item.mobile_number}</td>
+                                                    <td>{item.role_name}</td>
                                                     <td>
                                                         <div className="d-flex align-items-center">
-                                                            <a href="/edit-admin-account">
+                                                            <Link to={"/edit-admin-account/"+item.id}>
                                                                 <button type="button" className="btn btn-success btn-sm btn-icon-text mr-3">
                                                                     Edit
                                                                     <i className="typcn typcn-edit btn-icon-append"></i>
                                                                 </button>
-                                                            </a>
+                                                            </Link>
                                                         </div>
                                                     </td>
                                                     <td>
 
-                                                        <label className="toggle-switch toggle-switch-success">
-                                                            <input type="checkbox" id="category_1" checked/>
-                                                            <span className="toggle-slider round"></span>
-                                                        </label>
+                                                        {
+                                                            (item.status==='1') ? 
+                                                                
+                                                            <label class="toggle-switch toggle-switch-success">
+                                                                <input type="checkbox" onClick={()=>updateStatus('admin_users','0',item.id)} checked/>
+                                                                <span class="toggle-slider round"></span>												  
+                                                            </label>
+                                                            : 
+                                                            <label class="toggle-switch toggle-switch-success">
+                                                                <input type="checkbox" onClick={()=>updateStatus('admin_users','1',item.id)} />
+                                                                <span class="toggle-slider round"></span>												  
+                                                            </label>
+                                                        }
 
                                                     </td>
                                                     <td>
 
-                                                        <label className="toggle-switch toggle-switch-success">
-                                                            <input type="checkbox" id="category_del_1" />
-                                                            <span className="toggle-slider round"></span>
-                                                        </label>
+                                                        {
+                                                            (item.is_deleted==='1') ? 
+                                                            <label class="toggle-switch toggle-switch-success">
+                                                                <input type="checkbox" onClick={()=>softDelete('admin_users','0',item.id)} checked/>
+                                                                <span class="toggle-slider round"></span>
+                                                            </label>
+                                                            :
+                                                            <label class="toggle-switch toggle-switch-success">
+                                                                <input type="checkbox" onClick={()=>softDelete('admin_users','1',item.id)} />
+                                                                <span class="toggle-slider round"></span>
+                                                            </label>
+                                                        }
 
                                                     </td>
-                                                </tr>
+                                                </tr>)
+                                                :
+                                                <tr>
+                                                    <td colSpan={5}>No record found...</td>
+                                                </tr>)
+                                                }      
                                                                                                 
                                             </tbody>
                                         </table>
 
                                         <div className="row">
                                             <div className="col-lg-12 text-center">
-                                                <div className="pagination-area">
-                                                    <nav>
-                                                        <ul className="page-numbers d-inline-flex">
-
-                                                            paging
-
-                                                        </ul>
-                                                    </nav>
-                                                </div>
+                                                {
+                                                    (((Math.ceil(admin_accounts.length / showPerPage)) > 1) && (admin_accounts[0].name !== 'No record found')) ?
+                                                        <div className="row paging_gap">
+                                                            <div className="col-lg-12 text-center">
+                                                                <div className="pagination-area">
+                                                                    <Pagination showPerPage={showPerPage} onPaginationChange={onPaginationChange} total={admin_accounts.length} />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    :
+                                                    <></>
+                                                }  
                                             </div>
                                         </div>
 

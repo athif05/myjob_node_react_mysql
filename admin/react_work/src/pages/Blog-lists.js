@@ -1,10 +1,50 @@
-import React from "react";
+import React, { useCallback, useEffect, useState} from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
-
+import Pagination from "../components/Pagination";
 
 const BlogLists = () => {
+
+    const [blogs, setBlogs] = useState([]);
+
+    useEffect(()=>{
+        getBlogs();
+    });
+
+    const getBlogs = async()=>{
+        let result = await fetch(`http://localhost:12345/all-blogs-data`);
+        result = await result.json();
+        setBlogs(result);
+    }
+
+    /* update status, start here */
+    const updateStatus = useCallback(async (tbl, val, id) => {
+        let result_status = await fetch(`http://localhost:12345/update-generic-status/${tbl}/${val}/${id}`);
+    }, getBlogs());
+    /* update status, end here */
+
+
+    /* soft delete, start here */
+    const softDelete = useCallback( async (tbl, val, id) => {
+        let result_soft_delete = await fetch(`http://localhost:12345/generic-soft-delete/${tbl}/${val}/${id}`);
+    }, getBlogs());
+    /* soft delete, end here */
+
+
+    /* Pagination, start here */
+    const [showPerPage, setShowPerPage] = useState(10);
+    const [pagination, setPagination] = useState({
+        start: 0,
+        end: showPerPage,
+    });
+
+    const onPaginationChange = (start, end) => {
+        setPagination({ start: start, end: end });
+    };
+    /* Pagination, end here */
+
     return (
         <div className="container-scroller">
             <Header />
@@ -53,57 +93,81 @@ const BlogLists = () => {
                                             </thead>
                                             <tbody>
                                                 
+                                            {((blogs.length>0) && (blogs[0].name!=='No record found') ? blogs.slice(pagination.start, pagination.end).map((item, index)=> 
                                                 <tr>
-                                                    <td>1.</td>
-                                                    <td>4 blog</td>
-                                                    <td>Contrary to popular belief, Lorem Ipsum is not simply random text.</td>
+                                                    <td>{index+1}.</td>
+                                                    <td>{item.title}</td>
+                                                    <td>{item.description}</td>
                                                     <td>
                                                         <img src="assests/images/bvc-logo.png" alt="blog"/>
                                                     </td>
-                                                    <td>Blue coller job</td>
-                                                    <td>Sunny</td>
+                                                    <td>{item.blog_category_name}</td>
+                                                    <td>{item.author_name}</td>
                                                     <td>
-                                                        <div className="d-flex align-items-center">
-                                                            <a href="/edit-blog">
-                                                                <button type="button" className="btn btn-success btn-sm btn-icon-text mr-3">
-                                                                    Edit
-                                                                    <i className="typcn typcn-edit btn-icon-append"></i>
-                                                                </button>
-                                                            </a>
-                                                        </div>
+                                                        <Link to={"/edit-blog/"+item.id}>
+                                                            <button type="button" className="btn btn-success btn-sm btn-icon-text mr-3">
+                                                                Edit
+                                                                <i className="typcn typcn-edit btn-icon-append"></i>
+                                                            </button>
+                                                        </Link>
                                                     </td>
                                                     <td>
 
-                                                        <label className="toggle-switch toggle-switch-success">
-                                                            <input type="checkbox" id="category_1" checked/>
-                                                            <span className="toggle-slider round"></span>
-                                                        </label>
+                                                        {
+                                                            (item.status==='1') ? 
+                                                                
+                                                            <label class="toggle-switch toggle-switch-success">
+                                                                <input type="checkbox" onClick={()=>updateStatus('blogs','0',item.id)} checked/>
+                                                                <span class="toggle-slider round"></span>												  
+                                                            </label>
+                                                            : 
+                                                            <label class="toggle-switch toggle-switch-success">
+                                                                <input type="checkbox" onClick={()=>updateStatus('blogs','1',item.id)} />
+                                                                <span class="toggle-slider round"></span>												  
+                                                            </label>
+                                                        }
 
                                                     </td>
                                                     <td>
 
-                                                        <label className="toggle-switch toggle-switch-success">
-                                                            <input type="checkbox" id="category_del_1" />
-                                                            <span className="toggle-slider round"></span>
-                                                        </label>
+                                                        {
+                                                            (item.is_deleted==='1') ? 
+                                                            <label class="toggle-switch toggle-switch-success">
+                                                                <input type="checkbox" onClick={()=>softDelete('blogs','0',item.id)} checked/>
+                                                                <span class="toggle-slider round"></span>
+                                                            </label>
+                                                            :
+                                                            <label class="toggle-switch toggle-switch-success">
+                                                                <input type="checkbox" onClick={()=>softDelete('blogs','1',item.id)} />
+                                                                <span class="toggle-slider round"></span>
+                                                            </label>
+                                                        }
 
                                                     </td>
-                                                </tr>
+                                                    </tr>)
+                                                    :
+                                                    <tr>
+                                                        <td colSpan={9}>No record found...</td>
+                                                    </tr>)
+                                                    }
                                                                                                 
                                             </tbody>
                                         </table>
 
                                         <div className="row">
                                             <div className="col-lg-12 text-center">
-                                                <div className="pagination-area">
-                                                    <nav>
-                                                        <ul className="page-numbers d-inline-flex">
-
-                                                            paging
-
-                                                        </ul>
-                                                    </nav>
-                                                </div>
+                                                {
+                                                    (((Math.ceil(blogs.length / showPerPage)) > 1) && (blogs[0].name !== 'No record found')) ?
+                                                        <div className="row paging_gap">
+                                                            <div className="col-lg-12 text-center">
+                                                                <div className="pagination-area">
+                                                                    <Pagination showPerPage={showPerPage} onPaginationChange={onPaginationChange} total={blogs.length} />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    :
+                                                    <></>
+                                                }  
                                             </div>
                                         </div>
 

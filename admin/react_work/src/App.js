@@ -135,7 +135,7 @@ function App() {
 
               <Route path='/manage-admin-account' element={ <ManageAdminAccount /> }/>
               <Route path='/add-new-admin-account' element={ <AddNewAdminAccount /> }/>
-              <Route path='/edit-admin-account' element={ <EditAdminAccount /> }/>
+              <Route path='/edit-admin-account/:id' element={ <EditAdminAccount /> }/>
 
               <Route path='/contact-us-emails' element={ <ContactUsEmails /> }/>
 
@@ -145,15 +145,15 @@ function App() {
 
               <Route path='/blog-lists' element={ <BlogLists /> }/>
               <Route path='/add-new-blog' element={ <AddNewBlog /> }/>
-              <Route path='/edit-blog' element={ <EditBlog /> }/>
+              <Route path='/edit-blog/:id' element={ <EditBlog /> }/>
 
               <Route path='/manage-blog-categories' element={ <ManageBlogCategories /> }/>
               <Route path='/add-new-blog-category' element={ <AddNewBlogCategory /> }/>
-              <Route path='/edit-blog-category' element={ <EditBlogCategory /> }/>
+              <Route path='/edit-blog-category/:id' element={ <EditBlogCategory /> }/>
 
               <Route path='/manage-blog-authors' element={ <ManageBlogAuthors /> }/>
               <Route path='/add-new-blog-author' element={ <AddNewBlogAuthor /> }/>
-              <Route path='/edit-blog-author' element={ <EditBlogAuthor /> }/>
+              <Route path='/edit-blog-author/:id' element={ <EditBlogAuthor /> }/>
             </Route>
           </Routes>
 

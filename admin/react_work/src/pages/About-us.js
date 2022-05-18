@@ -1,12 +1,91 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
+import axios from 'axios';
 
 
 const AboutUs = () => {
+
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [error, setError] = useState(false);
+    const [success, setSuccess] = useState(false);
+
+    const [file, setFile] = useState();
+    const [fileName, setFileName] = useState("");
+
+    const saveFile = (e) => {
+        setFile(e.target.files[0]);
+        setFileName(e.target.files[0].name);
+    };
+
+    
+    /* CKEditor function */
+    const handelChange = (e, editor) => {
+        const data = editor.getData();
+        setDescription(data);
+    }
+
+
+    useEffect(()=>{
+        getAboutUs();
+    },[]);
+
+    const getAboutUs = async()=>{
+        const tbl = 'aboutuses';
+        let result = await fetch(`http://localhost:12345/all-generic-data/${tbl}`);
+        result = await result.json();
+        console.warn(result);
+        setTitle(result[0].title);
+        setDescription(result[0].description);
+    }
+
+
+    const updateAboutUs = async(e)=>{
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("fileName", fileName);
+        formData.append("title", title);
+        formData.append("description", description);
+        
+        /* if(!title || !description){
+            setError(true);
+            setSuccess(false);
+            return false;
+        }  */
+
+        try {
+
+            /* let result = await fetch("http://localhost:12345/update-about-us",formData, {
+                method:'put',
+                body: JSON.stringify({title, description}),
+                headers:{
+                    'Content-Type':'application/json'
+                }
+            });
+
+            result = await result.json(); */
+
+            const res = await axios.post(
+                "http://localhost:12345/update-about-us",
+                formData
+              );
+              console.log(res);
+
+            setSuccess(true);
+            setError(false);
+
+        } catch (ex) {
+            console.log(ex);
+        }
+
+    }
+
+
     return (
 
         <div className="container-scroller">
@@ -25,25 +104,28 @@ const AboutUs = () => {
                                 <div className="card-body">
 
                                     <h4 className="card-title">Manage About-Us</h4>
-                                    <form method="post" action="" className="forms-sample" enctype="multipart/form-data">
+                                    { success && <div className="alert alert-success" role="alert">Updated Successfully</div> }
 
                                         <input type="hidden" name="edit_id" id="edit_id" value="" />
 
                                             <div className="form-group">
                                                 <label for="name">Title</label>
-                                                <input type="text" className="form-control" id="title" name="title" placeholder="Title" value="" />
+                                                <input type="text" className="form-control" id="title" name="title" placeholder="Title" defaultValue={title} onChange={(e)=>setTitle(e.target.value)}/>
+                                                {error && !title && <span className="invalid-input">Enter Title</span>}
                                             </div>
 
                                             <div className="form-group">
                                                 <label for="name">Description</label>
                                                 
-                                                <CKEditor
+                                                {/* <CKEditor
                                                     editor={ ClassicEditor }
-                                                    data=""
+                                                    data={description}
+                                                    //content={description}
                                                     onReady={ editor => {
                                                         // You can store the "editor" and use when it is needed.
                                                         console.log( 'Editor is ready to use!', editor );
                                                     } }
+                                                    
                                                     onChange={ ( event, editor ) => {
                                                         const data = editor.getData();
                                                         console.log( { event, editor, data } );
@@ -54,22 +136,26 @@ const AboutUs = () => {
                                                     onFocus={ ( event, editor ) => {
                                                         console.log( 'Focus.', editor );
                                                     } }
-                                                />
+                                                /> */}
 
-                                                {/* <textarea rows="10" className="form-control" id="description" name="description" placeholder="Description"></textarea> */}
+                                                <CKEditor
+                                                    editor={ ClassicEditor }
+                                                    data={description}
+                                                    onChange={handelChange}
+                                                />
+                                                {error && !description && <span className="invalid-input">Enter Description</span>}
                                             </div>
 
 
                                             <div className="form-group">
                                                 <label for="name">Image</label>
-                                                <input type="file" className="form-control" name="image" id="image" accept="image/png, image/jpeg, image/jpg" />
+                                                <input type="file" className="form-control" onChange={saveFile} name="image" id="image" accept="image/png, image/jpeg, image/jpg" />
+                                                
                                             </div>
 
 
-                                                    <button type="submit" className="btn btn-primary mr-2">Update</button>
+                                                <button type="submit" className="btn btn-primary mr-2" onClick={updateAboutUs}>Update</button>
 
-
-                                                </form>
                                             </div>
                                         </div>
                                 </div>

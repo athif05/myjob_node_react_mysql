@@ -1,10 +1,77 @@
-import React from "react";
+import React, { useState, useEffect} from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 
 
 const EditBlog = () => {
+
+    const [title, setTitle] = useState();
+    const [description, setDescription] = useState();
+    const [blog_category_id, setBlogCategoryId] = useState();
+    const [author_id, setAuthorId] = useState();
+    const [image, setImage] = useState();
+    const [error, setError] = useState(false);
+
+    const [all_category, setAllCategory] = useState([]);
+    const [all_author, setAllAuthor] = useState([]);
+
+    const params = useParams();
+
+    useEffect(()=>{
+        getEditBlog();
+        getAllCategory();
+        getAllAuthor();
+    },[]);
+
+    const getAllCategory = async()=>{
+        const tbl = 'blog_categories';
+        let result = await fetch(`http://localhost:12345/all-generic-data/${tbl}`);
+        result = await result.json();
+        setAllCategory(result);
+    }
+
+    const getAllAuthor = async()=>{
+        const tbl = 'authors';
+        let result = await fetch(`http://localhost:12345/all-generic-data/${tbl}`);
+        result = await result.json();
+        setAllAuthor(result);
+    }
+
+    const getEditBlog = async()=>{
+        let result = await fetch(`http://localhost:12345/edit-blog/${params.id}`);
+        result = await result.json();
+        setTitle(result[0].title);
+        setDescription(result[0].description);
+        setBlogCategoryId(result[0].blog_category_id);
+        setAuthorId(result[0].author_id);
+    }
+
+    const navigate = useNavigate();
+
+    
+    const updateBlogs = async()=>{
+
+        if(!title || !description || !blog_category_id || !author_id){
+            setError(true);
+            return false;
+        }
+
+        let result = await fetch(`http://localhost:12345/update-blog/${params.id}`,{
+            method:"put",
+            body:JSON.stringify({title, description, blog_category_id, author_id}),
+            headers:{
+                "Content-Type":"application/json"
+            }
+        });
+
+        result = await result.json();
+
+        navigate("/blog-lists");
+
+    }
+
     return (
         <div className="container-scroller">
             <Header />
@@ -18,58 +85,56 @@ const EditBlog = () => {
 
                                 <div className="card-body">
 
-
                                     <h4 className="card-title">Edit Blog</h4>
-                                    <form method="post" action="" className="forms-sample" enctype="multipart/form-data">
 
                                         <div className="form-group">
                                             <label for="name">Title</label>
-                                            <input type="text" className="form-control" id="title" name="title" placeholder="Title" value="" />
-
+                                            <input type="text" className="form-control" id="title" name="title" placeholder="Title" defaultValue={title} onChange={(e)=>setTitle(e.target.value)}/>
+                                            { error && !title && <span className="invalid-input">Enter title</span>}
                                         </div>
 
                                         <div className="form-group">
                                             <label for="name">Description</label>
-                                            <textarea rows="10" className="form-control" id="description" name="description" placeholder="Description"></textarea>
+                                            <textarea rows="10" className="form-control" id="description" name="description" placeholder="Description" defaultValue={description} onChange={(e)=>setDescription(e.target.value)}></textarea>
                                             <script>
                                                 CKEDITOR.replace( 'description' );
                                             </script>
+                                            { error && !description && <span className="invalid-input">Enter description</span>}
                                         </div>
 
                                         <div className="form-group">
                                             <label for="name">Blog Category Name</label>
-                                            <select name="blog_category_id" className="form-control" id="blog_category_id">
+                                            <select name="blog_category_id" value={blog_category_id || ""} onChange={(e)=>setBlogCategoryId(e.target.value)} className="form-control" id="blog_category_id">
                                                 <option value="">-- Blog Category Name --</option>
-                                                <option value="">Blue Caller Job</option>
-                                                <option value="">White Caller Job</option>
+                                                { all_category.map((item_cat, index)=>
+                                                <option value={item_cat.id}>{item_cat.name}</option>
+                                                )}
                                             </select>
-
+                                            { error && !blog_category_id && <span className="invalid-input">Enter blog category</span>}
                                         </div>
 
                                         <div className="form-group">
                                             <label for="name">Author Name</label>
-                                            <select name="author_id" className="form-control" id="author_id">
+                                            <select name="author_id" value={author_id || ""} onChange={(e)=>setAuthorId(e.target.value)} className="form-control" id="author_id">
                                                 <option value="">-- Author Name --</option>
-
-                                                <option value="">Sunny</option>
-                                                <option value="">Rohan</option>
-
+                                                { all_author.map((item_aut, index)=>
+                                                <option value={item_aut.id}>{item_aut.name}</option>
+                                                )}
                                             </select>
+                                            { error && !author_id && <span className="invalid-input">Enter author</span>}
                                         </div>
 
                                         <div className="form-group">
                                             <label for="name">Image</label>
                                             <input type="file" className="form-control" name="image" id="image" accept="image/png, image/jpeg, image/jpg" />
-
                                         </div>
 
-                                        <button type="submit" className="btn btn-primary mr-2">Update</button>
+                                        <button type="submit" className="btn btn-primary mr-2" onClick={updateBlogs}>Update</button>
 
                                         <a href="/blog-lists">
                                             <span className="btn btn-light">Cancel</span>
                                         </a>
 
-                                    </form>
                                 </div>
                             </div>
                         </div>

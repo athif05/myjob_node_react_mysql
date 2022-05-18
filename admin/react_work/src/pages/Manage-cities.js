@@ -11,12 +11,11 @@ const ManageCities = () => {
 
     useEffect(()=>{
         getCities();
-    });
+    },[]);
 
     //fetch all data from DB table
     const getCities = async()=>{
-        const tbl = 'cities';
-        let result = await fetch(`http://localhost:12345/all-generic-data/${tbl}`);
+        let result = await fetch(`http://localhost:12345/all-cities-data`);
         result = await result.json();
         setCities(result);
     }
@@ -83,6 +82,7 @@ const ManageCities = () => {
                                                 <tr>
                                                     <th className="ml-5">#</th>
                                                     <th>City Name</th>
+                                                    <th>State Name</th>
                                                     <th>Actions</th>
                                                     <th>Status</th>
                                                     <th>Delete</th>
@@ -93,6 +93,7 @@ const ManageCities = () => {
                                                 <tr>
                                                     <td>{index+1}.</td>
                                                     <td>{item.name}</td>
+                                                    <td>{item.state_name}</td>
                                                     <td>
                                                         <div className="d-flex align-items-center">
                                                             <Link to={"/edit-city/"+item.id}>
@@ -139,7 +140,7 @@ const ManageCities = () => {
                                                     </tr>)
                                                 :
                                                 <tr>
-                                                    <td colSpan={5}>No record found...</td>
+                                                    <td colSpan={6}>No record found...</td>
                                                 </tr>)  
                                                 }
                                                                                                 
