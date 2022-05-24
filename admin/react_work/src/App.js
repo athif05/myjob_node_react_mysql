@@ -60,7 +60,7 @@ import ManageBlogAuthors from './pages/Manage-blog-authors';
 import AddNewBlogAuthor from './pages/Add-new-blog-author';
 import EditBlogAuthor from './pages/Edit-blog-author';
 import PrivateComponent from './components/PrivateComponent';
-
+import FileUploadTest from './pages/FileUploadTest';
 
 function App() {
 
@@ -76,6 +76,9 @@ function App() {
           <Routes>
             
             <Route element={<PrivateComponent />}>
+
+              <Route path='/fileUpload' element={ <FileUploadTest /> }/>
+
               <Route path='/dashboard' element={ <Dashboard /> }/>
 
               <Route path='/all-applied-jobs' element={ <AllAppliedJobs /> }/>

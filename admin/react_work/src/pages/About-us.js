@@ -21,7 +21,7 @@ const AboutUs = () => {
         setFile(e.target.files[0]);
         setFileName(e.target.files[0].name);
     };
-
+    
     
     /* CKEditor function */
     const handelChange = (e, editor) => {
@@ -43,7 +43,6 @@ const AboutUs = () => {
         setDescription(result[0].description);
     }
 
-
     const updateAboutUs = async(e)=>{
 
         const formData = new FormData();
@@ -52,33 +51,19 @@ const AboutUs = () => {
         formData.append("title", title);
         formData.append("description", description);
         
-        /* if(!title || !description){
+        if(!title || !description){
             setError(true);
             setSuccess(false);
             return false;
-        }  */
+        }
 
         try {
-
-            /* let result = await fetch("http://localhost:12345/update-about-us",formData, {
-                method:'put',
-                body: JSON.stringify({title, description}),
-                headers:{
-                    'Content-Type':'application/json'
-                }
-            });
-
-            result = await result.json(); */
-
             const res = await axios.post(
-                "http://localhost:12345/update-about-us",
-                formData
-              );
-              console.log(res);
-
+              "http://localhost:12345/update-about-us",
+              formData
+            );
+            console.log(res);
             setSuccess(true);
-            setError(false);
-
         } catch (ex) {
             console.log(ex);
         }
@@ -149,7 +134,7 @@ const AboutUs = () => {
 
                                             <div className="form-group">
                                                 <label for="name">Image</label>
-                                                <input type="file" className="form-control" onChange={saveFile} name="image" id="image" accept="image/png, image/jpeg, image/jpg" />
+                                                <input type="file" className="form-control" onChange={saveFile} accept="image/png, image/jpeg, image/jpg"/>
                                                 
                                             </div>
 

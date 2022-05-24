@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(fileupload());
-app.use(express.static("./public_html"));
+app.use(express.static("public_html"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }))
 
@@ -837,49 +837,69 @@ app.put('/update-admin-account/:id', async (req, res)=>{
 });
 /* update admin account data, end here */
 
+/* upload image from test page, start here */
+app.post("/uploadFile", (req, res) => {
 
-//! Use of Multer
-var storage = multer.diskStorage({
-    destination: (req, file, callBack) => {
-        callBack(null, './public_html/uploads/')     // directory name where save the file
-    },
-    filename: (req, file, callBack) => {
-        callBack(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-    }
-})
- 
-var upload = multer({
-    storage: storage
-});
+	const newpath = __dirname + "/public_html/uploads/";
+	const file = req.files.file;
+	const filename = file.name;
+
+	const title=req.body.title;
+
+	const image_path = "/public_html/uploads/"+filename;
+
+	file.mv(`${newpath}${filename}`, (err) => {
+		if (err) {
+			return res.status(500).send({ message: "File upload failed", code: 200 });
+		} 
+
+		connection.query("UPDATE aboutuses set image=?, title=? where id=1",[image_path, title], (error, result)=>{
+			return res.status(200).send({ message: "File Uploaded", code: 200 });
+		});
+
+	});
+  });
+/* upload image from test page, end here */
 
 /* update website about us, start here */
-app.post('/update-about-us', upload.single('image'), (req, res)=>{
-	console.log(req.body.title);
-	if (!req.file) {
-        console.log("No file upload");
-    } else {
-        console.log(req.file.filename)
-        var imgsrc = 'http://127.0.0.1:12345/images/' + req.file.filename
-        var insertData = "INSERT INTO aboutuses(image)VALUES(?)"
-        connection.query(insertData, [imgsrc], (err, result) => {
-            if (err) throw err
-            console.log("file uploaded")
-        })
-    }
+app.post('/update-about-us', (req, res)=>{
+	
+	const title=req.body.title;
+	var description=req.body.description;
 
-	
-	//var title=req.body.title;
-	//var description=req.body.description;
-	
-	
-	/* const sql = `UPDATE aboutuses set title="${title}",description="${description}" where id="1"`;
-	//console.log(sql);
-	connection.query(sql, (error, result)=>{
-		if(error) throw error;
+	if(!req.files){
 
-		res.send(result);
-	}); */
+		let sql="UPDATE aboutuses set title=?, description=? where id=1";
+		console.log(sql);
+		connection.query(sql,[title, description], (error, result)=>{
+			if(error) throw error;
+
+				res.send(result);
+		});
+		
+
+	} else {
+
+		const newpath = __dirname + "/public_html/uploads/";
+
+		const file = req.files.file;
+		const filename = file.name;
+
+		const image_path = "/public_html/uploads/"+filename;
+
+		file.mv(`${newpath}${filename}`, (err) => {
+			if (err) {
+				return res.status(500).send({ message: "File upload failed", code: 200 });
+			} 
 	
+			connection.query("UPDATE aboutuses set image=?, title=?, description=? where id=1",[image_path, title, description], (error, result)=>{
+				return res.status(200).send({ message: "File Uploaded", code: 200 });
+			});
+	
+		});
+	}
+	
+
 
 });
 /* update website about us, end here */
