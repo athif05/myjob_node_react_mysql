@@ -1,9 +1,11 @@
 import React, { useState, useEffect} from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
-
+import axios from 'axios';
 
 const EditBlog = () => {
 
@@ -11,11 +13,14 @@ const EditBlog = () => {
     const [description, setDescription] = useState();
     const [blog_category_id, setBlogCategoryId] = useState();
     const [author_id, setAuthorId] = useState();
-    const [image, setImage] = useState();
+    const [showFile, setShowFile] = useState();
     const [error, setError] = useState(false);
 
     const [all_category, setAllCategory] = useState([]);
     const [all_author, setAllAuthor] = useState([]);
+
+    const [file, setFile] = useState();
+    const [fileName, setFileName] = useState("");
 
     const params = useParams();
 
@@ -24,6 +29,12 @@ const EditBlog = () => {
         getAllCategory();
         getAllAuthor();
     },[]);
+
+    /* CKEditor function */
+    const handelChange = (e, editor) => {
+        const data = editor.getData();
+        setDescription(data);
+    }
 
     const getAllCategory = async()=>{
         const tbl = 'blog_categories';
@@ -46,7 +57,13 @@ const EditBlog = () => {
         setDescription(result[0].description);
         setBlogCategoryId(result[0].blog_category_id);
         setAuthorId(result[0].author_id);
+        setShowFile(result[0].image);
     }
+
+    const saveFile = (e) => {
+        setFile(e.target.files[0]);
+        setFileName(e.target.files[0].name);
+    };
 
     const navigate = useNavigate();
 
@@ -58,7 +75,16 @@ const EditBlog = () => {
             return false;
         }
 
-        let result = await fetch(`http://localhost:12345/update-blog/${params.id}`,{
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("fileName", fileName);
+        formData.append("title", title);
+        formData.append("description", description);
+        formData.append("blog_category_id", blog_category_id);
+        formData.append("author_id", author_id);
+
+
+        /* let result = await fetch(`http://localhost:12345/update-blog/${params.id}`,{
             method:"put",
             body:JSON.stringify({title, description, blog_category_id, author_id}),
             headers:{
@@ -66,11 +92,26 @@ const EditBlog = () => {
             }
         });
 
-        result = await result.json();
+        result = await result.json(); */
 
-        navigate("/blog-lists");
+        try {
+            const res = await axios.put(
+              `http://localhost:12345/update-blog/${params.id}`,
+              formData
+            );
+            console.log(res);
+            navigate("/blog-lists");
+            
+        } catch (ex) {
+            console.log(ex);
+        }
 
     }
+
+    const imageStyle = {
+        width: "120px",
+        height: "80px"
+    };
 
     return (
         <div className="container-scroller">
@@ -95,10 +136,11 @@ const EditBlog = () => {
 
                                         <div className="form-group">
                                             <label for="name">Description</label>
-                                            <textarea rows="10" className="form-control" id="description" name="description" placeholder="Description" defaultValue={description} onChange={(e)=>setDescription(e.target.value)}></textarea>
-                                            <script>
-                                                CKEDITOR.replace( 'description' );
-                                            </script>
+                                            <CKEditor
+                                                    editor={ ClassicEditor }
+                                                    data={description}
+                                                    onChange={handelChange}
+                                                />
                                             { error && !description && <span className="invalid-input">Enter description</span>}
                                         </div>
 
@@ -126,7 +168,8 @@ const EditBlog = () => {
 
                                         <div className="form-group">
                                             <label for="name">Image</label>
-                                            <input type="file" className="form-control" name="image" id="image" accept="image/png, image/jpeg, image/jpg" />
+                                            <input type="file" onChange={saveFile} className="form-control" accept="image/png, image/jpeg, image/jpg" />
+                                            { showFile ? <img src={showFile} alt="Aboutus" style={imageStyle}/> : null}
                                         </div>
 
                                         <button type="submit" className="btn btn-primary mr-2" onClick={updateBlogs}>Update</button>

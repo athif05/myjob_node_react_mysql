@@ -45,6 +45,11 @@ const BlogLists = () => {
     };
     /* Pagination, end here */
 
+    const imageStyle = {
+        width: "80px",
+        height: "80px"
+    };
+
     return (
         <div className="container-scroller">
             <Header />
@@ -97,9 +102,9 @@ const BlogLists = () => {
                                                 <tr>
                                                     <td>{index+1}.</td>
                                                     <td>{item.title}</td>
-                                                    <td>{item.description}</td>
+                                                    <td>{item.description.substring(0,50)}</td>
                                                     <td>
-                                                        <img src="assests/images/bvc-logo.png" alt="blog"/>
+                                                        { item.image ? <img src={item.image} alt={item.title} style={imageStyle}/> : null}
                                                     </td>
                                                     <td>{item.blog_category_name}</td>
                                                     <td>{item.author_name}</td>

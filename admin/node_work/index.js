@@ -6,6 +6,9 @@ const path = require('path');
 const multer = require('multer'); //use for upload image/file
 const fileupload = require("express-fileupload");
 const bodyParser = require('body-parser');
+const fs = require('node:fs/promises');
+const fss = require("fs");
+const hashfile = require('./db/hashfile'); //for encryption-decryption
 
 const app = express();
 
@@ -29,9 +32,42 @@ app.post("/login", (req, res)=>{
 	var email=req.body.email;
 	var password=req.body.password;
 
-	connection.query("SELECT id, name, email, role_id from admin_users where status='1' and is_deleted='0' and email=? and password=?",[email, password], (error, result)=>{
+	var sql=`SELECT id, name, email, role_id, password, ipv4 from admin_users where status='1' and is_deleted='0' and email="${email}"`;
+	//console.log(sql);
+
+	connection.query(sql, (error, result)=>{
 		if(result.length > 0){
-			res.send(result);
+
+			/* var fetch_pass=result[0].password;
+			var fetch_iv=result[0].ipv4; */
+
+
+			var hashf = hashfile.encrypt_fun(password);
+			console.log(hashf);
+			var fetchPass=hashfile.decrypt_fun(hashf);
+			console.log(fetchPass);
+
+			/* var dta={
+				iv: fetch_iv,
+				encryptedData: fetch_pass
+			  };
+
+			console.log(dta); */
+
+			
+			/* fetch_pass=hashfile.decrypt_fun({
+				iv: 'ddece22a2b2e09d3f9b6e7dd000180ac',
+				encryptedData: '677ef270d28d29077bab20ddcccb1ee7'
+			  });
+
+			console.log(fetch_pass+' / '+password); */
+
+			/* if(fetch_pass==password){
+				res.send(result);
+			} else {
+				res.send([{name: "No record found"}]);
+			} */
+			
 		} else {
 			res.send([{name: "No record found"}]);
 		}
@@ -55,7 +91,6 @@ app.get("/count-job-candidate-employer", (req, res) => {
 app.get("/today-applied-jobs", (req, res)=>{
 
     //	let date_ob = new Date();
-
     let date_ob = new Date().toISOString().
   replace(/T/, ' ').      // replace T with a space
   replace(/\..+/, '');     // delete the dot and everything after
@@ -330,7 +365,9 @@ app.get("/all-generic-data/:tbl", (req, res)=>{
 	} else if(tbl_name==='cities'){
 		sql="SELECT * from "+tbl_name+" where country_id='101' order by name asc";
 	} else if(tbl_name==='aboutuses'){
-		sql="SELECT * from "+tbl_name+" order by title asc";
+		sql="SELECT * from "+tbl_name+" where id='1'";
+	} else if(tbl_name==='contactuses'){
+		sql="SELECT * from "+tbl_name+" where id='1'";
 	} else {
 		sql="SELECT * from "+tbl_name+" order by name asc";
 	}
@@ -802,7 +839,11 @@ app.post('/add-admin-account', async (req, res)=>{
 	var password=req.body.password;
 	var role_id=req.body.role_id;
 	
-	sql = `INSERT INTO admin_users (name, email, mobile_number, password, role_id, status) VALUES ("${name}","${email}","${mobile}","${password}","${role_id}","1")`;
+	var hashf = hashfile.encrypt_fun(password);
+	password = hashf.encryptedData;
+	var ipv4 = hashf.iv;
+
+	sql = `INSERT INTO admin_users (name, email, mobile_number, password, role_id, status, ipv4) VALUES ("${name}","${email}","${mobile}","${password}","${role_id}","1","${ipv4}")`;
 	console.log(sql);
   	connection.query(sql, function(error, result) {
 		
@@ -826,7 +867,11 @@ app.put('/update-admin-account/:id', async (req, res)=>{
 	var password=req.body.password;
 	var role_id=req.body.role_id;
 
-	const sql = `UPDATE admin_users set name="${name}",email="${email}",mobile_number="${mobile}",password="${password}",role_id="${role_id}" where id="${req.params.id}"`;
+	var hashf = hashfile.encrypt_fun(password);
+	password = hashf.encryptedData;
+	var ipv4 = hashf.iv;
+
+	const sql = `UPDATE admin_users set name="${name}",email="${email}",mobile_number="${mobile}",password="${password}",role_id="${role_id}",ipv4="${ipv4}" where id="${req.params.id}"`;
 	console.log(sql);
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;
@@ -880,12 +925,32 @@ app.post('/update-about-us', (req, res)=>{
 
 	} else {
 
-		const newpath = __dirname + "/public_html/uploads/";
-
 		const file = req.files.file;
-		const filename = file.name;
+		let filename = file.name;
+		filename = filename.split('.').join('-' + Date.now() + '.'); //add datetime with image name
 
-		const image_path = "/public_html/uploads/"+filename;
+		//const newpath = __dirname + "/public_html/uploads/"; // node folder path
+		//const image_path = "/public_html/uploads/"+filename;  // node folder path
+		/* let image_path = newpath + filename;
+		image_path = image_path.replace(/\\/g, "/"); */
+
+		const newpath = "./../react_work/public/assests/uploads/"; // react folder path
+		const image_path = "/assests/uploads/"+filename;  // react folder path
+
+		//fetch image name for unlink from folder
+		connection.query("SELECT image from aboutuses where id=1", (error, result)=>{
+			if(result[0]['image']!==''){
+				let unlink_path = "./../react_work/public"+result[0]['image']; //image path for unlink
+
+				if (fss.existsSync(unlink_path)) {
+					// path exists
+					fs.unlink(unlink_path); //unlink image
+					console.log("exists:", path);
+				}
+
+				
+			}
+		}); 
 
 		file.mv(`${newpath}${filename}`, (err) => {
 			if (err) {
@@ -1035,23 +1100,38 @@ app.get("/all-blogs-data", (req, res)=>{
 /* add new blog in table, start here */
 app.post('/add-blog', async (req, res)=>{
     
-    const data = req.body;
     var title=req.body.title;
 	var description=req.body.description;
 	var blog_category_id=req.body.blog_category_id;
 	var author_id=req.body.author_id;
-	
-	sql = `INSERT INTO blogs (title, description, author_id, blog_category_id, status) VALUES ("${title}","${description}","${author_id}","${blog_category_id}","1")`;
-	console.log(sql);
-  	connection.query(sql, function(error, result) {
-		
-		if(error) throw error;
-		
-		res.send(result);
 
-		console.log("1 record inserted");
+	const file = req.files.file;
+	let filename = file.name;
+	filename = filename.split('.').join('-' + Date.now() + '.'); //add datetime with image name
+
+	const newpath = "./../react_work/public/assests/uploads/"; // react folder path
+	const image_path = "/assests/uploads/"+filename;  // react folder path
+ 
+	file.mv(`${newpath}${filename}`, (err) => {
+		if (err) {
+			return res.status(500).send({ message: "Blog File upload failed", code: 200 });
+		}
+
+		sql = `INSERT INTO blogs (title, description, image, author_id, blog_category_id, status) VALUES ("${title}","${description}","${image_path}","${author_id}","${blog_category_id}","1")`;
+		console.log(sql);
+		connection.query(sql, function(error, result) {
+			
+			if(error) throw error;
+			
+			res.send(result);
+
+			console.log("1 record inserted");
+
+		});
+
 
 	});
+	
 
 });
 /* add new blog in table, end here */
@@ -1079,8 +1159,71 @@ app.put('/update-blog/:id', async (req, res)=>{
 	var blog_category_id=req.body.blog_category_id;
 	var author_id=req.body.author_id;
 
-	const sql = `UPDATE blogs set title="${title}",description="${description}",blog_category_id="${blog_category_id}",author_id="${author_id}" where id="${req.params.id}"`;
-	console.log(sql);
+	if(!req.files){
+
+		const sql = `UPDATE blogs set title="${title}",description="${description}",blog_category_id="${blog_category_id}",author_id="${author_id}" where id="${req.params.id}"`;
+		console.log(sql);
+		connection.query(sql, (error, result)=>{
+			if(error) throw error;
+
+				res.send(result);
+		});	
+
+	} else {
+
+		const file = req.files.file;
+		let filename = file.name;
+		filename = filename.split('.').join('-' + Date.now() + '.'); //add datetime with image name
+
+		const newpath = "./../react_work/public/assests/uploads/"; // react folder path
+		const image_path = "/assests/uploads/"+filename;  // react folder path
+
+		//fetch image name for unlink from folder
+		connection.query(`SELECT image from blogs where id="${req.params.id}"`, (error, result)=>{
+			if(result[0]['image']!==''){
+				let unlink_path = "./../react_work/public"+result[0]['image']; //image path for unlink
+
+				if (fss.existsSync(unlink_path)) {
+					// path exists
+					fs.unlink(unlink_path); //unlink image
+					console.log("exists:", path);
+				}
+			}
+		});
+
+		file.mv(`${newpath}${filename}`, (err) => {
+			if (err) {
+				return res.status(500).send({ message: "Blog File upload failed", code: 200 });
+			}
+	
+			const sql = `UPDATE blogs set image="${image_path}",title="${title}",description="${description}",blog_category_id="${blog_category_id}",author_id="${author_id}" where id="${req.params.id}"`;
+			console.log(sql);
+			connection.query(sql, (error, result)=>{
+				if(error) throw error;
+		
+				res.send(result);
+			});
+	
+		});
+	}
+
+});
+/* update blog api, start here */
+
+
+/* update contact-us data, start here */
+app.put('/update-contact-us/', async (req, res)=>{
+	
+	var email1=req.body.email1;
+	var email2=req.body.email2;
+	var contact_number1=req.body.contact_number1;
+	var contact_number2=req.body.contact_number2;
+	var address_line1=req.body.address_line1;
+	var address_line2=req.body.address_line2;
+	var google_map=req.body.google_map;
+
+	const sql = `UPDATE contactuses set email1="${email1}",email2="${email2}",contact_number1="${contact_number1}",contact_number2="${contact_number2}",address_line1="${address_line1}",address_line2="${address_line2}",google_map="${google_map}" where id="1"`;
+	
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;
 
@@ -1088,6 +1231,7 @@ app.put('/update-blog/:id', async (req, res)=>{
 	}); 
 
 });
-/* update blog api, start here */
+/* update contact-us data, end here */
+
 
 app.listen(12345);

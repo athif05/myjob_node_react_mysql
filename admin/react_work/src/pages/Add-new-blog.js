@@ -1,7 +1,10 @@
 import React, { useState, useEffect} from "react";
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
+import axios from 'axios';
 
 const AddNewBlog = () => {
 
@@ -9,12 +12,25 @@ const AddNewBlog = () => {
     const [description, setDescription] = useState();
     const [blog_category_id, setBlogCategoryId] = useState();
     const [author_id, setAuthorId] = useState();
-    const [image, setImage] = useState();
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
 
     const [all_category, setAllCategory] = useState([]);
     const [all_author, setAllAuthor] = useState([]);
+
+    const [file, setFile] = useState();
+    const [fileName, setFileName] = useState("");
+
+    const saveFile = (e) => {
+        setFile(e.target.files[0]);
+        setFileName(e.target.files[0].name);
+    };
+
+    /* CKEditor function */
+    const handelChange = (e, editor) => {
+        const data = editor.getData();
+        setDescription(data);
+    }
 
     useEffect(()=>{
         getAllCategory();
@@ -42,21 +58,43 @@ const AddNewBlog = () => {
             return false;
         }
 
-        let result = await fetch("http://localhost:12345/add-blog",{
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("fileName", fileName);
+        formData.append("title", title);
+        formData.append("description", description);
+        formData.append("blog_category_id", blog_category_id);
+        formData.append("author_id", author_id);
+
+
+        /* let result = await fetch("http://localhost:12345/add-blog",{
             method: "post",
             body:JSON.stringify({title, description, blog_category_id, author_id}),
             headers:{
                 "Content-Type":"application/json"
             }
-        });
+        }); 
 
-        result = await result.json();
-        setSuccess(true);
-        setError(false);
-        setTitle('');
-        setDescription('');
-        setBlogCategoryId('');
-        setAuthorId('');
+        result = await result.json(); */
+
+        try {
+            const res = await axios.post(
+              "http://localhost:12345/add-blog",
+              formData
+            );
+            console.log(res);
+            setSuccess(true);
+            setError(false);
+            setTitle('');
+            setDescription('');
+            setBlogCategoryId('');
+            setAuthorId('');
+            
+        } catch (ex) {
+            console.log(ex);
+        }
+
+        
 
     }
 
@@ -85,10 +123,11 @@ const AddNewBlog = () => {
 
                                         <div className="form-group">
                                             <label for="name">Description</label>
-                                            <textarea rows="10" className="form-control" id="description" name="description" placeholder="Description" value={description} onChange={(e)=>setDescription(e.target.value)}></textarea>
-                                            <script>
-                                                CKEDITOR.replace( 'description' );
-                                            </script>
+                                            <CKEditor
+                                                    editor={ ClassicEditor }
+                                                    data={description}
+                                                    onChange={handelChange}
+                                                />
                                             { error && !description && <span className="invalid-input">Enter description</span>}
                                         </div>
 
@@ -116,7 +155,7 @@ const AddNewBlog = () => {
 
                                         <div className="form-group">
                                             <label for="name">Image</label>
-                                            <input type="file" className="form-control" name="image" id="image" accept="image/png, image/jpeg, image/jpg" />
+                                            <input type="file" onChange={saveFile} className="form-control" accept="image/png, image/jpeg, image/jpg" />
                                         </div>
 
                                         <button type="submit" className="btn btn-primary mr-2" onClick={addBlogs}>Submit</button>

@@ -13,6 +13,7 @@ const AboutUs = () => {
     const [description, setDescription] = useState('');
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [showFile, setShowFile] = useState();
 
     const [file, setFile] = useState();
     const [fileName, setFileName] = useState("");
@@ -41,6 +42,7 @@ const AboutUs = () => {
         console.warn(result);
         setTitle(result[0].title);
         setDescription(result[0].description);
+        setShowFile(result[0].image);
     }
 
     const updateAboutUs = async(e)=>{
@@ -63,13 +65,22 @@ const AboutUs = () => {
               formData
             );
             console.log(res);
+            setFileName('');
             setSuccess(true);
+
+            getAboutUs();
+            
         } catch (ex) {
             console.log(ex);
         }
 
     }
 
+
+    const imageStyle = {
+        width: "120px",
+        height: "80px"
+    };
 
     return (
 
@@ -131,11 +142,10 @@ const AboutUs = () => {
                                                 {error && !description && <span className="invalid-input">Enter Description</span>}
                                             </div>
 
-
                                             <div className="form-group">
                                                 <label for="name">Image</label>
                                                 <input type="file" className="form-control" onChange={saveFile} accept="image/png, image/jpeg, image/jpg"/>
-                                                
+                                                { showFile ? <img src={showFile} alt="Aboutus" style={imageStyle}/> : null}
                                             </div>
 
 
@@ -155,4 +165,4 @@ const AboutUs = () => {
 
 }
 
-                export default AboutUs;
+export default AboutUs;
