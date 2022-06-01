@@ -205,7 +205,7 @@ const SingleJobDetails = () => {
 														<>
 															{
 															/* if condition */
-															(item_qual==item_qualification.id) ? <>{item_qualification.name}, </> : null
+															(item_qual===item_qualification.id) ? <>{item_qualification.name}, </> : null
 															}
 														</>
 														)

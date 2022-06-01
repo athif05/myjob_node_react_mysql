@@ -8,7 +8,9 @@ const fileupload = require("express-fileupload");
 const bodyParser = require('body-parser');
 const fs = require('node:fs/promises');
 const fss = require("fs");
-const hashfile = require('./db/hashfile'); //for encryption-decryption
+var bcrypt = require('bcryptjs'); //for encryption-decryption
+var salt = bcrypt.genSaltSync(10); //use for salt
+
 
 const app = express();
 
@@ -32,42 +34,20 @@ app.post("/login", (req, res)=>{
 	var email=req.body.email;
 	var password=req.body.password;
 
-	var sql=`SELECT id, name, email, role_id, password, ipv4 from admin_users where status='1' and is_deleted='0' and email="${email}"`;
-	//console.log(sql);
+	var sql=`SELECT id, name, email, role_id, password from admin_users where status='1' and is_deleted='0' and email="${email}"`;
 
 	connection.query(sql, (error, result)=>{
 		if(result.length > 0){
 
-			/* var fetch_pass=result[0].password;
-			var fetch_iv=result[0].ipv4; */
+			var db_pass=result[0].password;
 
-
-			var hashf = hashfile.encrypt_fun(password);
-			console.log(hashf);
-			var fetchPass=hashfile.decrypt_fun(hashf);
-			console.log(fetchPass);
-
-			/* var dta={
-				iv: fetch_iv,
-				encryptedData: fetch_pass
-			  };
-
-			console.log(dta); */
-
-			
-			/* fetch_pass=hashfile.decrypt_fun({
-				iv: 'ddece22a2b2e09d3f9b6e7dd000180ac',
-				encryptedData: '677ef270d28d29077bab20ddcccb1ee7'
-			  });
-
-			console.log(fetch_pass+' / '+password); */
-
-			/* if(fetch_pass==password){
+			if(bcrypt.compareSync(password, db_pass)){
 				res.send(result);
-			} else {
+			} else{
 				res.send([{name: "No record found"}]);
-			} */
+			}
 			
+
 		} else {
 			res.send([{name: "No record found"}]);
 		}
@@ -839,11 +819,10 @@ app.post('/add-admin-account', async (req, res)=>{
 	var password=req.body.password;
 	var role_id=req.body.role_id;
 	
-	var hashf = hashfile.encrypt_fun(password);
-	password = hashf.encryptedData;
-	var ipv4 = hashf.iv;
+	// hasing password
+	var hash_password = bcrypt.hashSync(password, salt);
 
-	sql = `INSERT INTO admin_users (name, email, mobile_number, password, role_id, status, ipv4) VALUES ("${name}","${email}","${mobile}","${password}","${role_id}","1","${ipv4}")`;
+	sql = `INSERT INTO admin_users (name, email, mobile_number, password, role_id, status) VALUES ("${name}","${email}","${mobile}","${hash_password}","${role_id}","1")`;
 	console.log(sql);
   	connection.query(sql, function(error, result) {
 		
@@ -867,11 +846,10 @@ app.put('/update-admin-account/:id', async (req, res)=>{
 	var password=req.body.password;
 	var role_id=req.body.role_id;
 
-	var hashf = hashfile.encrypt_fun(password);
-	password = hashf.encryptedData;
-	var ipv4 = hashf.iv;
+	// hasing password
+	var hash_password = bcrypt.hashSync(password, salt);
 
-	const sql = `UPDATE admin_users set name="${name}",email="${email}",mobile_number="${mobile}",password="${password}",role_id="${role_id}",ipv4="${ipv4}" where id="${req.params.id}"`;
+	const sql = `UPDATE admin_users set name="${name}",email="${email}",mobile_number="${mobile}",password="${hash_password}",role_id="${role_id}" where id="${req.params.id}"`;
 	console.log(sql);
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;

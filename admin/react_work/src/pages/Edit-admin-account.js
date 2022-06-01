@@ -114,7 +114,7 @@ const EditAdminAccount = () => {
 
                                         <div className="form-group">
                                             <label for="name">Password</label>
-                                            <input type="text" className="form-control" id="password" name="password" placeholder="Password"  defaultValue={password} onChange={(e)=>setPassword(e.target.value)}/>
+                                            <input type="password" className="form-control" id="password" name="password" placeholder="Password"  defaultValue={password} onChange={(e)=>setPassword(e.target.value)}/>
                                             {error && !password && <span className="invalid-input">Enter Password</span> }
                                         </div>
 
