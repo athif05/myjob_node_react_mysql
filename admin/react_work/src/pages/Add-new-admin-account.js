@@ -3,8 +3,6 @@ import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 import validator from 'validator'; //email validation
-/* import { useForm, Controller } from "react-hook-form";
-import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input"; */
 
 const AddNewAdminAccount = () => {
 
@@ -30,13 +28,6 @@ const AddNewAdminAccount = () => {
     }
 
     const addAdminAccount = async()=>{
-
-        /* const isValid = isValidPhoneNumber(mobile);
-        console.warn({ isValid })
-
-        if(isValidPhoneNumber(mobile)==='false'){
-            return false;
-        } */
 
         if(!name || !mobile || !password || !role_id){
             setError(true);

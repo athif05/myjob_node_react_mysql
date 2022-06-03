@@ -61,6 +61,7 @@ import AddNewBlogAuthor from './pages/Add-new-blog-author';
 import EditBlogAuthor from './pages/Edit-blog-author';
 import PrivateComponent from './components/PrivateComponent';
 import FileUploadTest from './pages/FileUploadTest';
+import ValidateFormTest from './pages/ValidateFormTest';
 
 function App() {
 
@@ -78,6 +79,7 @@ function App() {
             <Route element={<PrivateComponent />}>
 
               <Route path='/fileUpload' element={ <FileUploadTest /> }/>
+              <Route path='/validateForm' element={ <ValidateFormTest /> }/>
 
               <Route path='/dashboard' element={ <Dashboard /> }/>
 
