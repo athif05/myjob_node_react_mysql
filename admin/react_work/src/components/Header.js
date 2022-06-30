@@ -24,11 +24,11 @@ const Header = () => {
                     <div className="navbar-brand-inner-wrapper d-flex justify-content-between align-items-center w-100">
 
                         <a className="navbar-brand brand-logo" href="/dashboard">
-                            <img src="assests/images/bvc-logo.png" alt="logo"/>
+                            <img src="/assests/images/bvc-logo.png" alt="logo"/>
                         </a>
 
                         <a className="navbar-brand brand-logo-mini" href="/dashboard">
-                            <img src="assests/images/bvc-logo.png" alt="logo"/>
+                            <img src="/assests/images/bvc-logo.png" alt="logo"/>
                         </a>
 
                         <button className="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
@@ -42,7 +42,7 @@ const Header = () => {
                     <ul className="navbar-nav mr-lg-2">
                         <li className="nav-item nav-profile dropdown">
                             <a className="nav-link" href="/dashboard" data-toggle="dropdown" id="profileDropdown">
-                                <img src="assests/images/faces/user-icon.png" alt="profile"/>
+                                <img src="/assests/images/faces/user-icon.png" alt="profile"/>
                                 <span className="nav-profile-name" style={{ textTransform: 'uppercase'}}>{JSON.parse(auth)[0].name}</span>
                             </a>
                             <div className="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">

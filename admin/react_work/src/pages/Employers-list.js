@@ -104,7 +104,9 @@ const EmployersList = () => {
                                         </td>
                                         <td>
                                             <Link to={{pathname:`/employer-details/`+item.employer_id}} target="_blank" data-tip="Click Here For Show Employer Details" className="text-decoration-none">{item.company_name}</Link>
+
                                             <ReactTooltip />
+                                            
                                         </td>
                                         <td>{item.city_name}</td>
                                         <td>{item.email}</td>
