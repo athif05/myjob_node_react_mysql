@@ -6976,3 +6976,14 @@ table p {
   background-size: 'cover';
   background-repeat: 'no-repeat';
 }
+
+.invalid-input {
+  color: red;
+  font-size: 13px;
+  padding-left:5px;
+}
+
+.display-linebreak {
+  white-space: pre-line;
+  font-size: 13px;
+}
