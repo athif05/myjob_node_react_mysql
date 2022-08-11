@@ -1,13 +1,54 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import MobileMenu from "../components/MobileMenu";
 
 const Login = () =>{
 
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  //set error message state
+  const [errorMessage, setErrorMessage] = useState("");
+
+  //create navigation
+  const navigate = useNavigate();
+
   useEffect(() => {
     document.title = 'BVC | Login';
+
+    const auth = localStorage.getItem('react_user_front');
+    if(auth){
+      navigate('/jobs');
+    }
+
   });
+
+  /* login function, start here */
+  const handleLogin = async() =>{
+
+    let result = await fetch('http://localhost:12345/user-login',{
+      method: 'post',
+      body: JSON.stringify({email, password}),
+      headers:{
+        'Content-Type': 'application/json'
+      },
+    });
+
+    result = await result.json();
+    console.warn(result);
+
+    if(result.name!=='No record found'){
+      //console.log(result.name);
+      localStorage.setItem('react_user_front',JSON.stringify(result));
+      navigate('/jobs');
+    }  else {
+      setErrorMessage("Please enter correct details..");
+    }
+
+  }
+  /* login function, end here */
 
   return (
     <div className="wrapper">
@@ -43,17 +84,22 @@ const Login = () =>{
               <div className="login-register-form">
                 <div className="form-title">
                   <h4 className="title">Sign In</h4>
+                  {errorMessage && (
+                    <div className="alert alert-danger text-center">
+                      {errorMessage}
+                    </div>
+                  )}
                 </div>
                 <form action="#">
                   <div className="row">
                     <div className="col-12">
                       <div className="form-group">
-                        <input className="form-control" type="email" placeholder="Email"/>
+                        <input className="form-control" type="email" name="email" id="email" placeholder="Email" value={email} onChange={(e)=>setEmail(e.target.value)}/>
                       </div>
                     </div>
                     <div className="col-12">
                       <div className="form-group">
-                        <input className="form-control" type="password" placeholder="Password"/>
+                        <input className="form-control" type="password" name="password" id="password" placeholder="Password" value={password} onChange={(e)=>setPassword(e.target.value)}/>
                       </div>
                     </div>
                     <div className="col-12">
@@ -71,7 +117,7 @@ const Login = () =>{
                     </div>
                     <div className="col-12">
                       <div className="form-group">
-                        <button type="button" className="btn-theme">Sign In</button>
+                        <button type="button" className="btn-theme" onClick={handleLogin}>Sign In</button>
                       </div>
                     </div>
                   </div>

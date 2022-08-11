@@ -131,6 +131,7 @@ p:last-child {
 img {
   height: auto;
   max-width: 100%;
+  max-height: 240px;
 }
 
 iframe {
@@ -192,7 +193,7 @@ table p {
 }
 
 .row > * {
-  margin-top: 0;
+  margin-top: 10;
 }
 
 .row {
@@ -1180,7 +1181,7 @@ table p {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  height: 870px;
+  height: 500px;
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
@@ -1188,17 +1189,17 @@ table p {
 }
 @media only screen and (max-width: 1199px) {
   .home-slider-container .slider-content-area {
-    height: 700px;
+    height: 400px;
   }
 }
 @media only screen and (max-width: 991px) {
   .home-slider-container .slider-content-area {
-    height: 600px;
+    height: 350px;
   }
 }
 @media only screen and (max-width: 767px) {
   .home-slider-container .slider-content-area {
-    height: 520px;
+    height: 320px;
   }
 }
 @media only screen and (max-width: 575px) {
@@ -1537,13 +1538,13 @@ table p {
 }
 
 .job-details-area .container {
-  padding-top: 120px;
+  padding-top: 60px;
   padding-bottom: 76px;
 }
 @media only screen and (max-width: 1199px) {
   .job-details-area .container {
-    padding-top: 80px;
-    padding-bottom: 50px;
+    padding-top: 40px;
+    padding-bottom: 30px;
   }
 }
 
@@ -1746,11 +1747,11 @@ table p {
       -ms-flex-pack: justify;
           justify-content: space-between;
   margin-bottom: 50px;
-  padding: 45px 44px 45px 50px;
+  padding: 20px;
 }
 @media only screen and (max-width: 991px) {
   .job-details-wrap {
-    padding: 30px 21px 30px 30px;
+    padding: 15px;
   }
 }
 @media only screen and (max-width: 767px) {
@@ -1924,6 +1925,7 @@ table p {
 .job-details-item .content .desc {
   margin-bottom: 19px;
   margin-right: -4px;
+  text-align: justify;
 }
 .job-details-item .job-details-list li {
   font-size: 16px;
@@ -2861,18 +2863,18 @@ table p {
 -----------------------------------------------------------------------
 */
 .team-details-area .container {
-  padding-top: 120px;
-  padding-bottom: 111px;
+  padding-top: 60px;
+  padding-bottom: 50px;
 }
 @media only screen and (max-width: 1199px) {
   .team-details-area .container {
-    padding-top: 80px;
-    padding-bottom: 82px;
+    padding-top: 40px;
+    padding-bottom: 32px;
   }
 }
 @media only screen and (max-width: 991px) {
   .team-details-area .container {
-    padding-bottom: 50px;
+    padding-bottom: 30px;
   }
 }
 
@@ -3001,11 +3003,11 @@ table p {
       -ms-flex-pack: justify;
           justify-content: space-between;
   margin-bottom: 50px;
-  padding: 45px 44px 45px 50px;
+  padding: 20px;
 }
 @media only screen and (max-width: 1199px) {
   .team-details-wrap {
-    padding: 30px 30px 30px 30px;
+    padding: 15px;
   }
 }
 @media only screen and (max-width: 767px) {
@@ -5231,6 +5233,7 @@ table p {
           justify-content: flex-start;
   margin-top: 10px;
   margin-bottom: 0;
+  cursor: pointer;
 }
 .pagination-area .page-numbers li .page-number {
   background-color: #f4f7f7;
@@ -6966,7 +6969,7 @@ table p {
 }
 
 .jobs-bck-img {
-  background-image: url("../img/photos/details1.jpg");
+  background-image: url("../img/photos/always-job-search-1024x512.png");
   background-size: 'cover';
   background-repeat: 'no-repeat';
 }

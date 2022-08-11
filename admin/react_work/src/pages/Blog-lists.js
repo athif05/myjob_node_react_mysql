@@ -102,7 +102,7 @@ const BlogLists = () => {
                                                 <tr>
                                                     <td>{index+1}.</td>
                                                     <td>{item.title}</td>
-                                                    <td>{item.description.substring(0,50)}</td>
+                                                    <td dangerouslySetInnerHTML={{__html:item.descriptionsubstring(0,50)}}></td>
                                                     <td>
                                                         { item.image ? <img src={item.image} alt={item.title} style={imageStyle}/> : null}
                                                     </td>

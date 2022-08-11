@@ -1,18 +1,90 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import MobileMenu from "../components/MobileMenu";
+import Moment from 'moment'; //use for convert date format.
+import Pagination from './../components/Pagination';
 
 import AOS from "aos";
 
 const Blog = () =>{
+
+  const [blogDetails, setBlogDetails] = useState([]);
+  const [blogCounts, setBlogCounts] = useState([]);
+  const [latestBlog, setLatestBlog] = useState([]);
+
+  const params = useParams();
+
   useEffect(() => {
     document.title = 'BVC | Company-Details';
 
     AOS.init();
     AOS.refresh();
 
+    getBlogDetails();
+    getBlogCounts();
+    getLatestBlog();
+
   },[]);
+
+  const blogByCategory = async(cat_id)=>{
+    let result = await fetch(`http://localhost:12345/search-blog-by-category/${cat_id}`);
+    result = await result.json();
+
+    setBlogDetails(result);
+  }
+
+  const getBlogDetails = async() => {
+    let result = await fetch(`http://localhost:12345/all-blogs-data`);
+    result = await result.json();
+    setBlogDetails(result);
+  }
+
+  const getBlogCounts =async() =>{
+    let result = await fetch(`http://localhost:12345/count-blog-with-category`);
+    result = await result.json();
+    setBlogCounts(result);
+  }
+
+  const getLatestBlog = async() => {
+    let result = await fetch(`http://localhost:12345/latest-blogs`);
+    result = await result.json();
+    setLatestBlog(result);
+  }
+
+  
+  /* blog fetch by seach box, start here */
+  const searchHandler = async(event)=>{
+    
+    let key = event.target.value;
+    if(key){
+
+      let result = await fetch(`http://localhost:12345/search-blogs-data/${key}`);
+      result = await result.json();
+
+      setBlogDetails(result);
+      
+    } 
+  }
+  /* blog fetch by seach box, end here */
+
+  const imageStyle = {
+    width: "70px",
+    Height: "71px"
+  };
+
+  /* Pagination, start here */
+  const [showPerPage, setShowPerPage] = useState(12);
+  const [pagination, setPagination] = useState({
+      start: 0,
+      end: showPerPage,
+  });
+
+  const onPaginationChange = (start, end) => {
+      setPagination({ start: start, end: end });
+  };
+  /* Pagination, end here */
 
   return (
     <div className="wrapper">
@@ -45,182 +117,50 @@ const Blog = () =>{
             <div className="row justify-content-between flex-xl-row-reverse">
               <div className="col-xl-8">
                 <div className="row row-gutter-70">
+
+                  {
+                    ((blogDetails.length>0) && (blogDetails[0].name!=='No record found') ? blogDetails.slice(pagination.start, pagination.end).map((item, index) => 
                   <div className="col-sm-6 col-lg-4 col-xl-6">
                     
                     <div className="post-item">
                       <div className="thumb">
-                        <a href="/blog-details"><img src="assets/img/blog/2.jpg" alt="ssImage" width="370" height="270"/></a>
+                        <a href={"/blog-details/"+item.id}>
+                          { item.image ? <img src={"http://localhost:3000/"+item.image} alt={item.title}  width="370" height="270"/> : 
+                            <img src="/assets/img/blog/no-image.jpg" alt="ssImage" width="370" height="270"/>
+                          }
+                        </a>
                       </div>
                       <div className="content">
-                        <div className="author">By <a href="blog.html">Walter Houston</a></div>
-                        <h4 className="title"><a href="/blog-details">All of these amazing features <br/>come at an affordable price!</a></h4>
-                        <p>Lorem Ipsum is simpely dummy & text themes print industry orem psumen has been them industry spa also the loep into type setting.</p>
+                        <div className="author">By <a href={"/author-blogs/"+item.author_id}>{item.author_name}</a></div>
+                        <h4 className="title"><a href={"/blog-details/"+item.id}>{item.title}</a></h4>
+                        <p dangerouslySetInnerHTML={{__html:item.description.substring(0,150)}}></p>
                         <div className="meta">
-                          <span className="post-date">03 April, 2022</span>
+                          <span className="post-date">{Moment(item.created_at).format('DD-MM-YYYY')}</span>
                           <span className="dots"></span>
-                          <span className="post-time">10 min read</span>
+                          <span className="post-time">{item.blog_category_name}</span>
                         </div>
                       </div>
                     </div>
                     
                   </div>
-                  <div className="col-sm-6 col-lg-4 col-xl-6">
-                    
-                    <div className="post-item">
-                      <div className="thumb">
-                        <a href="/blog-details"><img src="assets/img/blog/3.jpg" alt="ssImage" width="370" height="270"/></a>
-                      </div>
-                      <div className="content">
-                        <div className="author">By <a href="/blog">Walter Houston</a></div>
-                        <h4 className="title"><a href="/blog-details">With WooLentor's drag-and <br/>drop interface for creating...</a></h4>
-                        <p>Lorem Ipsum is simpely dummy & text themes print industry orem psumen has been them industry spa also the loep into type setting.</p>
-                        <div className="meta">
-                          <span className="post-date">03 April, 2022</span>
-                          <span className="dots"></span>
-                          <span className="post-time">10 min read</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                  </div>
-                  <div className="col-sm-6 col-lg-4 col-xl-6">
-                    
-                    <div className="post-item">
-                      <div className="thumb">
-                        <a href="/blog-details"><img src="assets/img/blog/4.jpg" alt="ssImage" width="370" height="270"/></a>
-                      </div>
-                      <div className="content">
-                        <div className="author">By <a href="blog.html">Walter Houston</a></div>
-                        <h4 className="title"><a href="/blog-details">With WooLentor's drag-and <br/>drop interface for creating...</a></h4>
-                        <p>Lorem Ipsum is simpely dummy & text themes print industry orem psumen has been them industry spa also the loep into type setting.</p>
-                        <div className="meta">
-                          <span className="post-date">03 April, 2022</span>
-                          <span className="dots"></span>
-                          <span className="post-time">10 min read</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                  </div>
-                  <div className="col-sm-6 col-lg-4 col-xl-6">
-                    
-                    <div className="post-item">
-                      <div className="thumb">
-                        <a href="/blog-details"><img src="assets/img/blog/5.jpg" alt="ssImage" width="370" height="270"/></a>
-                      </div>
-                      <div className="content">
-                        <div className="author">By <a href="blog.html">Walter Houston</a></div>
-                        <h4 className="title"><a href="/blog-details">Make your store stand out <br/>from the others by converting</a></h4>
-                        <p>Lorem Ipsum is simpely dummy & text themes print industry orem psumen has been them industry spa also the loep into type setting.</p>
-                        <div className="meta">
-                          <span className="post-date">03 April, 2021</span>
-                          <span className="dots"></span>
-                          <span className="post-time">10 min read</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                  </div>
-                  <div className="col-sm-6 col-lg-4 col-xl-6">
-                    
-                    <div className="post-item">
-                      <div className="thumb">
-                        <a href="/blog-details"><img src="assets/img/blog/6.jpg" alt="ssImage" width="370" height="270"/></a>
-                      </div>
-                      <div className="content">
-                        <div className="author">By <a href="blog.html">Walter Houston</a></div>
-                        <h4 className="title"><a href="/blog-details">All of these amazing features <br/>come at an affordable price!</a></h4>
-                        <p>Lorem Ipsum is simpely dummy & text themes print industry orem psumen has been them industry spa also the loep into type setting.</p>
-                        <div className="meta">
-                          <span className="post-date">03 April, 2022</span>
-                          <span className="dots"></span>
-                          <span className="post-time">10 min read</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                  </div>
-                  <div className="col-sm-6 col-lg-4 col-xl-6">
-                    
-                    <div className="post-item">
-                      <div className="thumb">
-                        <a href="/blog-details"><img src="assets/img/blog/7.jpg" alt="ssImage" width="370" height="270"/></a>
-                      </div>
-                      <div className="content">
-                        <div className="author">By <a href="blog.html">Walter Houston</a></div>
-                        <h4 className="title"><a href="/blog-details">With WooLentor's drag-and <br/>drop interface for creating...</a></h4>
-                        <p>Lorem Ipsum is simpely dummy & text themes print industry orem psumen has been them industry spa also the loep into type setting.</p>
-                        <div className="meta">
-                          <span className="post-date">03 April, 2022</span>
-                          <span className="dots"></span>
-                          <span className="post-time">10 min read</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                  </div>
-                  <div className="col-sm-6 col-lg-4 col-xl-6">
-                    
-                    <div className="post-item">
-                      <div className="thumb">
-                        <a href="/blog-details"><img src="assets/img/blog/8.jpg" alt="ssImage" width="370" height="270"/></a>
-                      </div>
-                      <div className="content">
-                        <div className="author">By <a href="blog.html">Walter Houston</a></div>
-                        <h4 className="title"><a href="/blog-details">With WooLentor's drag-and <br/>drop interface for creating...</a></h4>
-                        <p>Lorem Ipsum is simpely dummy & text themes print industry orem psumen has been them industry spa also the loep into type setting.</p>
-                        <div className="meta">
-                          <span className="post-date">03 April, 2022</span>
-                          <span className="dots"></span>
-                          <span className="post-time">10 min read</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                  </div>
-                  <div className="col-sm-6 col-lg-4 col-xl-6">
-                    
-                    <div className="post-item">
-                      <div className="thumb">
-                        <a href="/blog-details"><img src="assets/img/blog/9.jpg" alt="ssImage" width="370" height="270"/></a>
-                      </div>
-                      <div className="content">
-                        <div className="author">By <a href="blog.html">Walter Houston</a></div>
-                        <h4 className="title"><a href="/blog-details">Make your store stand out <br/>from the others by converting</a></h4>
-                        <p>Lorem Ipsum is simpely dummy & text themes print industry orem psumen has been them industry spa also the loep into type setting.</p>
-                        <div className="meta">
-                          <span className="post-date">03 April, 2021</span>
-                          <span className="dots"></span>
-                          <span className="post-time">10 min read</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                  </div>
+                  ) : null)
+                }
+                  
+                
                   <div className="col-12 text-left">
+                    
+                    {
+                    (((Math.ceil(blogDetails.length / showPerPage)) > 1) && (blogDetails[0].name !== 'No record found')) ?
+
                     <div className="pagination-area">
-                      <nav>
-                        <ul className="page-numbers d-inline-flex">
-                          <li>
-                            <a className="page-number active" href="blog.html">1</a>
-                          </li>
-                          <li>
-                            <a className="page-number" href="blog.html">2</a>
-                          </li>
-                          <li>
-                            <a className="page-number" href="blog.html">3</a>
-                          </li>
-                          <li>
-                            <a className="page-number" href="blog.html">4</a>
-                          </li>
-                          <li>
-                            <a className="page-number next" href="blog.html">
-                              <i className="icofont-long-arrow-right"></i>
-                            </a>
-                          </li>
-                        </ul>
-                      </nav>
+
+                      <Pagination showPerPage={showPerPage} onPaginationChange={onPaginationChange} total={blogDetails.length} />
+                      
                     </div>
+                    :
+                      <></>
+                    } 
+
                   </div>
                 </div>
               </div>
@@ -229,14 +169,14 @@ const Blog = () =>{
                   <div className="widget-item">
                     <div className="widget-body">
                       <div className="widget-search-box">
-                        <form action="#" method="post">
+                        
                           <div className="form-input-item">
-                            <input type="search" id="search2" placeholder="Search here"/>
-                            <button type="submit" className="btn-src">
+                            <input type="search" id="search2" placeholder="Search here" onChange={searchHandler}/>
+                            <button type="submit" className="btn-src" onClick={searchHandler}>
                               <i className="icofont-search"></i>
                             </button>
                           </div>
-                        </form>
+                        
                       </div>
                     </div>
                   </div>
@@ -247,12 +187,13 @@ const Blog = () =>{
                     <div className="widget-body">
                       <div className="widget-categories">
                         <ul>
-                          <li><a href="/jobs">Commercial Movers<span>(16)</span></a></li>
-                          <li><a href="/jobs">Air Freight Services<span>(03)</span></a></li>
-                          <li><a href="/jobs">Drone Services<span>(08)</span></a></li>
-                          <li><a href="/jobs">Road Freight<span>(18)</span></a></li>
-                          <li><a href="/jobs">Warehousing<span>(02)</span></a></li>
-                          <li><a href="/jobs">Consulting Storage<span>(14)</span></a></li>
+                          {
+                            (blogCounts.length>0 ? blogCounts.map((item, index) =>
+                              <li><a onClick={()=>blogByCategory(item.id)} style={{cursor:"pointer"}}>{item.name}<span>({item.total_blog})</span></a></li>
+                            ):null)
+                          }
+                          
+                          <li><a onClick={()=>getBlogDetails()} style={{cursor:"pointer"}}>Clear All Filter</a></li>
                         </ul>
                       </div>
                     </div>
@@ -263,54 +204,33 @@ const Blog = () =>{
                     </div>
                     <div className="widget-body">
                       <div className="widget-post">
-                        <div className="widget-blog-post">
-                          <div className="thumb">
-                            <a href="/blog-details"><img src="assets/img/blog/s1.jpg" alt="ssImage" width="71" height="70"/></a>
-                          </div>
-                          <div className="content">
-                            <h4><a href="/blog-details">This includes shipment <br/>of raw materials.</a></h4>
-                            <div className="meta">
-                              <span className="post-date"><i className="icofont-ui-calendar"></i> 10 August, 2021</span>
+
+                        {
+                          ((latestBlog.length>0) && (latestBlog[0].name!=='No record found') ? latestBlog.map((item, index)=>
+                            <div className="widget-blog-post">
+                              <div className="thumb">
+                                <a href={"/blog-details/"+item.id}>
+                                { item.image ? <img src={"http://localhost:3000/"+item.image} alt={item.title} style={imageStyle}/> : 
+                                  <img src="/assets/img/blog/no-image.jpg" alt="NoImage" style={imageStyle}/>
+                                }
+                                </a>
+                              </div>
+                              <div className="content">
+                                <h4><a href={"/blog-details/"+item.id}>{item.title}</a></h4>
+                                <div className="meta">
+                                  <span className="post-date"><i className="icofont-ui-calendar"></i> { item.created_at ? Moment(item.created_at).format('DD-MM-YYYY') : null}</span>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                        <div className="widget-blog-post">
-                          <div className="thumb">
-                            <a href="/blog-details"><img src="assets/img/blog/s2.jpg" alt="ssImage" width="71" height="70"/></a>
-                          </div>
-                          <div className="content">
-                            <h4><a href="/blog-details">All of these amazing <br/>features come price.</a></h4>
-                            <div className="meta">
-                              <span className="post-date"><i className="icofont-ui-calendar"></i> 18 August, 2021</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="widget-blog-post">
-                          <div className="thumb">
-                            <a href="/blog-details"><img src="assets/img/blog/s3.jpg" alt="ssImage" width="71" height="70"/></a>
-                          </div>
-                          <div className="content">
-                            <h4><a href="/blog-details">This includes shipment <br/>of raw materials.</a></h4>
-                            <div className="meta">
-                              <span className="post-date"><i className="icofont-ui-calendar"></i> 19 August, 2021</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="widget-blog-post">
-                          <div className="thumb">
-                            <a href="/blog-details"><img src="assets/img/blog/s4.jpg" alt="ssImage" width="71" height="70"/></a>
-                          </div>
-                          <div className="content">
-                            <h4><a href="/blog-details">All of these amazing <br/>features come price.</a></h4>
-                            <div className="meta">
-                              <span className="post-date"><i className="icofont-ui-calendar"></i> 10 August, 2021</span>
-                            </div>
-                          </div>
-                        </div>
+                          ):null)
+                        }
+                        
+                        
                       </div>
                     </div>
                   </div>
-                  <div className="widget-item mb-md-0">
+
+                  {/* <div className="widget-item mb-md-0">
                     <div className="widget-title">
                       <h3 className="title">Popular Tags</h3>
                     </div>
@@ -328,7 +248,8 @@ const Blog = () =>{
                         </ul>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
+
                 </div>
               </div>
             </div>

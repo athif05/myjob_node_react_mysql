@@ -1,11 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import MobileMenu from "../components/MobileMenu";
+import Moment from 'moment'; //use for convert date format.
 
 import AOS from "aos";
 
 const JobDetails = () =>{
+
+  const [jobDetails, setJobDetails] = useState([]);
+  const [qualifications, setQualifications] = useState([]);
+
+  const params = useParams();
 
   useEffect(() => {
     document.title = 'BVC | Job-Details';
@@ -13,7 +20,29 @@ const JobDetails = () =>{
     AOS.init();
     AOS.refresh();
 
+    getJobDetails();
+
   },[]);
+
+
+  const getJobDetails = async()=>{
+    let result = await fetch(`http://localhost:12345/job-details/${params.id}`);
+    result = await result.json();
+
+    setJobDetails(result);
+
+    const qualification_ids = result[0].qualification_ids.split(',');
+
+    let result_qualifications = await fetch(`http://localhost:12345/job-qualifications/${qualification_ids}`);
+    result_qualifications = await result_qualifications.json();
+    
+    setQualifications(result_qualifications);
+  }
+
+  const imageStyle = {
+    width: "130px",
+    Height: "130px"
+  }
 
   return (
     <div className="wrapper">
@@ -41,6 +70,8 @@ const JobDetails = () =>{
           </div>
         </div>
         
+        {
+          ((jobDetails.length>0) && (jobDetails[0].name!=='No record found') ? jobDetails.map((item_job, index)=>
         <section className="job-details-area">
           <div className="container">
             <div className="row">
@@ -48,19 +79,21 @@ const JobDetails = () =>{
                 <div className="job-details-wrap">
                   <div className="job-details-info">
                     <div className="thumb">
-                      <img src="assets/img/companies/10.jpg" width="130" height="130" alt="HasTech"/>
+                      { item_job.company_logo ? <img src={"http://localhost:3000/"+item_job.company_logo} alt={item_job.job_title}  style={imageStyle}/> : 
+                        <img src="/assets/img/blog/no-image.jpg" alt="ssImage" style={imageStyle}/>
+                      }
                     </div>
                     <div className="content">
-                      <h4 className="title">Senior Web Developer</h4>
-                      <h5 className="sub-title">Obelus Concepts Ltd.</h5>
+                      <h4 className="title">{item_job.job_title}</h4>
+                      <h5 className="sub-title">{item_job.company_name}</h5>
                       <ul className="info-list">
-                        <li><i className="icofont-location-pin"></i> New York, USA</li>
-                        <li><i className="icofont-phone"></i> +88 456 796 457</li>
+                        <li><i className="icofont-location-pin"></i> {item_job.job_location_name}, {item_job.state_name}</li>
+                        <li><i className="icofont-phone"></i> {item_job.company_mobile_number}</li>
                       </ul>
                     </div>
                   </div>
                   <div className="job-details-price">
-                    <h4 className="title">$5000 <span>/monthly</span></h4>
+                    <h4 className="title">{item_job.salary} INR <span>/monthly</span></h4>
                     <button type="button" className="btn-theme">Apply Now</button>
                   </div>
                 </div>
@@ -71,21 +104,22 @@ const JobDetails = () =>{
                 <div className="job-details-item">
                   <div className="content">
                     <h4 className="title">Description</h4>
-                    <p className="desc">It is a long established fact that a reader will be distracted the readable content of page when looking atits layout. The point of using is that has more-or-less normal a distribution of letters, as opposed to usin content publishing packages web page editors. It is a long established fact that a reader will be distracts by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that has look like readable publishing packages and web page editors.</p>
-                    <p className="desc">It is a long established fact that a reader will be distracted the readable content of a page when looking atits layout. The point of using is that has more-or-less normal a distribution of letters, as opposed to usin content publishing packages web page editors.</p>
+                    <p className="desc" dangerouslySetInnerHTML={{__html:item_job.job_description}}></p>
                   </div>
                   <div className="content">
                     <h4 className="title">Responsibilities</h4>
-                    <ul className="job-details-list">
+                    <p className="desc" dangerouslySetInnerHTML={{__html:item_job.job_responsibilities}}></p>
+                    {/* <ul className="job-details-list">
                       <li><i className="icofont-check"></i> Developing custom themes (WordPress.org & ThemeForest Standards)</li>
                       <li><i className="icofont-check"></i> Creating reactive website designs</li>
                       <li><i className="icofont-check"></i> Working under strict deadlines</li>
                       <li><i className="icofont-check"></i> Develop page speed optimized themes</li>
-                    </ul>
+                    </ul> */}
                   </div>
                   <div className="content">
                     <h4 className="title">Requirements</h4>
-                    <ul className="job-details-list">
+                    <p className="desc" dangerouslySetInnerHTML={{__html:item_job.job_requirements}}></p>
+                    {/* <ul className="job-details-list">
                       <li><i className="icofont-check"></i> Having approved theme/s on ThemeForest will be given high preference.</li>
                       <li><i className="icofont-check"></i> Strong knowledge of WordPress Theme Standards</li>
                       <li><i className="icofont-check"></i> Ability to convert HTML templates into fully functional WordPress themes.</li>
@@ -94,21 +128,24 @@ const JobDetails = () =>{
                       <li><i className="icofont-check"></i> Ability to debug and fix bugs arising from other developer’s code.</li>
                       <li><i className="icofont-check"></i> Sense of humor</li>
                       <li><i className="icofont-check"></i> Hard worker and passionate – we are growing super fast</li>
-                    </ul>
+                    </ul> */}
                   </div>
                   <div className="content">
-                    <h4 className="title">Educational Requirements</h4>
-                    <p className="desc">It doesn’t matter where you went to college or what your CGPA was as long as you are smart, passionate, ready to work hard, and have fun.</p>
+                    <h4 className="title">Candidate's Requirements</h4>
+                    <p className="desc" dangerouslySetInnerHTML={{__html:item_job.candidate_requirements}}></p>
+                  </div>
+                  <div className="content">
+                    <h4 className="title">Skills</h4>
+                    <p className="desc" dangerouslySetInnerHTML={{__html:item_job.skills}}></p>
                   </div>
                   <div className="content">
                     <h4 className="title">Working Hours</h4>
                     <ul className="job-details-list">
-                      <li><i className="icofont-check"></i> 8:00 AM - 5:00 PM</li>
-                      <li><i className="icofont-check"></i> Weekly: 5 days.</li>
-                      <li><i className="icofont-check"></i> Weekend: Saturday, Sunday.</li>
+                      <li><i className="icofont-check"></i> {item_job.working_hours}</li>
+                      <li><i className="icofont-check"></i> {item_job.working_day_name}</li>
                     </ul>
                   </div>
-                  <div className="content">
+                  {/* <div className="content">
                     <h4 className="title">Benefits</h4>
                     <ul className="job-details-list">
                       <li><i className="icofont-check"></i> Work in a flat organization where your voice is always heard.</li>
@@ -138,7 +175,7 @@ const JobDetails = () =>{
                     <h4 className="title">Statement</h4>
                     <p className="desc">Finate is committed to creating the happiest company working for and is proud to provide equal opportunity to all. All the qualified applicants will receive consideration for employment without regard to race, color, ancestry, religion, sex,  sexual orientation, age, citizenship, marital status, disability, gender identity, or any other basis protected by federal, state, or local law.</p>
                     <a className="btn-apply-now" href="contact.html">Apply Now <i className="icofont-long-arrow-right"></i></a>
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="col-lg-5 col-xl-4">
@@ -153,63 +190,72 @@ const JobDetails = () =>{
                           <tr>
                             <td className="table-name">Job Type</td>
                             <td className="dotted">:</td>
-                            <td data-text-color="#03a84e">Full-time</td>
+                            <td data-text-color="#03a84e"> {item_job.types_of_job_name}</td>
                           </tr>
                           <tr>
                             <td className="table-name">Category</td>
                             <td className="dotted">:</td>
-                            <td>Development</td>
+                            <td>{item_job.main_job_category}</td>
                           </tr>
                           <tr>
-                            <td className="table-name">Posted</td>
+                            <td className="table-name">Job Posted</td>
                             <td className="dotted">:</td>
-                            <td>20 June, 2021</td>
+                            <td>{Moment(item_job.created_at).format('DD-MM-YYYY')}</td>
                           </tr>
                           <tr>
-                            <td className="table-name">Category</td>
+                            <td className="table-name">CTC</td>
                             <td className="dotted">:</td>
-                            <td>Development</td>
-                          </tr>
-                          <tr>
-                            <td className="table-name">Salary</td>
-                            <td className="dotted">:</td>
-                            <td>$5000 / Monthly</td>
+                            <td>{item_job.ctc} INR / Monthly</td>
                           </tr>
                           <tr>
                             <td className="table-name">Experience</td>
                             <td className="dotted">:</td>
-                            <td>05 Years</td>
+                            <td>
+                              {item_job.experience_required}
+                              { (item_job.experience_required==='Experience') ? <span><br/>Min: {item_job.min_experience_required}<br/>Max: {item_job.max_experience_required}</span> : null}
+                            </td>
                           </tr>
                           <tr>
                             <td className="table-name">Gender</td>
                             <td className="dotted">:</td>
-                            <td>Male or Female</td>
+                            <td>{item_job.gender}</td>
                           </tr>
                           <tr>
                             <td className="table-name">Qualification</td>
                             <td className="dotted">:</td>
-                            <td>BSC, MSC</td>
+                            <td>
+                              { qualifications.map((item_qual, index) => 
+                                <span>{item_qual.name}
+                                {(qualifications.length > index+1) ? ", " : null}
+                                </span>
+                              )}                          
+                            </td>
                           </tr>
                           <tr>
-                            <td className="table-name">Level</td>
+                            <td className="table-name">No of Opening</td>
                             <td className="dotted">:</td>
-                            <td>Senior</td>
+                            <td>{item_job.no_of_opening}</td>
+                          </tr>
+                          <tr>
+                            <td className="table-name">English ?</td>
+                            <td className="dotted">:</td>
+                            <td>{item_job.english_required}</td>
                           </tr>
                           <tr>
                             <td className="table-name">Applied</td>
                             <td className="dotted">:</td>
-                            <td>26 Applicant</td>
+                            <td>{item_job.job_applied} Applicant</td>
                           </tr>
-                          <tr>
+                          {/* <tr>
                             <td className="table-name">Application End</td>
                             <td className="dotted">:</td>
                             <td data-text-color="#ff6000">20 November, 2021</td>
-                          </tr>
+                          </tr> */}
                         </tbody>
                       </table>
                     </div>
                   </div>
-                  <div className="widget-item">
+                  {/* <div className="widget-item">
                     <div className="widget-title">
                       <h3 className="title">Share With</h3>
                     </div>
@@ -220,8 +266,8 @@ const JobDetails = () =>{
                       <a href="https://www.pinterest.com/" rel="noopener"><i className="icofont-pinterest"></i></a>
                       <a href="https://dribbble.com/" rel="noopener"><i className="icofont-dribbble"></i></a>
                     </div>
-                  </div>
-                  <div className="widget-item widget-tag">
+                  </div> */}
+                  {/* <div className="widget-item widget-tag">
                     <div className="widget-title">
                       <h3 className="title">Tags:</h3>
                     </div>
@@ -241,13 +287,14 @@ const JobDetails = () =>{
                       <a href="/jobs">Cleaning Agency</a>
                       <a href="/jobs">Business</a>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
           </div>
         </section>
-        
+        ) : null)
+      }
       </main>
 
       <Footer />
@@ -256,7 +303,7 @@ const JobDetails = () =>{
       <div id="scroll-to-top" className="scroll-to-top"><span className="icofont-rounded-up"></span></div>
 
     
-      <aside className="off-canvas-wrapper offcanvas offcanvas-start" tabindex="-1" id="AsideOffcanvasMenu" aria-labelledby="offcanvasExampleLabel">
+      <aside className="off-canvas-wrapper offcanvas offcanvas-start" tabIndex="-1" id="AsideOffcanvasMenu" aria-labelledby="offcanvasExampleLabel">
         <MobileMenu />
       </aside>
   

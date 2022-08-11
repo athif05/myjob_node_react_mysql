@@ -10,6 +10,18 @@ const fs = require('node:fs/promises');
 const fss = require("fs");
 var bcrypt = require('bcryptjs'); //for encryption-decryption
 var salt = bcrypt.genSaltSync(10); //use for salt
+var nodemailer = require('nodemailer'); //for send email
+
+
+/*email config setting, start here*/
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'athif.hussain@bvceservices.com',
+    pass: 'h#5Xfr3-T'
+  }
+});
+/*email config setting, end here*/
 
 
 const app = express();
@@ -29,7 +41,7 @@ app.get('/', (req, res)=>{
 app.post("/login", (req, res)=>{
 
 	const data = req.body;
-    /* console.warn(data); */
+    console.warn(data);
 
 	var email=req.body.email;
 	var password=req.body.password;
@@ -61,6 +73,7 @@ app.get("/count-job-candidate-employer", (req, res) => {
 
 	connection.query("SELECT count(id) as total_candidate, (select count(id) from  employer_details) as total_employer, (select count(id) from all_jobs) as total_job from candidate_details",(error, result) => {
 		if(error) throw error;
+		//console.log(result);
 			res.send(result);
 	});
 });
@@ -120,28 +133,10 @@ app.get("/candidate-details/:id", (req, res)=>{
 	
 	const final_object='';
 
-	connection.query("SELECT cd.*, cities.name as citie_name, states.name as state_name, notice_periods.name as notice_period, work_experiences.name as work_experience_name from candidate_details as cd LEFT JOIN cities on cities.id=cd.city_id LEFT JOIN states on states.id=cd.state_id LEFT JOIN notice_periods on notice_periods.id=cd.notice_period LEFT JOIN work_experiences on work_experiences.id=cd.work_experience where cd.user_id="+req.params.id, (error, result)=>{
+	var sql=`SELECT cd.*, cities.name as citie_name, states.name as state_name, notice_periods.name as notice_period, work_experiences.name as work_experience_name from candidate_details as cd LEFT JOIN cities on cities.id=cd.city_id LEFT JOIN states on states.id=cd.state_id LEFT JOIN notice_periods on notice_periods.id=cd.notice_period LEFT JOIN work_experiences on work_experiences.id=cd.work_experience where cd.user_id=`+req.params.id;
+	//console.log(sql);
+	connection.query(sql, (error, result)=>{
 		if(result.length > 0){
-
-			/* connection.query("SELECT * from candidate_work_experiences where user_id="+result[0].user_id, (error, results)=>{
-				if(results.length > 0){
-
-					//console.log(typeof results);
-
-					//result_wrk=results;
-					final_object=Object.assign(result, results);
-					//final_object={...result, ...results};
-
-				}
-			});  */
-
-			//result.push(result_wrk);
-
-			//console.log(typeof result_wrk);
-			//console.log(typeof final_object);
-			//console.log(final_object);
-			
-
 			res.send(result);
 		} else {
 			res.send([{name: "No record found"}]);
@@ -186,7 +181,7 @@ app.get("/candidate-qualifications/:user_id", (req, res)=>{
 /* show single job deatils api, start here */
 app.get("/job-details/:id", (req, res)=>{
 
-	connection.query("SELECT all_jobs.*, cities.name as job_location_name, states.name as state_name,  main_job_categories.name as main_job_category, job_categories.name as types_of_job_name, working_days.name as working_day_name, fee_charged_reasons.name as fee_charged_reason_name from all_jobs LEFT JOIN cities on cities.id=all_jobs.job_location_id LEFT JOIN states on states.id=all_jobs.state_id LEFT JOIN main_job_categories on main_job_categories.id=all_jobs.job_category_id LEFT JOIN job_categories on job_categories.id=all_jobs.types_of_job_id LEFT JOIN working_days on working_days.id=all_jobs.working_days LEFT JOIN fee_charged_reasons on fee_charged_reasons.id=all_jobs.candidate_fee_reasons where all_jobs.id="+req.params.id, (error, result)=>{
+	connection.query("SELECT all_jobs.*, cities.name as job_location_name, states.name as state_name,  main_job_categories.name as main_job_category, job_categories.name as types_of_job_name, working_days.name as working_day_name, fee_charged_reasons.name as fee_charged_reason_name, employer_details.company_name as company_name, employer_details.mobile_number as company_mobile_number, employer_details.company_logo as company_logo, count(job_applied_by_employees.id) as job_applied from all_jobs LEFT JOIN cities on cities.id=all_jobs.job_location_id LEFT JOIN states on states.id=all_jobs.state_id LEFT JOIN main_job_categories on main_job_categories.id=all_jobs.job_category_id LEFT JOIN job_categories on job_categories.id=all_jobs.types_of_job_id LEFT JOIN working_days on working_days.id=all_jobs.working_days LEFT JOIN fee_charged_reasons on fee_charged_reasons.id=all_jobs.candidate_fee_reasons LEFT JOIN employer_details on employer_details.employer_id=all_jobs.employer_id LEFT JOIN job_applied_by_employees on job_applied_by_employees.job_id=all_jobs.id where all_jobs.id="+req.params.id, (error, result)=>{
 		if(result.length > 0){
 			res.send(result);
 		} else {
@@ -223,6 +218,49 @@ app.get("/all-states", (req, res)=>{
 	}); 
 });
 /* fetch states api, end here */
+
+
+/* fetch  work experiences api, start here */
+app.get("/all-work-experiences", (req, res)=>{
+
+	connection.query("SELECT * from work_experiences where status='1' and is_deleted='0'", (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+});
+/* fetch work experiences api, end here */
+
+
+/* fetch  notice periods api, start here */
+app.get("/all-notice-periods", (req, res)=>{
+
+	connection.query("SELECT * from notice_periods where status='1' and is_deleted='0'", (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+});
+/* fetch notice periods api, end here */
+
+
+/* fetch job categories api, start here */
+app.get("/all-job-categories", (req, res)=>{
+
+	connection.query("SELECT * from job_categories where status='1' and is_deleted='0'", (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+});
+/* fetch job categories api, end here */
+
 
 
 /* fetch city api, start here */
@@ -403,7 +441,7 @@ app.put('/update-qualification/:id', async (req, res)=>{
 	
 	var name=req.body.name;
 	const sql = `UPDATE qualifications set name="${name}" where id="${req.params.id}"`;
-	console.log(sql);
+	//console.log(sql);
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;
 
@@ -494,7 +532,7 @@ app.put('/update-domain/:id', async (req, res)=>{
 	
 	var name=req.body.name;
 	const sql = `UPDATE company_domains set name="${name}" where id="${req.params.id}"`;
-	console.log(sql);
+	//console.log(sql);
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;
 
@@ -508,7 +546,7 @@ app.put('/update-domain/:id', async (req, res)=>{
 /* update domain data, start here */
 app.get('/all-jobs', async (req, res)=>{
 	
-	connection.query("SELECT all_jobs.*, working_days.name as working_day_name, job_categories.name as job_type_name, employer_details.company_name as company_name from all_jobs LEFT JOIN working_days on working_days.id=all_jobs.working_days LEFT JOIN job_categories on job_categories.id=all_jobs.types_of_job_id LEFT JOIN employer_details on employer_details.employer_id=all_jobs.employer_id", (error, result)=>{
+	connection.query("SELECT all_jobs.*, working_days.name as working_day_name, job_categories.name as job_type_name, employer_details.company_name as company_name, employer_details.company_logo as company_logo, employer_details.employer_id as employer_id, cities.name as job_location_city_name, states.name as job_location_state_name from all_jobs LEFT JOIN working_days on working_days.id=all_jobs.working_days LEFT JOIN job_categories on job_categories.id=all_jobs.types_of_job_id LEFT JOIN employer_details on employer_details.employer_id=all_jobs.employer_id LEFT JOIN cities on cities.id=all_jobs.job_location_id LEFT JOIN states on states.id=all_jobs.state_id", (error, result)=>{
 		if(result.length > 0){
 			res.send(result);
 		} else {
@@ -558,7 +596,7 @@ app.put('/update-job-category/:id', async (req, res)=>{
 	
 	var name=req.body.name;
 	const sql = `UPDATE job_categories set name="${name}" where id="${req.params.id}"`;
-	console.log(sql);
+	//console.log(sql);
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;
 
@@ -602,12 +640,28 @@ app.get('/edit-job-domain/:id', async (req, res)=>{
 });
 /* edit job-domain data, end here */
 
+
+/* active job-domain data, start here */
+app.get('/active-job-domain', async (req, res)=>{
+	
+	connection.query("SELECT * from main_job_categories where status='1' and is_deleted='0'", (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+
+});
+/* active job-domain data, end here */
+
+
 /* update job-domain data, start here */
 app.put('/update-job-domain/:id', async (req, res)=>{
 	
 	var name=req.body.name;
 	const sql = `UPDATE main_job_categories set name="${name}" where id="${req.params.id}"`;
-	console.log(sql);
+	//console.log(sql);
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;
 
@@ -657,7 +711,7 @@ app.put('/update-notice-period/:id', async (req, res)=>{
 	
 	var name=req.body.name;
 	const sql = `UPDATE notice_periods set name="${name}" where id="${req.params.id}"`;
-	console.log(sql);
+	//console.log(sql);
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;
 
@@ -707,7 +761,7 @@ app.put('/update-fee-charge-reason/:id', async (req, res)=>{
 	
 	var name=req.body.name;
 	const sql = `UPDATE fee_charged_reasons set name="${name}" where id="${req.params.id}"`;
-	console.log(sql);
+	//console.log(sql);
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;
 
@@ -766,7 +820,7 @@ app.put('/update-generic-table/:tbl/:id', async (req, res)=>{
 	
 	var name=req.body.name;
 	const sql = `UPDATE `+req.params.tbl+` set name="${name}" where id="${req.params.id}"`;
-	console.log(sql);
+	//console.log(sql);
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;
 
@@ -784,7 +838,7 @@ app.put('/update-city/:id', async (req, res)=>{
 	var state_id=req.body.state_id;
 
 	const sql = `UPDATE cities set name="${name}",state_id="${state_id}" where id="${req.params.id}"`;
-	console.log(sql);
+	//console.log(sql);
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;
 
@@ -823,7 +877,7 @@ app.post('/add-admin-account', async (req, res)=>{
 	var hash_password = bcrypt.hashSync(password, salt);
 
 	sql = `INSERT INTO admin_users (name, email, mobile_number, password, role_id, status) VALUES ("${name}","${email}","${mobile}","${hash_password}","${role_id}","1")`;
-	console.log(sql);
+	//console.log(sql);
   	connection.query(sql, function(error, result) {
 		
 		if(error) throw error;
@@ -850,7 +904,7 @@ app.put('/update-admin-account/:id', async (req, res)=>{
 	var hash_password = bcrypt.hashSync(password, salt);
 
 	const sql = `UPDATE admin_users set name="${name}",email="${email}",mobile_number="${mobile}",password="${hash_password}",role_id="${role_id}" where id="${req.params.id}"`;
-	console.log(sql);
+	//console.log(sql);
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;
 
@@ -893,7 +947,7 @@ app.post('/update-about-us', (req, res)=>{
 	if(!req.files){
 
 		let sql="UPDATE aboutuses set title=?, description=? where id=1";
-		console.log(sql);
+		//console.log(sql);
 		connection.query(sql,[title, description], (error, result)=>{
 			if(error) throw error;
 
@@ -968,7 +1022,7 @@ app.put('/update-blog-category/:id', async (req, res)=>{
 	var name=req.body.name;
 
 	const sql = `UPDATE blog_categories set name="${name}" where id="${req.params.id}"`;
-	console.log(sql);
+	//console.log(sql);
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;
 
@@ -1024,7 +1078,7 @@ app.post('/add-author', async (req, res)=>{
 	var blog_category_id=req.body.blog_category_id;
 	
 	sql = `INSERT INTO authors (name, email, mobile_number, alternate_number, address, blog_category_id, status) VALUES ("${name}","${email}","${mobile_number}","${alternate_number}","${address}","${blog_category_id}","1")`;
-	console.log(sql);
+	//console.log(sql);
   	connection.query(sql, function(error, result) {
 		
 		if(error) throw error;
@@ -1049,7 +1103,7 @@ app.put('/update-author/:id', async (req, res)=>{
 	var blog_category_id=req.body.blog_category_id;
 
 	const sql = `UPDATE authors set name="${name}",email="${email}",mobile_number="${mobile_number}",alternate_number="${alternate_number}",address="${address}",blog_category_id="${blog_category_id}" where id="${req.params.id}"`;
-	console.log(sql);
+	//console.log(sql);
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;
 
@@ -1064,7 +1118,7 @@ app.put('/update-author/:id', async (req, res)=>{
 app.get("/all-blogs-data", (req, res)=>{
 
 	const sql = "SELECT blogs.*, blog_categories.name as blog_category_name, authors.name as author_name FROM blogs LEFT JOIN blog_categories on blog_categories.id=blogs.blog_category_id LEFT JOIN authors on authors.id=blogs.author_id ";
-	console.log(sql);
+	//console.log(sql);
 	connection.query(sql, (error, result)=>{
 		if(result.length > 0){
 			res.send(result);
@@ -1096,7 +1150,7 @@ app.post('/add-blog', async (req, res)=>{
 		}
 
 		sql = `INSERT INTO blogs (title, description, image, author_id, blog_category_id, status) VALUES ("${title}","${description}","${image_path}","${author_id}","${blog_category_id}","1")`;
-		console.log(sql);
+		//console.log(sql);
 		connection.query(sql, function(error, result) {
 			
 			if(error) throw error;
@@ -1140,7 +1194,7 @@ app.put('/update-blog/:id', async (req, res)=>{
 	if(!req.files){
 
 		const sql = `UPDATE blogs set title="${title}",description="${description}",blog_category_id="${blog_category_id}",author_id="${author_id}" where id="${req.params.id}"`;
-		console.log(sql);
+		//console.log(sql);
 		connection.query(sql, (error, result)=>{
 			if(error) throw error;
 
@@ -1175,7 +1229,7 @@ app.put('/update-blog/:id', async (req, res)=>{
 			}
 	
 			const sql = `UPDATE blogs set image="${image_path}",title="${title}",description="${description}",blog_category_id="${blog_category_id}",author_id="${author_id}" where id="${req.params.id}"`;
-			console.log(sql);
+			//console.log(sql);
 			connection.query(sql, (error, result)=>{
 				if(error) throw error;
 		
@@ -1210,6 +1264,405 @@ app.put('/update-contact-us/', async (req, res)=>{
 
 });
 /* update contact-us data, end here */
+
+
+/*---------- Front End API, start here -----------*/
+
+/* add new user account in table, start here */
+app.post('/user-registration', async (req, res)=>{
+    
+    const data = req.body;
+    var name=req.body.name;
+	var number=req.body.number;
+	var email=req.body.email;
+	var password=req.body.password;
+	var user_type=req.body.user_type;
+	
+	// hasing password
+	var hash_password = bcrypt.hashSync(password, salt);
+
+	sql = `INSERT INTO users (name, email, mobile_number, password, user_type, status, privacy_policy) VALUES ("${name}","${email}","${number}","${hash_password}","${user_type}","1","1")`;
+	//console.log(sql);
+  	connection.query(sql, function(error, result) {
+		
+		if(error) throw error;
+		
+		var user_id = result.insertId;
+
+		if(user_type=='1'){
+
+			sql2 = `INSERT INTO candidate_details (name, email, mobile_number, user_id, status) VALUES ("${name}","${email}","${number}","${user_id}","1")`;
+			//console.log(sql2);
+		  	connection.query(sql2);
+
+		} else if(user_type=='2') {
+			sql2 = `INSERT INTO employer_details (company_name, email, mobile_number, employer_id, status) VALUES ("${name}","${email}","${number}","${user_id}","1")`;
+			//console.log(sql2);
+		  	connection.query(sql2);
+		}
+
+
+		res.send(result);
+
+		console.log("1 record inserted");
+
+	});
+
+});
+/* add new admin account in table, end here */
+
+/* login api, start here */
+app.post("/user-login", (req, res)=>{
+
+	const data = req.body;
+
+	var email=req.body.email;
+	var password=req.body.password;
+
+	const sql=`SELECT id, name, email, user_type, password from users where status='1' and is_deleted='0' and email="${email}"`;
+	//console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(result.length > 0){
+
+			var db_pass=result[0].password;
+			var result=result[0];
+			
+			delete result.password;
+
+			if(bcrypt.compareSync(password, db_pass)){
+				res.send(result);
+			} else{
+				res.send([{name: "No record found"}]);
+			}
+			
+
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+});
+/* login api, end here */
+
+/* forgot password api, start here */
+app.post("/forgot-password", (req, res)=>{
+
+	var email = req.body.email;
+
+	const sql=`SELECT id, email, password from users where status='1' and is_deleted='0' and email="${email}"`;
+	connection.query(sql, (error, result)=>{
+		if(result.length>0){
+
+			/*var user_idd=result[0].id;
+			user_idd='bvc98'+user_idd;
+
+			var mailOptions = {
+			  from: 'athif.hussain@bvceservices.com',
+			  to: 'athif.hussain05@gmail.com',
+			  subject: 'Reset Password Node.js',
+			  html: "<h1>Welcome {email},</h1> <br/><p>Reset your password, by <a href='http://localhost:3001/reset-password/"'.${user_idd}.'" target='_blank'>click here</a></p>"
+			};
+
+			transporter.sendMail(mailOptions, function(error, info){
+			  if (error) {
+			    console.log(error);
+			  } else {
+			    console.log('Email sent: ' + info.response);
+			  }
+			});*/
+			
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+});
+/* forgot password api, end here */
+
+/* add new contact email in table, start here */
+app.post('/contact-email', async (req, res)=>{
+    
+    const data = req.body;
+    var name=req.body.name;
+	var email=req.body.email;
+	var subject=req.body.subject;
+	var message=req.body.message;
+	
+
+	sql = `INSERT INTO contact_emails (name, email, subject, message) VALUES ("${name}","${email}","${subject}","${message}")`;
+	//console.log(sql);
+  	connection.query(sql, function(error, result) {
+		
+		if(error) throw error;
+		
+		res.send(result);
+
+		console.log("1 record inserted");
+
+	});
+
+});
+/* add new contact email in table, end here */
+
+
+/* count blog with blog category name, start here */
+app.get("/count-blog-with-category", (req, res) => {
+
+//connection.query("SELECT * , (select count(id) from  employer_details) as total_employer, (select count(id) from all_jobs) as total_job from blogs",(error, result) => {
+
+	connection.query("SELECT blog_categories.*,  count(blogs.id) as total_blog from blog_categories LEFT JOIN blogs on blogs.blog_category_id=blog_categories.id where blog_categories.status='1' and blog_categories.is_deleted='0' group by blogs.blog_category_id order by blog_categories.name asc",(error, result) => {
+		if(error) throw error;
+		//console.log(result);
+			res.send(result);
+	});
+});
+/* count blog with blog category name, end here */
+
+/* show latest 5 blogs api, start here */
+app.get("/latest-blogs", (req, res)=>{
+
+	const sql = "SELECT blogs.*, blog_categories.name as blog_category_name, authors.name as author_name FROM blogs LEFT JOIN blog_categories on blog_categories.id=blogs.blog_category_id LEFT JOIN authors on authors.id=blogs.author_id order by blogs.id desc limit 0,5";
+	
+	connection.query(sql, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+});
+/* show latest 5 blogs api, end here */
+
+
+/* show single job deatils api, start here */
+app.get("/blog-details/:id", (req, res)=>{
+
+	connection.query("SELECT blogs.*, blog_categories.name as blog_category_name, authors.name as author_name FROM blogs LEFT JOIN blog_categories on blog_categories.id=blogs.blog_category_id LEFT JOIN authors on authors.id=blogs.author_id where blogs.id="+req.params.id, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+});
+/* show single job deatils api, end here */
+
+
+/* show all blogs api, start here */
+app.get("/blog-by-category/:cat_id/:id", (req, res)=>{
+
+	const sql = "SELECT blogs.*, blog_categories.name as blog_category_name, authors.name as author_name FROM blogs LEFT JOIN blog_categories on blog_categories.id=blogs.blog_category_id LEFT JOIN authors on authors.id=blogs.author_id where blogs.blog_category_id="+req.params.cat_id+" and blogs.id!="+req.params.id;
+	connection.query(sql, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+});
+/* show all blogs api, end here */
+
+
+/* search blogs by category api, start here */
+app.get("/search-blog-by-category/:cat_id", (req, res)=>{
+
+	var cat_id=req.params.cat_id;
+
+	const sql = "SELECT blogs.*, blog_categories.name as blog_category_name, authors.name as author_name FROM blogs LEFT JOIN blog_categories on blog_categories.id=blogs.blog_category_id LEFT JOIN authors on authors.id=blogs.author_id where blogs.blog_category_id="+cat_id;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+	
+});
+/* search blogs by category api, start here */
+
+
+/* search blogs api, start here */
+app.get("/search-blogs-data/:key", (req, res)=>{
+
+	const sql = `SELECT blogs.*, blog_categories.name as blog_category_name, authors.name as author_name FROM blogs LEFT JOIN blog_categories on blog_categories.id=blogs.blog_category_id LEFT JOIN authors on authors.id=blogs.author_id where (blogs.title REGEXP "${req.params.key}") or (blogs.description REGEXP "${req.params.key}")`;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+});
+/* search blogs api, end here */
+
+
+/* fetch all active jobs data, start here */
+app.get('/all-active-jobs', async (req, res)=>{
+	
+	const sql=`SELECT all_jobs.*, working_days.name as working_day_name, job_categories.name as job_type_name, employer_details.company_name as company_name, employer_details.company_logo as company_logo, employer_details.employer_id as employer_id, cities.name as job_location_city_name, states.name as job_location_state_name from all_jobs LEFT JOIN working_days on working_days.id=all_jobs.working_days LEFT JOIN job_categories on job_categories.id=all_jobs.types_of_job_id LEFT JOIN employer_details on employer_details.employer_id=all_jobs.employer_id LEFT JOIN cities on cities.id=all_jobs.job_location_id LEFT JOIN states on states.id=all_jobs.state_id where all_jobs.status='1' and all_jobs.is_deleted='0'`;
+	//console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+
+});
+/* fetch all active jobs data, end here */
+
+
+/* fetch all active jobs with category data, start here */
+app.get('/all-active-jobs-with-category/:cat_id', async (req, res)=>{
+	
+	connection.query("SELECT all_jobs.*, working_days.name as working_day_name, job_categories.name as job_type_name, employer_details.company_name as company_name, employer_details.company_logo as company_logo, employer_details.employer_id as employer_id, cities.name as job_location_city_name, states.name as job_location_state_name from all_jobs LEFT JOIN working_days on working_days.id=all_jobs.working_days LEFT JOIN job_categories on job_categories.id=all_jobs.types_of_job_id LEFT JOIN employer_details on employer_details.employer_id=all_jobs.employer_id LEFT JOIN cities on cities.id=all_jobs.job_location_id LEFT JOIN states on states.id=all_jobs.state_id where all_jobs.job_category_id="+req.params.cat_id+" and all_jobs.status='1' and all_jobs.is_deleted='0'", (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+
+});
+/* fetch all active jobs with category data, end here */
+
+
+/* fetch all active jobs with url query data, start here */
+app.get('/all-active-jobs-with-url-query/:key_title/:city_id/:category_id', async (req, res)=>{
+	
+	var qry='';
+
+	var key_title=req.params.key_title;
+	var city_id=req.params.city_id;
+	var category_id=req.params.category_id;
+
+	if(key_title!=='NULL'){
+		qry+=` and ((all_jobs.job_title REGEXP '${key_title}') or (all_jobs.job_description REGEXP '${key_title}'))`;
+	}
+
+	if(city_id!=='NULL'){
+		qry+=` and all_jobs.job_location_id='${city_id}'`;
+	}
+
+	if(category_id!=='NULL'){
+		qry+=` and all_jobs.job_category_id='${category_id}'`;
+	}
+
+	const sql=`SELECT all_jobs.*, working_days.name as working_day_name, job_categories.name as job_type_name, employer_details.company_name as company_name, employer_details.company_logo as company_logo, employer_details.employer_id as employer_id, cities.name as job_location_city_name, states.name as job_location_state_name from all_jobs LEFT JOIN working_days on working_days.id=all_jobs.working_days LEFT JOIN job_categories on job_categories.id=all_jobs.types_of_job_id LEFT JOIN employer_details on employer_details.employer_id=all_jobs.employer_id LEFT JOIN cities on cities.id=all_jobs.job_location_id LEFT JOIN states on states.id=all_jobs.state_id where all_jobs.status='1' and all_jobs.is_deleted='0'`+qry;
+	//console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+
+});
+/* fetch all active jobs with url query data, end here */
+
+
+/* fetch jobs qualifications in job details page in frontend api, start here */
+app.get("/job-qualifications/:ids", (req, res)=>{
+	
+	let all_ids = req.params.ids;
+
+	/*const checkTYpe = typeof all_ids;
+	console.log('typeof '+ checkTYpe);*/
+
+	const sql = `SELECT name from qualifications where id in (${all_ids})`;
+
+	connection.query(sql, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+});
+/* fetch jobs qualifications in job details page in frontend api, end here */
+
+
+/* fetch city api, start here */
+app.get("/jobs-cities", (req, res)=>{
+
+	connection.query("SELECT cities.* from cities INNER JOIN all_jobs on cities.id=all_jobs.job_location_id where cities.status='1' and cities.is_deleted='0' and cities.country_id='101' order by name asc", (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	}); 
+});
+/* fetch city api, end here */
+
+
+/* fetch city api, start here */
+app.post("/search-jobs", (req, res)=>{
+
+	var qry='';
+
+	var key_title=req.body.key_title;
+	var city_id=req.body.city_id;
+	var category_id=req.body.category_id;
+
+	if(key_title){
+		qry+=` and ((all_jobs.job_title REGEXP '${key_title}') or (all_jobs.job_description REGEXP '${key_title}'))`;
+	}
+
+	if(city_id){
+		qry+=` and all_jobs.job_location_id='${city_id}'`;
+	}
+
+	if(category_id){
+		qry+=` and all_jobs.job_category_id='${category_id}'`;
+	}
+
+	
+	const sql=`SELECT all_jobs.*, working_days.name as working_day_name, job_categories.name as job_type_name, employer_details.company_name as company_name, employer_details.company_logo as company_logo, employer_details.employer_id as employer_id, cities.name as job_location_city_name, states.name as job_location_state_name from all_jobs LEFT JOIN working_days on working_days.id=all_jobs.working_days LEFT JOIN job_categories on job_categories.id=all_jobs.types_of_job_id LEFT JOIN employer_details on employer_details.employer_id=all_jobs.employer_id LEFT JOIN cities on cities.id=all_jobs.job_location_id LEFT JOIN states on states.id=all_jobs.state_id where all_jobs.status='1' and all_jobs.is_deleted='0'`+qry;
+	//console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+
+});
+/* fetch city api, end here */
+
+
+/* count jobs with blog category name, start here */
+app.get("/jobs-counts-with-category", (req, res) => {
+
+	connection.query("SELECT main_job_categories.*, count(all_jobs.id) as total_jobs from main_job_categories LEFT JOIN all_jobs on all_jobs.job_category_id=main_job_categories.id where main_job_categories.status='1' and main_job_categories.is_deleted='0' and all_jobs.status='1' and all_jobs.is_deleted='0' group by all_jobs.job_category_id order by main_job_categories.name asc",(error, result) => {
+		if(error) throw error;
+		//console.log(result);
+			res.send(result);
+	});
+});
+/* count jobs with blog category name, end here */
+
+
+/* update domain data, start here */
+app.get('/recent-active-jobs-list', async (req, res)=>{
+	
+	connection.query("SELECT all_jobs.*, working_days.name as working_day_name, job_categories.name as job_type_name, employer_details.company_name as company_name, employer_details.company_logo as company_logo, employer_details.employer_id as employer_id, cities.name as job_location_city_name, states.name as job_location_state_name from all_jobs LEFT JOIN working_days on working_days.id=all_jobs.working_days LEFT JOIN job_categories on job_categories.id=all_jobs.types_of_job_id LEFT JOIN employer_details on employer_details.employer_id=all_jobs.employer_id LEFT JOIN cities on cities.id=all_jobs.job_location_id LEFT JOIN states on states.id=all_jobs.state_id where all_jobs.status='1' and all_jobs.is_deleted='0' order by all_jobs.id desc limit 0,9", (error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No record found"}]);
+		}
+	});
+
+});
+/* update domain data, end here */
+
+
+/*---------- Front End API, end here -----------*/
 
 
 app.listen(12345);

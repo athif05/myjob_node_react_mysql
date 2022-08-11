@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import AOS from "aos";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -13,8 +13,12 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 
-
 const AboutUs = () =>{
+
+  /* fetch about us details */
+  const [aboutDetails, setAboutDetails] = useState([]);
+  const [countJobCandidateCompany, setCountJobCandidateCompany] = useState([]);
+  const [companyLogo, setCompanyLogo] = useState([]);
 
   useEffect(() => {
     document.title = 'BVC | About Us';
@@ -22,7 +26,42 @@ const AboutUs = () =>{
     AOS.init();
     AOS.refresh();
 
+    getAboutUs();
+    getCountJobCandidateCompany();
+    getCompanyLogo();
+
   },[]);
+
+
+  const getAboutUs = async() => {
+    const tbl = 'aboutuses';
+    let result = await fetch(`http://localhost:12345/all-generic-data/${tbl}`);
+    result = await result.json();
+
+    setAboutDetails(result);
+  }
+
+  const getCountJobCandidateCompany = async()=> {
+    
+    let result = await fetch(`http://localhost:12345/count-job-candidate-employer`);
+    result = await result.json();
+    //console.log(result[0]);
+    setCountJobCandidateCompany(result);
+  }
+
+  const getCompanyLogo = async()=>{
+    let result = await fetch(`http://localhost:12345/all-employers-data`);
+    result = await result.json();
+    //console.log(result[0]);
+    setCompanyLogo(result);
+  }
+
+
+  const imageStyle = {
+    width: "100%",
+    maxHeight: "400px",
+    marginBottom: "20px"
+  };
 
   return (
     <div className="wrapper">
@@ -49,67 +88,30 @@ const AboutUs = () =>{
             </div>
           </div>
         </div>
-        
+        {
+          ((aboutDetails.length>0) && (aboutDetails[0].name!=='No record found') ? aboutDetails.map((item, index) => 
         <section className="about-area about-default-wrapper">
           <div className="container">
             <div className="about-item">
               <div className="row">
-                <div className="col-md-6 col-lg-3">
-                  <div className="about-thumb" data-aos="fade-down" data-aos-duration="1000">
-                    <img src="assets/img/about/1.jpg" alt="HasTech"/>
-                  </div>
-                </div>
-                <div className="col-md-6 col-lg-3">
-                  <div className="about-thumb about-thumb-two" data-aos="fade-down" data-aos-duration="1200">
-                    <img src="assets/img/about/2.jpg" alt="bvc"/>
-                  </div>
-                </div>
-                <div className="col-lg-6">
+                                
+                <div className="col-lg-12 ">
                   <div className="about-content" data-aos="fade-down" data-aos-duration="1000">
                     <h4 className="sub-title">// About BVC</h4>
-                    <h3 className="title">BVC help your for get your dream job and build your bright career.</h3>
-                    <p className="desc">It is a long established fact that a reader will be distracted the readable content of a page when looking at its layout. The point of using is that has more-or-less normal a distribution of letters, as opposed to using 'Content publishing packages web page editors.</p>
-                    <div className="member-join-content" data-aos="fade-right" data-aos-duration="1200">
-                      <div className="member-join-thumb">
-                        <ul>
-                          <li>
-                            <a href="candidate-details.html">
-                              <img src="assets/img/about/member1.png" width="50" height="50" alt="bvc"/>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="candidate-details.html">
-                              <img src="assets/img/about/member2.png" width="50" height="50" alt="bvc"/>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="candidate-details.html">
-                              <img src="assets/img/about/member3.png" width="50" height="50" alt="bvc"/>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="candidate-details.html">
-                              <img src="assets/img/about/member4.png" width="50" height="50" alt="bvc"/>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="candidate-details.html">
-                              <img src="assets/img/about/member4.png" width="50" height="50" alt="bvc"/>
-                              <span>+</span>
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                      <div className="member-join-btn">
-                        <a className="join-now-btn" href="job-details.html"><span>+</span> Join Now</a>
-                      </div>
-                    </div>
+                    <h3 className="title">{item.title}</h3>
+
+                    { item.image ? <img src={"http://localhost:3000/"+item.image} alt={item.title} style={imageStyle}/> : null}
+
+                    <p className="desc" style={{textAlign:"justify"}} dangerouslySetInnerHTML={{__html:item.description}}></p>
+                    
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
+        ): null)
+      }
         
         <section className="funfact-area bg-color-gray">
           <div className="container">
@@ -119,7 +121,13 @@ const AboutUs = () =>{
                   <div className="funfact-col">
                     
                     <div className="funfact-item" data-aos="fade-down">
-                      <h2 className="counter-number"><span className="counter" data-counterup-delay="50">5689</span></h2>
+                      <h2 className="counter-number"><span className="counter" data-counterup-delay="50">
+                      {
+                          (countJobCandidateCompany.map((item_total_job, index) =>
+                              item_total_job.total_job
+                          ))
+                      }
+                      </span></h2>
                       <h6 className="counter-title">Total Jobs</h6>
                     </div>
                     
@@ -127,7 +135,13 @@ const AboutUs = () =>{
                   <div className="funfact-col">
                     
                     <div className="funfact-item" data-aos="fade-down" data-aos-duration="1500">
-                      <h2 className="counter-number"><span className="counter" data-counterup-delay="50">8567</span></h2>
+                      <h2 className="counter-number"><span className="counter" data-counterup-delay="50">
+                      {
+                          (countJobCandidateCompany.map((item_total_job, index) =>
+                              item_total_job.total_candidate
+                          ))
+                      }  
+                      </span></h2>
                       <h6 className="counter-title">Candidates</h6>
                     </div>
                     
@@ -135,7 +149,13 @@ const AboutUs = () =>{
                   <div className="funfact-col">
                     
                     <div className="funfact-item" data-aos="fade-down" data-aos-duration="1700">
-                      <h2 className="counter-number"><span className="counter" data-counterup-delay="50">7457</span></h2>
+                      <h2 className="counter-number"><span className="counter" data-counterup-delay="50">
+                      {
+                          (countJobCandidateCompany.map((item_total_job, index) =>
+                              item_total_job.total_candidate
+                          ))
+                      }   
+                      </span></h2>
                       <h6 className="counter-title">Resume</h6>
                     </div>
                     
@@ -143,19 +163,18 @@ const AboutUs = () =>{
                   <div className="funfact-col">
                     
                     <div className="funfact-item" data-aos="fade-down" data-aos-duration="1900">
-                      <h2 className="counter-number"><span className="counter" data-counterup-delay="50">6483</span></h2>
+                      <h2 className="counter-number"><span className="counter" data-counterup-delay="50">
+                      {
+                          (countJobCandidateCompany.map((item_total_job, index) =>
+                              item_total_job.total_employer
+                          ))
+                      }  
+                      </span></h2>
                       <h6 className="counter-title">Compnay’s</h6>
                     </div>
                     
                   </div>
-                  <div className="funfact-col">
-                    
-                    <div className="funfact-item" data-aos="fade-down" data-aos-duration="2200">
-                      <h2 className="counter-number"><span className="counter" data-counterup-delay="50">358</span></h2>
-                      <h6 className="counter-title">Country’s</h6>
-                    </div>
-                    
-                  </div>
+                  
                 </div>
               </div>
             </div>
@@ -513,76 +532,21 @@ const AboutUs = () =>{
 
                   <div className="swiper brand-logo-slider-container">
                     <div className="swiper-wrapper">
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
+                      {
+                        ((companyLogo.length>0) && (companyLogo[0]!=='No record found') ? companyLogo.map((item, index)=>
                         
-                        <div className="brand-logo-item">
-                          <img src="assets/img/brand-logo/1.png" alt="bvc"/>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="brand-logo-item">
-                          <img src="assets/img/brand-logo/2.png" alt="bvc"/>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="brand-logo-item">
-                          <img src="assets/img/brand-logo/3.png" alt="bvc"/>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="brand-logo-item">
-                          <img src="assets/img/brand-logo/4.png" alt="bvc"/>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="brand-logo-item">
-                          <img src="assets/img/brand-logo/5.png" alt="bvc"/>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="brand-logo-item">
-                          <img src="assets/img/brand-logo/6.png" alt="bvc"/>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="brand-logo-item">
-                          <img src="assets/img/brand-logo/1.png" alt="bvc"/>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
+                          <SwiperSlide>
+                            <div className="swiper-slide">
+                              
+                              <div className="brand-logo-item">
+                                <img src={"http://localhost:3000/"+item.company_logo} alt={item.company_name}/>
+                              </div>
+                              
+                            </div>
+                          </SwiperSlide>
+                        ) : null)
+                      }
+              
                     </div>
                   </div>
                   

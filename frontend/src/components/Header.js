@@ -1,6 +1,33 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
+
+    const navigate = useNavigate();
+    
+
+    //get item from local storage
+    const auth = localStorage.getItem('react_user_front');
+    /* var auth_json=JSON.parse(JSON.stringify(auth)); //convert string into json
+    setLoginDetails(auth_json);
+    console.log(loginDetails); */
+
+    if(auth){
+        const userData = JSON.parse(localStorage.getItem('react_user_front'));
+        var user_type = userData.user_type;
+        var user_id = userData.id;
+    } else {
+        var user_type='';
+        var user_id = '';
+    }
+    
+
+
+    //logout function
+    const logout = () => {
+        localStorage.clear();
+        navigate('/login');
+    }
 
     return (
         <>
@@ -12,8 +39,8 @@ const Header = () => {
                     <div className="header-align-start">
                     <div className="header-logo-area">
                         <a href="/">
-                            <img className="logo-main" src="assets/img/bvc-logo.png" alt="BVC" />
-                            <img className="logo-light" src="assets/img/bvc-logo.png" alt="BVC" />
+                            <img className="logo-main" src="/assets/img/bvc-logo.png" alt="BVC" />
+                            <img className="logo-light" src="/assets/img/bvc-logo.png" alt="BVC" />
                         </a>
                     </div>
                     </div>
@@ -31,7 +58,34 @@ const Header = () => {
 
                         <li><a href="/contact-us"><span>Contact Us</span></a></li>
 
-                        <li><a href="/login"><span>Login</span></a></li>
+                        { (auth) ?
+                            <li className="has-submenu"><a href="/#"><span>My Account</span></a>
+                                <ul className="submenu-nav">
+                                    
+                                    {(() => {
+                                    switch (user_type) {
+                                        case "1":   return <>
+                                        <li><a href={"/candidate-details/"+user_id}><span>Profile</span></a></li>
+                                        <li><a href="/job-details"><span>Job Listing</span></a></li>
+                                        <li><a href="/login" onClick={logout}><span>Logout</span></a></li>
+                                        </>;
+                                        case "2": return <>
+                                        <li><a href="/jobs"><span>Profile</span></a></li>
+                                        <li><a href="/job-details"><span>All Jobs</span></a></li>
+                                        <li><a href="/job-details"><span>Post New Job</span></a></li>
+                                        <li><a href="/login" onClick={logout}><span>Logout</span></a></li>
+                                        </>;
+                                        default:      return "null";
+                                    }
+                                    })()}
+
+                                </ul>
+                            </li> 
+                            : 
+                            <li><a href="/login"><span>Login</span></a></li>
+                        }
+                        
+                        
 
                         {/* <li className="has-submenu"><a href="/#"><span>Find Jobs</span></a>
                             <ul className="submenu-nav">

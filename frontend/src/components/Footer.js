@@ -1,12 +1,13 @@
 import React from "react";
 
 const Footer = () => {
+
   return (
     <>
     
       <footer className="footer-area">
 
-        <div className="footer-top">
+        {/* <div className="footer-top">
           <div className="container pt--0 pb--0">
             <div className="row">
               <div className="col-lg-5">
@@ -24,7 +25,7 @@ const Footer = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="footer-main" style={{ textAlign: "left" }}>
           <div className="container pt--0 pb--0">
@@ -33,7 +34,7 @@ const Footer = () => {
                 <div className="widget-item widget-about">
                   <div className="widget-logo-area">
                     <a href="/">
-                      <img className="logo-main" src="assets/img/bvc-logo.png" alt="BVC" />
+                      <img className="logo-main" src="/assets/img/bvc-logo.png" alt="BVC" />
                     </a>
                   </div>
                   <p className="desc">Find your dream job with us. Best job portal for an employers and employee.</p>

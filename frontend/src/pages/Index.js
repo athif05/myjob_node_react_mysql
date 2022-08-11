@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import MobileMenu from "../components/MobileMenu";
@@ -15,13 +16,93 @@ import 'swiper/css/scrollbar';
 
 const Index = () => {
 
+  const [jobLists, setJobLists] = useState([]);
+  const [jobCategory, setJobCategory] = useState([]);
+  const [jobCity, setJobCity] = useState([]);
+
+  const [key_title, setKeyTitle] = useState('');
+  const [city_id, setCityId] = useState('');
+  const [category_id, setCategoryId] = useState('');
+
+  const [jobCountsCategoryWise, setJobCountsCategoryWise] = useState([]);
+  const [recentJobLists, setRecentJobLists] = useState([]);
+  const [companyDetails, setCompanyDetails] = useState([]);
+
+  //create navigation
+  const navigate = useNavigate();
+
   useEffect(() => {
     document.title = 'BVC | Home';
 
     AOS.init();
     AOS.refresh();
 
+    getJobLists();
+    getJobCategory();
+    getJobCountsCategoryWise();
+    getRecentJobLists();
+
   },[]);
+
+  /* fetch all Jobs, start here */
+  const getJobLists = async () =>{
+    let result = await fetch(`http://localhost:12345/all-active-jobs`);
+    result = await result.json();
+    setJobLists(result);
+  }
+  /* fetch all Jobs, end here */
+
+
+  /* fetch cities and job category for search job, start here */
+  const getJobCategory = async () =>{
+    let result = await fetch(`http://localhost:12345/active-job-domain`);
+    result = await result.json();
+
+    setJobCategory(result);
+
+
+    let result_cities = await fetch(`http://localhost:12345/jobs-cities`);
+    result_cities = await result_cities.json();
+
+    setJobCity(result_cities);
+  }
+  /* fetch cities and job category for search job, end here */
+
+
+  /* fetch job category with job counts, start here */
+  const getJobCountsCategoryWise = async () =>{
+    let result_cities = await fetch(`http://localhost:12345/jobs-counts-with-category`);
+    result_cities = await result_cities.json();
+
+    setJobCountsCategoryWise(result_cities);
+  }
+  /* fetch job category with job counts, end here */
+
+  
+  const getRecentJobLists = async () =>{
+    /* fetch recent added jobs, start here */
+    let result = await fetch(`http://localhost:12345/recent-active-jobs-list`);
+    result = await result.json();
+
+    setRecentJobLists(result);
+    /* fetch recent added jobs, end here */
+
+    /* fetch recent added jobs, start here */
+    let result_logo = await fetch(`http://localhost:12345/all-employers-data`);
+    result_logo = await result_logo.json();
+    setCompanyDetails(result_logo);
+  }
+  
+  /* search jobs, start here */
+  const searchHandler = async() => {
+    navigate('/jobs/search?key_title='+key_title+'&city_id='+city_id+'&category_id='+category_id);
+  }
+  /* search jobs, end here */
+
+  const imageStyle = {
+    width: "75px",
+    Height: "75px"
+  };
 
   return(
     <>
@@ -40,51 +121,51 @@ const Index = () => {
                 <div className="row justify-content-center align-items-center">
                   <div className="col-12 col-lg-8">
                     <div className="slider-content">
-                      <h2 className="title"><span className="counter" data-counterup-delay="80">2,568</span> job available <br/>You can choose your dream job</h2>
+                      <h2 className="title"><span className="counter" data-counterup-delay="80">
+                      {((jobLists.length>0) && (jobLists[0].name!=='No record found')) ? jobLists.length : 0 }
+                      </span> job available <br/>You can choose your dream job</h2>
                       <p className="desc">Find great job for build your bright career. Have many job in this plactform.</p>
                     </div>
                   </div>
                   <div className="col-12">
                     <div className="job-search-wrap">
                       <div className="job-search-form">
-                        <form action="#">
+                        
                           <div className="row row-gutter-10">
                             <div className="col-lg-auto col-sm-6 col-12 flex-grow-1">
                               <div className="form-group">
-                                <input type="text" className="form-control" placeholder="Job title or keywords"/>
+                                <input type="text" name="key_title" id="key_title" value={key_title} onChange={(e)=>setKeyTitle(e.target.value)} className="form-control" placeholder="Job title or keywords"/>
                               </div>
                             </div>
                             <div className="col-lg-auto col-sm-6 col-12 flex-grow-1">
                               <div className="form-group">
-                                <select className="form-control">
-                                  <option value="1">Choose City</option>
-                                  <option value="2">New York</option>
-                                  <option value="3">California</option>
-                                  <option value="4">Illinois</option>
-                                  <option value="5">Texas</option>
-                                  <option value="6">Florida</option>
+                                <select name="city_id" id="city_id" value={city_id} onChange={(e)=>setCityId(e.target.value)} className="form-control">
+                                  <option value=""> Choose City </option>
+                                  { jobCity.map(item_city =>
+                                    <option value={item_city.id}>{item_city.name}</option>
+                                    )
+                                  }
                                 </select>
                               </div>
                             </div>
                             <div className="col-lg-auto col-sm-6 col-12 flex-grow-1">
                               <div className="form-group">
-                                <select className="form-control">
-                                  <option value="1">Category</option>
-                                  <option value="2">Web Designer</option>
-                                  <option value="3">Web Developer</option>
-                                  <option value="4">Graphic Designer</option>
-                                  <option value="5">App Developer</option>
-                                  <option value="6">UI &amp; UX Expert</option>
+                                <select name="category_id" id="category_id" value={category_id} onChange={(e)=>setCategoryId(e.target.value)} className="form-control">
+                                  <option value=""> Choose Category </option>
+                                  { jobCategory.map(item_main_category =>
+                                    <option value={item_main_category.id}>{item_main_category.name}</option>
+                                    )
+                                  }
                                 </select>
                               </div>
                             </div>
                             <div className="col-lg-auto col-sm-6 col-12 flex-grow-1">
                               <div className="form-group">
-                                <button type="button" className="btn-form-search"><i className="icofont-search-1"></i></button>
+                                <button type="button" className="btn-form-search" onClick={searchHandler}><i className="icofont-search-1"></i></button>
                               </div>
                             </div>
                           </div>
-                        </form>
+                        
                       </div>
                     </div>
                   </div>
@@ -94,7 +175,7 @@ const Index = () => {
           </div>
         </div>
       </div>
-      <div className="container pt--0 pb--0">
+      {/* <div className="container pt--0 pb--0">
         <div className="row">
           <div className="col-12">
             <div className="play-video-btn">
@@ -104,7 +185,7 @@ const Index = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       <div className="home-slider-shape">
         <img className="shape1" data-aos="fade-down" data-aos-duration="1500" src="/assets/img/slider/vector1.png" width="270" height="234" alt="myjob"/>
         <img className="shape2" data-aos="fade-left" data-aos-duration="2000" src="/assets/img/slider/vector2.png" width="201" height="346" alt="myjob"/>
@@ -126,126 +207,21 @@ const Index = () => {
           </div>
         </div>
         <div className="row row-gutter-20" >
+
+          {
+            ((jobCountsCategoryWise.length>0) ? jobCountsCategoryWise.map((item_cat_job) =>
+          
           <div className="col-sm-6 col-lg-3">
-            
             <div className="job-category-item">
               <div className="content">
-                <h3 className="title"><a href="job-details">Accounting/Finance <span>(305)</span></a></h3>
+                <h3 className="title"><a href={"jobs/"+item_cat_job.id}>{item_cat_job.name} <span>({item_cat_job.total_jobs})</span></a></h3>
               </div>
-              <a className="overlay-link" href="job-details">&nbsp;</a>
+              <a className="overlay-link" href={"jobs/"+item_cat_job.id}>&nbsp;</a>
             </div>
-            
           </div>
-          <div className="col-sm-6 col-lg-3">
-            
-            <div className="job-category-item">
-              <div className="content">
-                <h3 className="title"><a href="job-details">Production/Operation <span>(95)</span></a></h3>
-              </div>
-              <a className="overlay-link" href="job-details">&nbsp;</a>
-            </div>
-            
-          </div>
-          <div className="col-sm-6 col-lg-3">
-            
-            <div className="job-category-item">
-              <div className="content">
-                <h3 className="title"><a href="job-details">Education/Training <span>(212)</span></a></h3>
-              </div>
-              <a className="overlay-link" href="job-details">&nbsp;</a>
-            </div>
-            
-          </div>
-          <div className="col-sm-6 col-lg-3">
-            
-            <div className="job-category-item">
-              <div className="content">
-                <h3 className="title"><a href="job-details">Design/Creative <span>(93)</span></a></h3>
-              </div>
-              <a className="overlay-link" href="job-details">&nbsp;</a>
-            </div>
-            
-          </div>
-          <div className="col-sm-6 col-lg-3">
-            
-            <div className="job-category-item">
-              <div className="content">
-                <h3 className="title"><a href="job-details">Health & Fitness <span>(4)</span></a></h3>
-              </div>
-              <a className="overlay-link" href="job-details">&nbsp;</a>
-            </div>
-            
-          </div>
-          <div className="col-sm-6 col-lg-3">
-            
-            <div className="job-category-item">
-              <div className="content">
-                <h3 className="title"><a href="job-details">Research/Consultancy <span>(34)</span></a></h3>
-              </div>
-              <a className="overlay-link" href="job-details">&nbsp;</a>
-            </div>
-            
-          </div>
-          <div className="col-sm-6 col-lg-3">
-            
-            <div className="job-category-item">
-              <div className="content">
-                <h3 className="title"><a href="job-details">Engineer/Architects <span>(376)</span></a></h3>
-              </div>
-              <a className="overlay-link" href="job-details">&nbsp;</a>
-            </div>
-            
-          </div>
-          <div className="col-sm-6 col-lg-3">
-            
-            <div className="job-category-item">
-              <div className="content">
-                <h3 className="title"><a href="job-details">Telecommunication <span>(450)</span></a></h3>
-              </div>
-              <a className="overlay-link" href="job-details">&nbsp;</a>
-            </div>
-            
-          </div>
-          <div className="col-sm-6 col-lg-3">
-            
-            <div className="job-category-item">
-              <div className="content">
-                <h3 className="title"><a href="job-details">Data Entry/Operator <span>(25)</span></a></h3>
-              </div>
-              <a className="overlay-link" href="job-details">&nbsp;</a>
-            </div>
-            
-          </div>
-          <div className="col-sm-6 col-lg-3">
-            
-            <div className="job-category-item">
-              <div className="content">
-                <h3 className="title"><a href="job-details">Production/Operation <span>(95)</span></a></h3>
-              </div>
-              <a className="overlay-link" href="job-details">&nbsp;</a>
-            </div>
-            
-          </div>
-          <div className="col-sm-6 col-lg-3">
-            
-            <div className="job-category-item">
-              <div className="content">
-                <h3 className="title"><a href="job-details">Marketing/Sales <span>(666)</span></a></h3>
-              </div>
-              <a className="overlay-link" href="job-details">&nbsp;</a>
-            </div>
-            
-          </div>
-          <div className="col-sm-6 col-lg-3">
-            
-            <div className="job-category-item">
-              <div className="content">
-                <h3 className="title"><a href="job-details">Security/Support Service <span>(62)</span></a></h3>
-              </div>
-              <a className="overlay-link" href="job-details">&nbsp;</a>
-            </div>
-           
-          </div>
+            ): null)
+          }
+
         </div>
       </div>
     </section>
@@ -263,249 +239,41 @@ const Index = () => {
           </div>
         </div>
         <div className="row">
+          {
+            recentJobLists.map((item_recent) =>
           <div className="col-md-6 col-lg-4">
-            
             <div className="recent-job-item">
               <div className="company-info">
                 <div className="logo">
-                  <a href="company-details"><img src="/assets/img/companies/1.jpg" width="75" height="75" alt="myjob"/></a>
+                  <a href={"/company-details/"+item_recent.employer_id}>
+                    { item_recent.company_logo ? <img src={"http://localhost:3000/"+item_recent.company_logo} alt={item_recent.job_title}  style={imageStyle}/> : 
+                      <img src="/assets/img/blog/no-image.jpg" alt="ssImage" style={imageStyle}/>
+                    }
+                  </a>
                 </div>
                 <div className="content">
-                  <h4 className="name"><a href="company-details">Darkento Ltd.</a></h4>
-                  <p className="address">New York, USA</p>
+                  <h4 className="name"><a href={"/company-details/"+item_recent.employer_id}>{item_recent.company_name}</a></h4>
+                  <p className="address">{item_recent.job_location_city_name}, {item_recent.job_location_state_name}</p>
                 </div>
               </div>
               <div className="main-content">
-                <h3 className="title"><a href="job-details">Front-end Developer</a></h3>
-                <h5 className="work-type">Full-time</h5>
-                <p className="desc">CSS3, HTML5, Javascript, Bootstrap, Jquery</p>
+                <h3 className="title"><a href={"/job-details/"+item_recent.id}>{item_recent.job_title}</a></h3>
+                <h5 className="work-type">{item_recent.job_type_name}</h5>
+                <p className="desc">{item_recent.skills}</p>
               </div>
               <div className="recent-job-info">
                 <div className="salary">
-                  <h4>$5000</h4>
+                  <h4>{item_recent.salary} INR</h4>
                   <p>/monthly</p>
                 </div>
-                <a className="btn-theme btn-sm" href="job-details">Apply Now</a>
+                <a className="btn-theme btn-sm" href={"/job-details/"+item_recent.id}>Apply Now</a>
               </div>
             </div>
-            
           </div>
-          <div className="col-md-6 col-lg-4">
-            
-            <div className="recent-job-item">
-              <div className="company-info">
-                <div className="logo">
-                  <a href="company-details"><img src="/assets/img/companies/2.jpg" width="75" height="75" alt="myjob"/></a>
-                </div>
-                <div className="content">
-                  <h4 className="name"><a href="company-details">Inspire Fitness Co.</a></h4>
-                  <p className="address">New York, USA</p>
-                </div>
-              </div>
-              <div className="main-content">
-                <h3 className="title"><a href="job-details">Senior UI Designer</a></h3>
-                <h5 className="work-type" data-text-color="#ff7e00">Part-time</h5>
-                <p className="desc">CSS3, HTML5, Javascript, Bootstrap, Jquery</p>
-              </div>
-              <div className="recent-job-info">
-                <div className="salary">
-                  <h4>$5000</h4>
-                  <p>/monthly</p>
-                </div>
-                <a className="btn-theme btn-sm" href="job-details">Apply Now</a>
-              </div>
-            </div>
-            
-          </div>
-          <div className="col-md-6 col-lg-4">
-            
-            <div className="recent-job-item">
-              <div className="company-info">
-                <div className="logo">
-                  <a href="company-details"><img src="/assets/img/companies/3.jpg" width="75" height="75" alt="myjob"/></a>
-                </div>
-                <div className="content">
-                  <h4 className="name"><a href="company-details">Cogent Data</a></h4>
-                  <p className="address">New York, USA</p>
-                </div>
-              </div>
-              <div className="main-content">
-                <h3 className="title"><a href="job-details">Graphic Designer</a></h3>
-                <h5 className="work-type" data-text-color="#0054ff">Remote</h5>
-                <p className="desc">CSS3, HTML5, Javascript, Bootstrap, Jquery</p>
-              </div>
-              <div className="recent-job-info">
-                <div className="salary">
-                  <h4>$5000</h4>
-                  <p>/monthly</p>
-                </div>
-                <a className="btn-theme btn-sm" href="job-details">Apply Now</a>
-              </div>
-            </div>
-            
-          </div>
-          <div className="col-md-6 col-lg-4">
-            
-            <div className="recent-job-item">
-              <div className="company-info">
-                <div className="logo">
-                  <a href="company-details"><img src="/assets/img/companies/4.jpg" width="75" height="75" alt="myjob"/></a>
-                </div>
-                <div className="content">
-                  <h4 className="name"><a href="company-details">Obelus Concepts</a></h4>
-                  <p className="address">New York, USA</p>
-                </div>
-              </div>
-              <div className="main-content">
-                <h3 className="title"><a href="job-details">UX Researcher</a></h3>
-                <h5 className="work-type">Full-time</h5>
-                <p className="desc">CSS3, HTML5, Javascript, Bootstrap, Jquery</p>
-              </div>
-              <div className="recent-job-info">
-                <div className="salary">
-                  <h4>$5000</h4>
-                  <p>/monthly</p>
-                </div>
-                <a className="btn-theme btn-sm" href="job-details">Apply Now</a>
-              </div>
-            </div>
-            
-          </div>
-          <div className="col-md-6 col-lg-4">
-            
-            <div className="recent-job-item">
-              <div className="company-info">
-                <div className="logo">
-                  <a href="company-details"><img src="/assets/img/companies/5.jpg" width="75" height="75" alt="myjob"/></a>
-                </div>
-                <div className="content">
-                  <h4 className="name"><a href="company-details">Sanguine Skincare</a></h4>
-                  <p className="address">New York, USA</p>
-                </div>
-              </div>
-              <div className="main-content">
-                <h3 className="title"><a href="job-details">Android App Developer</a></h3>
-                <h5 className="work-type" data-text-color="#0054ff">Remote</h5>
-                <p className="desc">CSS3, HTML5, Javascript, Bootstrap, Jquery</p>
-              </div>
-              <div className="recent-job-info">
-                <div className="salary">
-                  <h4>$5000</h4>
-                  <p>/monthly</p>
-                </div>
-                <a className="btn-theme btn-sm" href="job-details">Apply Now</a>
-              </div>
-            </div>
-            
-          </div>
-          <div className="col-md-6 col-lg-4">
-            
-            <div className="recent-job-item">
-              <div className="company-info">
-                <div className="logo">
-                  <a href="company-details"><img src="/assets/img/companies/6.jpg" width="75" height="75" alt="myjob"/></a>
-                </div>
-                <div className="content">
-                  <h4 className="name"><a href="company-details">Flux Water Gear</a></h4>
-                  <p className="address">New York, USA</p>
-                </div>
-              </div>
-              <div className="main-content">
-                <h3 className="title"><a href="job-details">Product Designer</a></h3>
-                <h5 className="work-type">Full-time</h5>
-                <p className="desc">CSS3, HTML5, Javascript, Bootstrap, Jquery</p>
-              </div>
-              <div className="recent-job-info">
-                <div className="salary">
-                  <h4>$5000</h4>
-                  <p>/monthly</p>
-                </div>
-                <a className="btn-theme btn-sm" href="job-details">Apply Now</a>
-              </div>
-            </div>
-            
-          </div>
-          <div className="col-md-6 col-lg-4">
-            
-            <div className="recent-job-item">
-              <div className="company-info">
-                <div className="logo">
-                  <a href="company-details"><img src="/assets/img/companies/7.jpg" width="75" height="75" alt="myjob"/></a>
-                </div>
-                <div className="content">
-                  <h4 className="name"><a href="company-details">Darkento Ltd.</a></h4>
-                  <p className="address">New York, USA</p>
-                </div>
-              </div>
-              <div className="main-content">
-                <h3 className="title"><a href="job-details">Front-end Developer</a></h3>
-                <h5 className="work-type">Full-time</h5>
-                <p className="desc">CSS3, HTML5, Javascript, Bootstrap, Jquery</p>
-              </div>
-              <div className="recent-job-info">
-                <div className="salary">
-                  <h4>$5000</h4>
-                  <p>/monthly</p>
-                </div>
-                <a className="btn-theme btn-sm" href="job-details">Apply Now</a>
-              </div>
-            </div>
-            
-          </div>
-          <div className="col-md-6 col-lg-4">
-            
-            <div className="recent-job-item">
-              <div className="company-info">
-                <div className="logo">
-                  <a href="company-details"><img src="/assets/img/companies/8.jpg" width="75" height="75" alt="myjob"/></a>
-                </div>
-                <div className="content">
-                  <h4 className="name"><a href="company-details">Inspire Fitness Co.</a></h4>
-                  <p className="address">New York, USA</p>
-                </div>
-              </div>
-              <div className="main-content">
-                <h3 className="title"><a href="job-details">Senior UI Designer</a></h3>
-                <h5 className="work-type" data-text-color="#ff7e00">Part-time</h5>
-                <p className="desc">CSS3, HTML5, Javascript, Bootstrap, Jquery</p>
-              </div>
-              <div className="recent-job-info">
-                <div className="salary">
-                  <h4>$5000</h4>
-                  <p>/monthly</p>
-                </div>
-                <a className="btn-theme btn-sm" href="job-details">Apply Now</a>
-              </div>
-            </div>
-            
-          </div>
-          <div className="col-md-6 col-lg-4">
-            
-            <div className="recent-job-item">
-              <div className="company-info">
-                <div className="logo">
-                  <a href="company-details"><img src="/assets/img/companies/9.jpg" width="75" height="75" alt="myjob"/></a>
-                </div>
-                <div className="content">
-                  <h4 className="name"><a href="company-details">Cogent Data</a></h4>
-                  <p className="address">New York, USA</p>
-                </div>
-              </div>
-              <div className="main-content">
-                <h3 className="title"><a href="job-details">Graphic Designer</a></h3>
-                <h5 className="work-type" data-text-color="#0054ff">Part-time</h5>
-                <p className="desc">CSS3, HTML5, Javascript, Bootstrap, Jquery</p>
-              </div>
-              <div className="recent-job-info">
-                <div className="salary">
-                  <h4>$5000</h4>
-                  <p>/monthly</p>
-                </div>
-                <a className="btn-theme btn-sm" href="job-details">Apply Now</a>
-              </div>
-            </div>
-            
-          </div>
+            )
+          }
+          
+          
         </div>
       </div>
     </section>
@@ -771,75 +539,22 @@ const Index = () => {
                   <div className="swiper brand-logo-slider-container">
                     <div className="swiper-wrapper">
 
-                      <SwiperSlide>
-                      <div className="swiper-slide">
+                      {
+                        ((companyDetails.length>0) && (companyDetails[0]!=='No record found') ? companyDetails.map((item_logo, index)=>
                         
-                        <div className="brand-logo-item">
-                          <img src="assets/img/brand-logo/1.png" alt="bvc"/>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
+                        <SwiperSlide>
+                          <div className="swiper-slide">
+                            
+                            <div className="brand-logo-item">
+                            <img src={"http://localhost:3000/"+item_logo.company_logo} alt={item_logo.company_name}/>
+                            </div>
+                            
+                          </div>
+                        </SwiperSlide>
+                        ) : null)
+                      }
 
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="brand-logo-item">
-                          <img src="assets/img/brand-logo/2.png" alt="bvc"/>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="brand-logo-item">
-                          <img src="assets/img/brand-logo/3.png" alt="bvc"/>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="brand-logo-item">
-                          <img src="assets/img/brand-logo/4.png" alt="bvc"/>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="brand-logo-item">
-                          <img src="assets/img/brand-logo/5.png" alt="bvc"/>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="brand-logo-item">
-                          <img src="assets/img/brand-logo/6.png" alt="bvc"/>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="brand-logo-item">
-                          <img src="assets/img/brand-logo/1.png" alt="bvc"/>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
+                      
                     </div>
                   </div>
                   
@@ -1045,7 +760,7 @@ const Index = () => {
           </div>
         </section>
     
-    <section className="blog-area blog-home-area">
+    {/* <section className="blog-area blog-home-area">
       <div className="container">
         <div className="row">
           <div className="col-12">
@@ -1118,7 +833,7 @@ const Index = () => {
           </div>
         </div>
       </div>
-    </section>
+    </section> */}
     
   </main>
 

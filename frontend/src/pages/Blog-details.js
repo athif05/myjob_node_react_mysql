@@ -1,7 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import MobileMenu from "../components/MobileMenu";
+import Moment from 'moment'; //use for convert date format.
 
 import AOS from "aos";
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper';
@@ -14,13 +16,46 @@ import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 
 const BlogDetails = () => {
+
+  const [blogDetails, setBlogDetails] = useState([]);
+  const [relatedBlogs, setRelatedBlogs] = useState([]);
+
+  const params = useParams();
+
   useEffect(() => {
     document.title = 'BVC | Company-Details';
 
     AOS.init();
     AOS.refresh();
 
+    getBlogDetails();
+    
   },[]);
+
+  
+  const getBlogDetails = async () => {
+
+    /* fetch sigle blog details, start here */
+    let result = await fetch(`http://localhost:12345/blog-details/${params.id}`);
+    result = await result.json();
+    
+    setBlogDetails(result);
+    /* fetch sigle blog details, end here */
+    
+
+    /* fetch related blog FileList, start here */
+    let result_related = await fetch(`http://localhost:12345/blog-by-category/${result[0].blog_category_id}/${result[0].id}`);
+    result_related = await result_related.json();
+    
+    setRelatedBlogs(result_related);
+    /* fetch related blog FileList, end here */
+    
+  }
+
+  const imageStyle = {
+    width: "100%",
+    height: "550px"
+  };
 
   return (
     <div className="wrapper">
@@ -48,76 +83,47 @@ const BlogDetails = () => {
         </div>
       </div>
       
+       
       <section className="blog-details-area">
+      {
+        ((blogDetails.length>0) && (blogDetails[0].name!=='No record found') ? blogDetails.map((item, index) =>
         <div className="post-details-item">
           <div className="container">
             <div className="row justify-content-center">
               <div className="col-12">
                 <div className="post-details-info text-center">
                   <div className="meta">
-                    <span className="author">By <a href="blog.html">Harold Leonard</a></span>
+                    <span className="author">By <a href={"/author-blogs/"+item.author_id}>{item.author_name}</a></span>
                     <span className="dots"></span>
-                    <span className="post-date">03 April, 21 </span>
+                    <span className="post-date">{Moment(item.created_at).format('DD-MM-YYYY')}</span>
                     <span className="dots"></span>
-                    <span className="post-time"> 10 min read</span>
+                    <span className="post-time">{item.blog_category_name}</span>
                   </div>
-                  <h4 className="title">Simple pricing structure you have the flexibility to be able to grow your business in an effective.</h4>
-                  <div className="widget-tags">
+                  <h4 className="title">{item.title}</h4>
+                  {/* <div className="widget-tags">
                     <ul>
                       <li><a href="blog.html">Agency</a></li>
                       <li><a className="active" href="blog.html">Circular</a></li>
                       <li><a href="blog.html">Business</a></li>
                       <li><a href="blog.html">Corporate</a></li>
                     </ul>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="post-details-thumb">
-                  <img className="w-100" src="assets/img/blog/details1.jpg" alt="ssImage" width="1170" height="550"/>
+
+                  { item.image ? <img src={"http://localhost:3000/"+item.image} alt={item.title} style={imageStyle}/> : 
+                    null
+                  }
+                  
                 </div>
               </div>
               <div className="col-lg-10">
                 <div className="post-details-content">
-                  <h4 className="desc-title">The job board technology solution for those looking to setup and operate their own job board, through to those who have an established job.</h4>
-                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry has been industry standard dummy text ever since the a galley type and scrambe make type specimen book has survived not only five centuries text of the printing and typesetin indus standard dummy text everem since the 1500s, when an unknown printer.</p>
-                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry has been industry standard dummy text ever since the a galley type and scrambe make type specimen book has survived not only five centuries text of the printing and typesetin indus standard dummy text everem since the 1500s, when an unknown printer Lorem Ipsum is simply dummy text of the printing and typesetting industry has been industry standar and scrambe make type specimen book has survived not only five centuries text of the printing and typesetin indus standard dummy text everem since the 1500s, when an unknown printer.</p>
-                  <div className="post-details-content-list">
-                    <h4 className="title">Table of Content:</h4>
-                    <ul className="list-style">
-                      <li>
-                        <a href="/blog-details"><i className="icofont-double-right"></i>It was popularised in the 1960s with the release of Letraset sheets containing</a>
-                      </li>
-                      <li>
-                        <a href="/blog-details"><i className="icofont-double-right"></i> Many desktop publishing packages and web page editors now use</a>
-                      </li>
-                      <li>
-                        <a href="/blog-details"><i className="icofont-double-right"></i> It was popularised in the 1960s with the release of Letraset sheets containing</a>
-                      </li>
-                      <li>
-                        <a href="/blog-details"><i className="icofont-double-right"></i> Many desktop publishing packages and web page editors now use</a>
-                      </li>
-                      <li>
-                        <a href="/blog-details"><i className="icofont-double-right"></i> It was popularised in the 1960s with the release of Letraset sheets containing</a>
-                      </li>
-                    </ul>
-                  </div>
-                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry has been industry standard dummy text ever since the a galley type and scrambe make type specimen book has survived not only five centuries text of the printing and typesetin indus standard dummy text everem since the 1500s, when an unknown printer Lorem Ipsum is simply dummy text of the printing and typesetting industry has been industry standar and scrambe make type specimen book has survived not only five centuries text of the printing and typesetin indus standard dummy text everem since the 1500s, when an unknown printer.</p>
-                  <h4 className="desc-title2">Our company fails the real world test in all kinds of ways.</h4>
-                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry has been industry standard dummy text ever since the a galley type and scrambe make type specimen book has survived not only five centuries text of the printing and typesetin indus standard dummy text everem since the 1500s, when an unknown printer.</p>
-                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry has been industry standard dummy text ever since the a galley type and scrambe make type specimen book has survived not only five centuries text of the printing and typesetin indus standard dummy text everem since the 1500s, when an unknown printer Lorem Ipsum is simply dummy text of the printing and typesetting industry has been industry standar and scrambe make type specimen book has survived not only five centuries text of the printing and typesetin indus standard dummy text everem since the 1500s, when an unknown printer.</p>
-                  <div className="content-thumb">
-                    <img className="w-100" src="assets/img/blog/details2.jpg" alt="ssImage" width="970" height="450"/>
-                  </div>
-                  <h4 className="desc-title3">Well, that wasn’t the only unconventional thing 37Signals did on their way up.</h4>
-                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry has been industry standard dummy text ever since the a galley type and scrambe make type specimen book has survived not only five centuries text of the printing and typesetin indus standard dummy text everem since the 1500s, when an unknown printer Lorem Ipsum is simply dummy text of the printing and typesetting industry has been industry standar and scrambe make type specimen book has survived not only five centuries text of the printing and typesetin indus standard dummy text everem since the 1500s, when an unknown printer.</p>
-                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry has been industry standard dummy text ever since the a galley type and scrambe make type specimen book has survived not only five centuries text of the printing and typesetin indus standard dummy text everem since the 1500s, when an unknown printer Lorem Ipsum is simply dummy text of the printing and typesetting industry has been industry standar and scrambe make type specimen book has survived not only five centuries text of the printing and typesetin indus standard dummy text everem since the 1500s, when an unknown printer.</p>
-                  <blockquote className="blockquote-item">
-                    <div className="content">
-                      <p>2,83k People Receive Our Weekly WordPress Related Newsletter.</p>
-                    </div>
-                  </blockquote>
-                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy ever since the 1500s, when an unknown printer took a galley of type and scirambled it to make a type specimen book. It has survive only five centuries, but also the leap into electronic typesetting, remaining the essentially unchanged. It was popularised in the 1960 the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing crambled it to make specimen book. It has survived nots only five centuries, but also the leap into.</p>
-                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy ever since the 1500s, when an unknown printer took a galley of type and scirambled it to make a type specimen book. It has survive only five centuries, but also the leap into electronic typesetting, remaining the essentially unchanged. It was popularised in the 1960 the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing crambled it to make specimen book. It has survived nots only five centuries, but also the leap into.</p>
-                  <div className="post-details-footer">
+                  
+                  <p dangerouslySetInnerHTML={{__html:item.description}}></p>
+                  
+     
+                  {/* <div className="post-details-footer">
                     <div className="widget-social-icons">
                       <span>Share this article:</span>
                       <div className="social-icons">
@@ -127,12 +133,16 @@ const BlogDetails = () => {
                         <a href="https://www.linkedin.com/signup" target="_blank" rel="noopener"><i className="icofont-linkedin"></i></a>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
+
                 </div>
               </div>
             </div>
           </div>
         </div>
+        ):null)
+      }
+
         <div className="related-posts-area related-post-area bg-color-gray">
           <div className="container">
             <div className="row">
@@ -166,97 +176,35 @@ const BlogDetails = () => {
                   <div className="swiper related-post-slider-container">
                     <div className="swiper-wrapper related-post-slider">
 
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="post-item2">
-                          <div className="thumb">
-                            <a href="/blog-details">
-                              <img src="assets/img/blog/10.jpg" alt="ssImage" width="350" height="270"/>
-                            </a>
-                          </div>
-                          <div className="content">
-                            <h5 className="author">By <a href="blog.html">Walter Houston</a></h5>
-                            <h4 className="title"><a href="/blog-details">Why wild animal welfare in addition to farmed animal...</a></h4>
-                            <div className="meta">
-                              <span className="post-date">03 April, 2021</span>
-                              <span className="dots"></span>
-                              <span className="post-time">10 min read</span>
+                      {
+                        ((relatedBlogs.length>0) && (relatedBlogs[0].name!=='No record found') ? relatedBlogs.map((item_rel, index) => 
+                          <SwiperSlide>
+                          <div className="swiper-slide">
+                            
+                            <div className="post-item2">
+                              <div className="thumb">
+                                <a href={"/blog-details/"+item_rel.id}>
+                                  { item_rel.image ? <img src={"http://localhost:3000/"+item_rel.image} alt={item_rel.title}  width="370" height="270"/> : 
+                                    <img src="/assets/img/blog/no-image.jpg" alt="ssImage" width="370" height="270"/>
+                                  }
+                                </a>
+                              </div>
+                              <div className="content">
+                                <h5 className="author">By <a href={"/author-blogs/"+item_rel.author_id}>{item_rel.author_name}</a></h5>
+                                <h4 className="title"><a href={"/blog-details/"+item_rel.id}>{item_rel.title}</a></h4>
+                                <div className="meta">
+                                  <span className="post-date">{Moment(item_rel.created_at).format('DD-MM-YYYY')}</span>
+                                  {/* <span className="dots"></span>
+                                  <span className="post-time">10 min read</span> */}
+                                </div>
+                              </div>
                             </div>
+                            
                           </div>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="post-item2">
-                          <div className="thumb">
-                            <a href="/blog-details">
-                              <img src="assets/img/blog/11.jpg" alt="ssImage" width="350" height="270"/>
-                            </a>
-                          </div>
-                          <div className="content">
-                            <h5 className="author">By <a href="blog.html">Walter Houston</a></h5>
-                            <h4 className="title"><a href="/blog-details">Organizations and individual advocates around the world...</a></h4>
-                            <div className="meta">
-                              <span className="post-date">03 April, 2021</span>
-                              <span className="dots"></span>
-                              <span className="post-time">10 min read</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="post-item2">
-                          <div className="thumb">
-                            <a href="/blog-details">
-                              <img src="assets/img/blog/12.jpg" alt="ssImage" width="350" height="270"/>
-                            </a>
-                          </div>
-                          <div className="content">
-                            <h5 className="author">By <a href="blog.html">Walter Houston</a></h5>
-                            <h4 className="title"><a href="/blog-details">It is not currently possible for us to have a good sense.</a></h4>
-                            <div className="meta">
-                              <span className="post-date">03 April, 2021</span>
-                              <span className="dots"></span>
-                              <span className="post-time">10 min read</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
-
-                      <SwiperSlide>
-                      <div className="swiper-slide">
-                        
-                        <div className="post-item2">
-                          <div className="thumb">
-                            <a href="/blog-details">
-                              <img src="assets/img/blog/3.jpg" alt="ssImage" width="350" height="270"/>
-                            </a>
-                          </div>
-                          <div className="content">
-                            <h5 className="author">By <a href="blog.html">Walter Houston</a></h5>
-                            <h4 className="title"><a href="/blog-details">Why wild animal welfare in addition to farmed animal...</a></h4>
-                            <div className="meta">
-                              <span className="post-date">03 April, 2021</span>
-                              <span className="dots"></span>
-                              <span className="post-time">10 min read</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                      </div>
-                      </SwiperSlide>
+                          </SwiperSlide>
+                        ) : null)
+                      }
+                      
                       
                     </div>
                   </div>
@@ -267,7 +215,8 @@ const BlogDetails = () => {
 
           </div>
         </div>
-        <div className="comment-area">
+
+        {/* <div className="comment-area">
           <div className="container pt--0 pb--0">
             <div className="row justify-content-center">
               <div className="col-lg-10">
@@ -351,7 +300,8 @@ const BlogDetails = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
+
       </section>
       
     </main>

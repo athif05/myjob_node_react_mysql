@@ -1,13 +1,79 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import MobileMenu from "../components/MobileMenu";
+import validator from 'validator'; //email validation
 
 const Contact = () =>{
 
+  /* for show contact details */
+  const [contact_detials, setContactDetials] = useState([]);
+
+  /* for save get in touch details */
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+
+  const [error, setError] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+
+
   useEffect(() => {
     document.title = 'BVC | Contact Us';
+
+    getContactUs();
+
+  },[]);
+
+
+  const getContactUs = async () =>{
+    const tbl = 'contactuses';
+    let result = await fetch(`http://localhost:12345/all-generic-data/${tbl}`);
+    result = await result.json();
+
+    setContactDetials(result);
+}
+
+/* save message into db, start here */
+const sendMessage = async() =>{
+
+  if(!name || !email || !subject || !message){
+    setError(true);
+    setSuccess(false);
+    return false;
+  }
+
+  if (!validator.isEmail(email)) { 
+    setEmailError('Enter valid Email!');
+    return false;
+  }  else {
+    setEmailError('');
+  }
+
+  let result = await fetch("http://localhost:12345/contact-email",{
+    method: "post",
+    body:JSON.stringify({name, email, subject, message}),
+    headers:{
+        "Content-Type":"application/json"
+    }
   });
+
+  result = await result.json();
+  console.log(result);
+
+  setError(false);
+  setSuccess('Thanks for contact us.');
+  setName('');
+  setEmail('');
+  setSubject('');
+  setMessage('');
+
+  getContactUs();
+
+}
+/* save message into db, end here */
 
   return (
     <div className="wrapper">
@@ -34,7 +100,8 @@ const Contact = () =>{
             </div>
           </div>
         </div>
-        
+        {
+          ((contact_detials.length>0) && (contact_detials[0].name!=='No record found') ? contact_detials.map((item, index) =>
         <section className="contact-area contact-page-area">
           <div className="container">
             <div className="row contact-page-wrapper">
@@ -47,8 +114,8 @@ const Contact = () =>{
                     <div className="info">
                       <h5 className="title">Call Us:</h5>
                       <p>
-                        <a href="tel://568975468">(00) 568 975 468</a><br/>
-                        <a href="tel://+88465748937">+88 465 748 937</a>
+                        <a href={"tel://"+item.contact_number1}>{item.contact_number1}</a><br/>
+                        <a href={"tel://"+item.contact_number2}>{item.contact_number2}</a>
                       </p>
                     </div>
                   </div>
@@ -59,8 +126,8 @@ const Contact = () =>{
                     <div className="info">
                       <h5 className="title">Email:</h5>
                       <p>
-                        <a href="mailto://youremail@gmail.com">youremail@gmail.com</a><br/>
-                        <a href="mailto://demomail@gmail.com">demomail@gmail.com</a>
+                        <a href={"mailto://"+item.email1}>{item.email1}</a><br/>
+                        <a href={"mailto://"+item.email2}>{item.email2}</a>
                       </p>
                     </div>
                   </div>
@@ -71,8 +138,8 @@ const Contact = () =>{
                     <div className="info">
                       <h5 className="title">Address:</h5>
                       <p>
-                        Sunset Beach, North <br/>
-                        Carolina(NC), 28468
+                        {item.address_line1} <br/>
+                        {item.address_line2}
                       </p>
                     </div>
                   </div>
@@ -82,31 +149,37 @@ const Contact = () =>{
                 
                 <div className="contact-form">
                   <h4 className="contact-form-title">Get in Touch</h4>
-                  <form id="contact-form" action="https://whizthemes.com/mail-php/raju/arden/mail.php" method="POST">
+                  {success && <div className="alert alert-success" role="alert">{success}</div>}
+                  <form id="contact-form" >
                     <div className="row">
                       <div className="col-md-12">
                         <div className="form-group">
-                          <input className="form-control" type="text" name="con_name" placeholder="Name:"/>
+                          <input className="form-control" type="text" name="name" id="name" pattern="[a-zA-Z ]*" value={name} onChange={(e) => setName((v)=>(e.target.validity.valid ? e.target.value : v))} placeholder="Name:" maxLength={100}/>
+                          {error && !name && <span className="invalid-input">Enter name</span> }
                         </div>
                       </div>
                       <div className="col-md-12">
                         <div className="form-group">
-                          <input className="form-control" type="email" name="con_email" placeholder="Email:"/>
+                          <input className="form-control" type="email" name="email" id="email" value={email} onChange={(e)=>setEmail(e.target.value)} maxLength={50} placeholder="Email:"/>
+                          {error && !email && <span className="invalid-input">Enter email</span> }
+                          <span className="invalid-input">{emailError}</span>
                         </div>
                       </div>
                       <div className="col-md-12">
                         <div className="form-group">
-                          <input className="form-control" type="text" placeholder="Subject:"/>
+                          <input className="form-control" type="text" name="subject" id="subject" value={subject} onChange={(e)=>setSubject(e.target.value)} placeholder="Subject:"/>
+                          {error && !subject && <span className="invalid-input">Enter subject</span> }
                         </div>
                       </div>
                       <div className="col-md-12">
                         <div className="form-group">
-                          <textarea className="form-control" name="con_message" placeholder="Message"></textarea>
+                          <textarea className="form-control" name="message" id="message" value={message} onChange={(e)=>setMessage(e.target.value)} placeholder="Message"></textarea>
+                          {error && !message && <span className="invalid-input">Enter message</span> }
                         </div>
                       </div>
                       <div className="col-md-12">
                         <div className="form-group mb--0">
-                          <button className="btn-theme d-block w-100" type="submit">Send Message</button>
+                          <button className="btn-theme d-block w-100" type="button" onClick={sendMessage}>Send Message</button>
                         </div>
                       </div>
                     </div>
@@ -117,13 +190,14 @@ const Contact = () =>{
               </div>
               <div className="col-lg-6">
                 <div className="map-area">
-                  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1912972.6636523942!2d144.28416561146162!3d-38.05127959850456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad646b5d2ba4df7%3A0x4045675218ccd90!2sMelbourne%20VIC%2C%20Australia!5e0!3m2!1sen!2sbd!4v1634028820404!5m2!1sen!2sbd"></iframe>
+                  <iframe src={item.google_map}></iframe>
                 </div>
               </div>
             </div>
           </div>
         </section>
-        
+        ) : null)
+      }
       </main>
 
       <Footer />
