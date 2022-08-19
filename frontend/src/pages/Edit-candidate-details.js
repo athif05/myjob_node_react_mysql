@@ -332,7 +332,7 @@ const EditCandidateDetails = () =>{
                                                 
                                                 <div className="form-group col-md-4">
                                                     <label htmlFor="Club">Email:</label>
-                                                    <input type="text" className="form-control" name="email" id="email" defaultValue={email} onChange={(e)=>setEmail(e.target.value)} maxLength="50" readOnly={email ? "true" : "false"} />
+                                                    <input type="text" className="form-control" name="email" id="email" defaultValue={email} onChange={(e)=>setEmail(e.target.value)} maxLength="50" readOnly={email ? true : false} />
                                                 </div> 
                                                 
                                                 <div className="form-group col-md-4">
@@ -397,7 +397,12 @@ const EditCandidateDetails = () =>{
                                                     <table className="table table-bordered" id="dynamicWorkTable">  
                                                         <thead style={WorkExpThead}>
                                                             <tr>
-                                                                
+                                                            <th style={WorkExpTh20}>Designation</th>
+                                                            <th style={WorkExpTh30}>Company Name</th>
+                                                            <th style={WorkExpTh10}>Date From</th>
+                                                            <th style={WorkExpTh10}>Date To</th>
+                                                            <th style={WorkExpTh20}>Describe Role</th>
+                                                            <th style={WorkExpTh10}>Action</th>  
                                                             </tr>
                                                         </thead>
                                                         
@@ -430,11 +435,13 @@ const EditCandidateDetails = () =>{
                                                 <div className="form-group col-md-12">
                                                     <table className="table table-bordered" id="dynamicTable">  
                                                         <thead style={WorkExpThead}>
-                                                            <th style={WorkExpTh20}>Course Name</th>
-                                                            <th style={WorkExpTh30}>College/University</th>
-                                                            <th style={WorkExpTh20}>Year</th>
-                                                            <th style={WorkExpTh20}>Marks</th>
-                                                            <th style={WorkExpTh10}>Action</th>
+                                                            <tr>
+                                                                <th style={WorkExpTh20}>Course Name</th>
+                                                                <th style={WorkExpTh30}>College/University</th>
+                                                                <th style={WorkExpTh20}>Year</th>
+                                                                <th style={WorkExpTh20}>Marks</th>
+                                                                <th style={WorkExpTh10}>Action</th>
+                                                            </tr>
                                                         </thead>
                                                         
                                                         <tbody>     
