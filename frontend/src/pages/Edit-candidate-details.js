@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import MobileMenu from "../components/MobileMenu";
+import axios from 'axios';
 
 import WorkExperienceTableRows from "../components/WorkExperienceTableRows";
 import QualificationTableRows from "../components/QualificationTableRows";
@@ -89,15 +90,15 @@ const EditCandidateDetails = () =>{
     const [error, setError] = useState(false);
     const [success, setSuccess] = useState(false);
 
-    const [file, setFile] = useState('');
-    const [fileName, setFileName] = useState("");
-
     const [candidate_details, setCandidateDetails] = useState([]);
     const [all_states, setAllStates] = useState([]);
     const [all_cities, setAllCities] = useState([]);
     const [all_work_experiences, setAllWorkExperiences] = useState([]);
     const [all_notice_periods, setAllNoticePeriods] = useState([]);
     const [all_job_category, setAllJobCategory] = useState([]);
+
+    const [candidate_work_experience, setCandidateWorkExperience] = useState([]);
+    const [candidate_qualification, setCandidateQualification] = useState([]);
 
     const params = useParams();
 
@@ -153,7 +154,16 @@ const EditCandidateDetails = () =>{
         result_job_category = await result_job_category.json();
         setAllJobCategory(result_job_category);
         
-        
+
+        let result_candidate_work_experiences = await fetch(`http://localhost:12345/candidate-work-experience/${params.id}`);
+        result_candidate_work_experiences = await result_candidate_work_experiences.json();
+        setCandidateWorkExperience(result_candidate_work_experiences);
+
+
+        let result_candidate_qualification = await fetch(`http://localhost:12345/candidate-qualifications/${params.id}`);
+        result_candidate_qualification = await result_candidate_qualification.json();
+        setCandidateQualification(result_candidate_qualification);
+
     }
 
     const [rowsData, setRowsData] = useState([]);
@@ -191,19 +201,88 @@ const EditCandidateDetails = () =>{
   
     }
 
-   const deleteTableRowsQual = (index)=>{
-    const rows = [...rowsDataQual];
-    rows.splice(index, 1);
-    setRowsDataQual(rows);
-}
- 
-   const handleChange = (index, evnt)=>{
+    const deleteTableRowsQual = (index)=>{
+        const rows = [...rowsDataQual];
+        rows.splice(index, 1);
+        setRowsDataQual(rows);
+    }
     
-    const { name, value } = evnt.target;
-    const rowsInput = [...rowsData];
-    rowsInput[index][name] = value;
-    setRowsData(rowsInput); 
-}
+    const handleChange = (index, evnt)=>{
+        
+        const { name, value } = evnt.target;
+        const rowsInput = [...rowsData];
+        rowsInput[index][name] = value;
+        setRowsData(rowsInput); 
+    }
+
+    const [file, setFile] = useState('');
+    const [fileName, setFileName] = useState("");
+
+    const saveFile = (e) => {
+        setFile(e.target.files[0]);
+        setFileName(e.target.files[0].name);
+    };
+
+    const updateDetails = async()=>{
+
+        
+        if(!name || !email || !mobile_number || !permanent_address || !current_address || !state_id || !city || !work_experience || !describe_job_profile || !skills || !job_title || !job_keywords || !job_category || !job_locations || !english_required || !working_or_not){
+            setError(true);
+            return false;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("fileName", fileName);
+        formData.append("name", name);
+        formData.append("email", email);
+        formData.append("mobile_number", mobile_number);
+        formData.append("alternate_number", alternate_number);
+        formData.append("permanent_address", permanent_address);
+        formData.append("current_address", current_address);
+        formData.append("state_id", state_id);
+        formData.append("city_id", city);
+        formData.append("work_experience", work_experience);
+        formData.append("designation", designation);
+        formData.append("company_name", company_name);
+        formData.append("date_from", date_from);
+        formData.append("date_to", date_to);
+        formData.append("describe_role", describe_role);
+        formData.append("course_name", course_name);
+        formData.append("college", college);
+        formData.append("year", year);
+        formData.append("marks", marks);
+        formData.append("describe_job_profile", describe_job_profile);
+        formData.append("skills", skills);
+        formData.append("notice_period", notice_period);
+        formData.append("last_ctc", last_ctc);
+        formData.append("job_title", job_title);
+        formData.append("job_keywords", job_keywords);
+        formData.append("job_category", job_category);
+        formData.append("job_locations", job_locations);
+        formData.append("english_required", english_required);
+        formData.append("working_or_not", working_or_not);
+
+        console.log('update');
+        
+        /* try {
+            const res = await axios.post(
+            `http://localhost:12345/update-candidate-details/${params.id}`,
+            formData
+            );
+            console.log(res);
+            setSuccess(true);
+            setError(false);
+            
+        } catch (ex) {
+            console.log(ex);
+        } */
+
+    }
+
+    //console.log(job_locations);
+    var job_locations_array = job_locations.split(',');
+    //console.log(job_locations_array);
 
     return (
         <div className="wrapper">
@@ -233,7 +312,7 @@ const EditCandidateDetails = () =>{
                 <section className="team-details-area">
 
                     <div className="container" style={containerStyle}>
-                        <form method="post" id="myForm" enctype="multipart/form-data">
+                        <form method="post" id="myForm" encType="multipart/form-data">
                             <div className="col-12" tabIndex="-1" role="dialog" id="myModal">
                                 <div role="document" style={{width:"100%!important"}}>{/* className="modal-dialog" */}
                                     <div className="modal-content">
@@ -253,12 +332,12 @@ const EditCandidateDetails = () =>{
                                                 
                                                 <div className="form-group col-md-4">
                                                     <label htmlFor="Club">Email:</label>
-                                                    <input type="text" className="form-control" name="email" id="email" defaultValue={email} onChange={(e)=>setEmail(e.target.value)} maxLength="50" />
+                                                    <input type="text" className="form-control" name="email" id="email" defaultValue={email} onChange={(e)=>setEmail(e.target.value)} maxLength="50" readOnly={email ? "true" : "false"} />
                                                 </div> 
                                                 
                                                 <div className="form-group col-md-4">
                                                     <label htmlFor="Country">Mobile Number: <span className="error-msg-star">*</span></label>
-                                                    <input type="text" className="form-control" name="mobile_number" id="mobile_number" maxLength="10" defaultValue={mobile_number} onChange={(e)=>setMobileNumber(e.target.value)} required />
+                                                    <input type="text" className="form-control" name="mobile_number" id="mobile_number" maxLength="10" defaultValue={mobile_number} onChange={(e)=>setMobileNumber(e.target.value)} required readOnly={mobile_number ? true : false}/>
                                                 </div>
                                             </div>
 
@@ -317,30 +396,28 @@ const EditCandidateDetails = () =>{
                                                 <div className="form-group col-12">
                                                     <table className="table table-bordered" id="dynamicWorkTable">  
                                                         <thead style={WorkExpThead}>
-                                                            <th style={WorkExpTh20}>Designation</th>
-                                                            <th style={WorkExpTh30}>Company Name</th>
-                                                            <th style={WorkExpTh10}>Date From</th>
-                                                            <th style={WorkExpTh10}>Date To </th>
-                                                            <th style={WorkExpTh20}>Describe Role</th>
-                                                            <th style={WorkExpTh10}>
-                                                                Action
-                                                            </th>
+                                                            <tr>
+                                                                
+                                                            </tr>
                                                         </thead>
                                                         
                                                         <tbody>  
-                                                            
-                                                        <tr>
-                                                                <td><input type="text" name="addmore_designation[]" placeholder="Enter your designation" className="form-control" style={WorkExpTd}/></td>
-                                                                <td><input type="text" name="addmore_company_name[]" placeholder="Enter your company name" className="form-control" style={WorkExpTd}/></td>								
-                                                                <td><input type="date" name="addmore_from[]" placeholder="Enter from" className="form-control" style={WorkExpTd}/></td>
-                                                                <td><input type="date" name="addmore_to[]" placeholder="Enter to" className="form-control" style={WorkExpTd}/></td>								
-                                                                <td><input type="text" name="addmore_describe_role[]" placeholder="Describe Role" className="form-control" style={WorkExpTd}/></td>  
-                                                                <td>			
+                                                            { candidate_work_experience.map((item_work_exp, index)=>
+                                                        <tr key={index}>
+                                                                <td><input type="text" name="addmore_designation[]" defaultValue={item_work_exp['designation_name']} onChange={(e)=>setDesignation(e.target.value)} placeholder="Enter your designation" className="form-control" style={WorkExpTd}/></td>
+                                                                <td><input type="text" name="addmore_company_name[]" defaultValue={item_work_exp['organization_name']} onChange={(e)=>setCompanyName(e.target.value)} placeholder="Enter your company name" className="form-control" style={WorkExpTd}/></td>								
+                                                                <td><input type="date" name="addmore_from[]" defaultValue={item_work_exp['date_from']} onChange={(e)=>setDateFrom(e.target.value)} placeholder="Enter from" className="form-control" style={WorkExpTd}/></td>
+                                                                <td><input type="date" name="addmore_to[]" defaultValue={item_work_exp['date_to']} onChange={(e)=>setDateTo(e.target.value)} placeholder="Enter to" className="form-control" style={WorkExpTd}/></td>								
+                                                                <td><input type="text" name="addmore_describe_role[]" defaultValue={item_work_exp['describe_role']} onChange={(e)=>setDescribeRole(e.target.value)} placeholder="Describe Role" className="form-control" style={WorkExpTd}/></td>  
+                                                                <td>
+                                                                 			
                                                                 {/* <span className="btn btn-success" onClick={addTableRows} style={{ backgroundColor:"green", height:"23px", lineHeight:"6px", fontSize:"14px"}}>Add More</span> */}
+                                                                { (index ==0 ) ?
                                                                 <button type="button" className="btn btn-success" onClick={addTableRows} style={WorkExpTd}>Add More</button>
+                                                                : <button type="button" className="btn btn-danger" onClick={()=>(deleteTableRows(index))} style={WorkExpTd}>Remove</button> }
                                                                 </td>  
                                                             </tr>
-
+                                                        )}
                                                             <WorkExperienceTableRows rowsData={rowsData} deleteTableRows={deleteTableRows} handleChange={handleChange} />
 
                                                         </tbody>
@@ -360,17 +437,22 @@ const EditCandidateDetails = () =>{
                                                             <th style={WorkExpTh10}>Action</th>
                                                         </thead>
                                                         
-                                                        <tbody>                                                                 
-                                                            <tr>
-                                                                <td><input type="text" name="addmore_qualification[]" placeholder="Enter your qualification" className="form-control" style={WorkExpTd}/></td>
-                                                                <td><input type="text" name="addmore_college_university[]" placeholder="Enter your college/university" className="form-control" style={WorkExpTd}/></td>								
-                                                                <td><input type="text" name="addmore_year[]" placeholder="Enter your year" className="form-control" style={WorkExpTd}/></td>  
-                                                                <td><input type="text" name="addmore_marks[]" placeholder="Enter your marks" className="form-control" style={WorkExpTd}/></td>  
+                                                        <tbody>     
+                                                        { candidate_qualification.map((item_cand_qual, indexx)=>                                                            
+                                                            <tr key={indexx}>
+                                                                <td><input type="text" name="addmore_qualification[]" defaultValue={item_cand_qual['qualification']} onChange={(e)=>setCourseName(e.target.value)} placeholder="Enter your qualification" className="form-control" style={WorkExpTd}/></td>
+                                                                <td><input type="text" name="addmore_college_university[]" defaultValue={item_cand_qual['college_university']} onChange={(e)=>setCollege(e.target.value)} placeholder="Enter your college/university" className="form-control" style={WorkExpTd}/></td>								
+                                                                <td><input type="text" name="addmore_year[]" defaultValue={item_cand_qual['year']} onChange={(e)=>setYear(e.target.value)} placeholder="Enter your year" className="form-control" style={WorkExpTd}/></td>  
+                                                                <td><input type="text" name="addmore_marks[]" defaultValue={item_cand_qual['marks']} onChange={(e)=>setMarks(e.target.value)} placeholder="Enter your marks" className="form-control" style={WorkExpTd}/></td>  
                                                                 <td>			
-                                                                    <button type="button" className="btn btn-success"  onClick={addTableRowsQual}  style={WorkExpTd}>Add More</button>
+                                                                    
+                                                                { (indexx ==0 ) ?
+                                                                <button type="button" className="btn btn-success"  onClick={addTableRowsQual}  style={WorkExpTd}>Add More</button>
+                                                                : <button type="button" className="btn btn-danger" onClick={()=>(deleteTableRowsQual(indexx))} style={WorkExpTd}>Remove</button> }
+                                                                    
                                                                 </td>  
                                                             </tr>
-
+                                                        )}
                                                             <QualificationTableRows rowsDataQual={rowsDataQual} deleteTableRowsQual={deleteTableRowsQual} handleChange={handleChange} />
 
                                                         </tbody> 
@@ -448,7 +530,7 @@ const EditCandidateDetails = () =>{
                                             <div className="row">
                                                 <div className="form-group col-md-4">
                                                     <label htmlFor="Goal Score">Job Locations <span className="error-msg-star">*</span> <p style={{fontSize:"10px", color:"red"}}>(Press Ctrl key for select multiple)</p></label>
-                                                    <select className="form-control select"  value={job_locations || ""} onChange={(e)=>setJobLocations(e.target.value)} name="job_locations_id[]" id="job_locations_id"  multiple data-mdb-filter="true" required>
+                                                    <select multiple className="form-control select"  value={job_locations_array || ""} onChange={(e)=>setJobLocations(e.target.value)} name="job_locations_id[]" id="job_locations_id"   data-mdb-filter="true" required>
                                                         <option value="">-- Select Job Locations --</option>
                                                         { all_cities.map((item_cities) =>
                                                         <option value={item_cities.id} key={item_cities.id}>{item_cities.name}</option>
@@ -483,7 +565,7 @@ const EditCandidateDetails = () =>{
                                             <a href="#">
                                                 <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancel</button>
                                             </a>
-                                            <button  className="btn btn-success" id="submit-btn">Update Profile</button>
+                                            <button  className="btn btn-success" id="submit-btn" onClick={updateDetails}>Update Profile</button>
                                         </div>
 
                                     </div>

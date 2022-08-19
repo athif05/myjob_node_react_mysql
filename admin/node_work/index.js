@@ -128,6 +128,22 @@ app.get("/update-applied-jobs-status/:val/:id", (req, res) =>{
 /* update applied job status api, start here */
 
 
+
+/* update candidate details, start here */
+app.post('/update-candidate-details/:id', async (req, res)=>{
+
+	const sql = `UPDATE candidate_details set name="${req.params.name}",email="${req.params.email}",mobile_number="${req.params.mobile_number}",alternate_number="${req.params.alternate_number}",permanent_address="${req.params.permanent_address}",current_address="${req.params.current_address}",state_id="${req.params.state_id}",city_id="${req.params.city_id}",work_experience="${req.params.work_experience}",describe_job_profile="${req.params.describe_job_profile}",skills="${req.params.skills}",notice_period="${req.params.notice_period}",last_ctc="${req.params.last_ctc}",job_title="${req.params.job_title}",job_keywords="${req.params.job_keywords}",job_category="${req.params.job_category}",job_locations="${req.params.job_locations}",english_required="${req.params.english_required}",working_or_not="${req.params.working_or_not}" where id="${req.params.id}"`;
+	console.log(sql);
+	connection.query(sql, (error, result)=>{
+		if(error) throw error;
+
+		res.send(result);
+	}); 
+
+});
+/* update candidate details, end here */
+
+
 /* show single candidate details api, start here */
 app.get("/candidate-details/:id", (req, res)=>{
 	
@@ -266,7 +282,7 @@ app.get("/all-job-categories", (req, res)=>{
 /* fetch city api, start here */
 app.get("/all-cities", (req, res)=>{
 
-	connection.query("SELECT * from cities where status='1' and is_deleted='0' and country_id='101'", (error, result)=>{
+	connection.query("SELECT * from cities where status='1' and is_deleted='0' and country_id='101' order by name asc", (error, result)=>{
 		if(result.length > 0){
 			res.send(result);
 		} else {
