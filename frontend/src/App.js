@@ -14,6 +14,7 @@ import Blog from './pages/Blog';
 import BlogDetails from './pages/Blog-details';
 import CandidateDetails from './pages/Candidate-details';
 import EditCandidateDetails from './pages/Edit-candidate-details';
+import CandidateJobsList from './pages/Candidate-jobs-list';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           <Route path='/candidate-details/:id' element={ <CandidateDetails /> } />
 
           <Route path='/edit-candidate/:id' element={ <EditCandidateDetails /> } />
+          <Route path='/candidate-jobs-list/:id' element={ <CandidateJobsList /> } />
 
         </Routes>
       </BrowserRouter>

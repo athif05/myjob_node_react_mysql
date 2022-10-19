@@ -66,7 +66,7 @@ const Header = () => {
                                     switch (user_type) {
                                         case "1":   return <>
                                         <li><a href={"/candidate-details/"+user_id}><span>Profile</span></a></li>
-                                        <li><a href="/job-details"><span>Job Listing</span></a></li>
+                                        <li><a href={"/candidate-jobs-list/"+user_id}><span>Job Listing</span></a></li>
                                         <li><a href="/login" onClick={logout}><span>Logout</span></a></li>
                                         </>;
                                         case "2": return <>

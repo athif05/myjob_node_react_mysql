@@ -100,6 +100,19 @@ const EditCandidateDetails = () =>{
     const [candidate_work_experience, setCandidateWorkExperience] = useState([]);
     const [candidate_qualification, setCandidateQualification] = useState([]);
 
+
+    const [addmore_designation, setAddMoreDesignation] = useState([]);
+    const [addmore_company_name, setAddMoreCompanyName] = useState([]);
+    const [addmore_from, setAddMoreFrom] = useState([]);
+    const [addmore_to, setAddMoreTo] = useState([]);
+    const [addmore_describe_role, setAddMoreDescribeRole] = useState([]);
+
+    const [addmore_qualification, setAddMoreQualification] = useState([]);
+    const [addmore_college_university, setAddMoreCollegeUniversity] = useState([]);
+    const [addmore_year, setAddMoreYear] = useState([]);
+    const [addmore_marks, setAddMoreMarks] = useState([]);
+
+
     const params = useParams();
 
     useEffect(()=>{
@@ -223,13 +236,16 @@ const EditCandidateDetails = () =>{
         setFileName(e.target.files[0].name);
     };
 
-    const updateDetails = async()=>{
+    const updateCanDetails = async()=>{
 
-        
         if(!name || !email || !mobile_number || !permanent_address || !current_address || !state_id || !city || !work_experience || !describe_job_profile || !skills || !job_title || !job_keywords || !job_category || !job_locations || !english_required || !working_or_not){
             setError(true);
             return false;
         }
+     
+        console.log(designation);
+
+        let designation=JSON.stringify(designation);
 
         const formData = new FormData();
         formData.append("file", file);
@@ -244,14 +260,14 @@ const EditCandidateDetails = () =>{
         formData.append("city_id", city);
         formData.append("work_experience", work_experience);
         formData.append("designation", designation);
-        formData.append("company_name", company_name);
-        formData.append("date_from", date_from);
-        formData.append("date_to", date_to);
-        formData.append("describe_role", describe_role);
-        formData.append("course_name", course_name);
-        formData.append("college", college);
-        formData.append("year", year);
-        formData.append("marks", marks);
+        formData.append("addmore_company_name[]", addmore_company_name);
+        formData.append("addmore_from[]", addmore_from);
+        formData.append("addmore_to[]", addmore_to);
+        formData.append("describe_role[]", addmore_describe_role);
+        formData.append("course_name", addmore_qualification);
+        formData.append("college", addmore_college_university);
+        formData.append("year", addmore_year);
+        formData.append("marks", addmore_marks);
         formData.append("describe_job_profile", describe_job_profile);
         formData.append("skills", skills);
         formData.append("notice_period", notice_period);
@@ -263,20 +279,21 @@ const EditCandidateDetails = () =>{
         formData.append("english_required", english_required);
         formData.append("working_or_not", working_or_not);
 
-        console.log('update');
-        
-        /* try {
+        try {
             const res = await axios.post(
             `http://localhost:12345/update-candidate-details/${params.id}`,
             formData
             );
+
             console.log(res);
             setSuccess(true);
             setError(false);
             
+            getCandidateDetails();
+
         } catch (ex) {
             console.log(ex);
-        } */
+        }
 
     }
 
@@ -312,13 +329,18 @@ const EditCandidateDetails = () =>{
                 <section className="team-details-area">
 
                     <div className="container" style={containerStyle}>
-                        <form method="post" id="myForm" encType="multipart/form-data">
+                        
                             <div className="col-12" tabIndex="-1" role="dialog" id="myModal">
                                 <div role="document" style={{width:"100%!important"}}>{/* className="modal-dialog" */}
                                     <div className="modal-content">
                                         <div className="modal-header" style={{ backgroundColor:"#ccc"}}>
-                                            <h5 className="modal-title">Update Your Profile</h5>  
+                                            <h5 className="modal-title">Update Your Profile</h5>
+
+                                            { success && <div className="alert alert-success" role="alert">Updated Successfully</div> }
+
                                         </div>
+
+                                        
 
                                         <div className="modal-body" style={{ backgroundColor:"#f9f9f9"}}>
                                             <h6 style={PersonalInfo}>Personal Information</h6>
@@ -408,8 +430,9 @@ const EditCandidateDetails = () =>{
                                                         
                                                         <tbody>  
                                                             { candidate_work_experience.map((item_work_exp, index)=>
-                                                        <tr key={index}>
-                                                                <td><input type="text" name="addmore_designation[]" defaultValue={item_work_exp['designation_name']} onChange={(e)=>setDesignation(e.target.value)} placeholder="Enter your designation" className="form-control" style={WorkExpTd}/></td>
+                                                            
+                                                            <tr key={index}>
+                                                                <td><input type="text" name="designation[]" defaultValue={item_work_exp['designation_name']} onChange={(e)=>setDesignation((arr) => [...e.target.value])} placeholder="Enter your designation" className="form-control" style={WorkExpTd}/></td>
                                                                 <td><input type="text" name="addmore_company_name[]" defaultValue={item_work_exp['organization_name']} onChange={(e)=>setCompanyName(e.target.value)} placeholder="Enter your company name" className="form-control" style={WorkExpTd}/></td>								
                                                                 <td><input type="date" name="addmore_from[]" defaultValue={item_work_exp['date_from']} onChange={(e)=>setDateFrom(e.target.value)} placeholder="Enter from" className="form-control" style={WorkExpTd}/></td>
                                                                 <td><input type="date" name="addmore_to[]" defaultValue={item_work_exp['date_to']} onChange={(e)=>setDateTo(e.target.value)} placeholder="Enter to" className="form-control" style={WorkExpTd}/></td>								
@@ -417,7 +440,7 @@ const EditCandidateDetails = () =>{
                                                                 <td>
                                                                  			
                                                                 {/* <span className="btn btn-success" onClick={addTableRows} style={{ backgroundColor:"green", height:"23px", lineHeight:"6px", fontSize:"14px"}}>Add More</span> */}
-                                                                { (index ==0 ) ?
+                                                                { (index ===0 ) ?
                                                                 <button type="button" className="btn btn-success" onClick={addTableRows} style={WorkExpTd}>Add More</button>
                                                                 : <button type="button" className="btn btn-danger" onClick={()=>(deleteTableRows(index))} style={WorkExpTd}>Remove</button> }
                                                                 </td>  
@@ -453,7 +476,7 @@ const EditCandidateDetails = () =>{
                                                                 <td><input type="text" name="addmore_marks[]" defaultValue={item_cand_qual['marks']} onChange={(e)=>setMarks(e.target.value)} placeholder="Enter your marks" className="form-control" style={WorkExpTd}/></td>  
                                                                 <td>			
                                                                     
-                                                                { (indexx ==0 ) ?
+                                                                { (indexx ===0 ) ?
                                                                 <button type="button" className="btn btn-success"  onClick={addTableRowsQual}  style={WorkExpTd}>Add More</button>
                                                                 : <button type="button" className="btn btn-danger" onClick={()=>(deleteTableRowsQual(indexx))} style={WorkExpTd}>Remove</button> }
                                                                     
@@ -501,7 +524,7 @@ const EditCandidateDetails = () =>{
                                                 
                                                 <div className="form-group col-md-4">
                                                     <label htmlFor="Goal Score">Profile Image</label>
-                                                    <input type="file" className="form-control" name="profile_image" id="profile_image" accept="image/png, image/jpeg, image/jpg" />
+                                                    <input type="file" className="form-control" name="profile_image" id="profile_image" accept="image/png, image/jpeg, image/jpg" onChange={saveFile}/>
                                                 </div>
                                                 
                                                 <div className="form-group col-md-4">
@@ -548,37 +571,37 @@ const EditCandidateDetails = () =>{
                                                 <div className="form-group col-md-8">
                                                     <label htmlFor="Goal Score">English Required <span className="error-msg-star">*</span></label><br/>
                                                 
-                                                    <input type="radio" name="english_required_id" value="No English" checked={english_required == 'No English'? true: false} onChange={(e)=>setEnglishRequired(e.target.value)} /> No English  &nbsp; &nbsp; &nbsp;
+                                                    <input type="radio" name="english_required_id" value="No English" checked={english_required === 'No English'? true: false} onChange={(e)=>setEnglishRequired(e.target.value)} /> No English  &nbsp; &nbsp; &nbsp;
                                                 
-                                                    <input type="radio" name="english_required_id" value="Basic English" checked={english_required == 'Basic English'? true: false} onChange={(e)=>setEnglishRequired(e.target.value)} /> Basic English  &nbsp; &nbsp; &nbsp;
+                                                    <input type="radio" name="english_required_id" value="Basic English" checked={english_required === 'Basic English'? true: false} onChange={(e)=>setEnglishRequired(e.target.value)} /> Basic English  &nbsp; &nbsp; &nbsp;
                                                 
-                                                    <input type="radio" name="english_required_id" value="Good English" checked={english_required == 'Good English'? true: false} onChange={(e)=>setEnglishRequired(e.target.value)} /> Good English  &nbsp; &nbsp; &nbsp;
+                                                    <input type="radio" name="english_required_id" value="Good English" checked={english_required === 'Good English'? true: false} onChange={(e)=>setEnglishRequired(e.target.value)} /> Good English  &nbsp; &nbsp; &nbsp;
 
-                                                    <input type="radio" name="english_required_id" value="Excellent/Fluent English" checked={english_required == 'Excellent/Fluent English'? true: false} onChange={(e)=>setEnglishRequired(e.target.value)} /> Excellent/Fluent English
+                                                    <input type="radio" name="english_required_id" value="Excellent/Fluent English" checked={english_required === 'Excellent/Fluent English'? true: false} onChange={(e)=>setEnglishRequired(e.target.value)} /> Excellent/Fluent English
                                                 </div>
                                             </div>
 
                                             <div className="row">
                                                 <div className="form-group col-md-4">
                                                     <label htmlFor="Goal Score">Working or Not <span className="error-msg-star">*</span></label><br/>
-                                                    <input type="radio" name="working_or_not" value="Yes" checked={working_or_not == 'Yes'? true: false} onChange={(e)=>setWorkingorNot(e.target.value)}  /> Yes &nbsp; &nbsp;&nbsp; &nbsp;
-                                                    <input type="radio" name="working_or_not" value="No" checked={working_or_not == 'No'? true: false} onChange={(e)=>setWorkingorNot(e.target.value)}/> No
+                                                    <input type="radio" name="working_or_not" value="Yes" checked={working_or_not === 'Yes'? true: false} onChange={(e)=>setWorkingorNot(e.target.value)}  /> Yes &nbsp; &nbsp;&nbsp; &nbsp;
+                                                    <input type="radio" name="working_or_not" value="No" checked={working_or_not === 'No'? true: false} onChange={(e)=>setWorkingorNot(e.target.value)}/> No
                                                 </div>
                                             </div>
 
                                         </div>
 
                                         <div className="modal-footer">
-                                            <a href="#">
+                                            {/* <a href="#">
                                                 <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                            </a>
-                                            <button  className="btn btn-success" id="submit-btn" onClick={updateDetails}>Update Profile</button>
+                                            </a> */}
+                                            <button  className="btn btn-success" id="submit-btn" onClick={updateCanDetails}>Update Profile</button>
                                         </div>
 
                                     </div>
                                 </div>
                             </div>
-                        </form>
+                            
                     </div>
 
                 </section>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -38,6 +38,24 @@ const JobDetails = () =>{
     
     setQualifications(result_qualifications);
   }
+
+
+
+    /* update status, start here */
+    const applyJob = useCallback(async (job_id, user_id) => {
+      let result_status = await fetch(`http://localhost:12345/candidate-apply-job/${job_id}/${user_id}`);
+    }, getJobDetails());
+    /* update status, end here */
+
+
+    const auth = localStorage.getItem('react_user_front');
+
+    if(auth){
+        const userData = JSON.parse(localStorage.getItem('react_user_front'));
+        var user_id = userData.id;
+    } else {
+        var user_id = '';
+    }
 
   const imageStyle = {
     width: "130px",
@@ -94,7 +112,7 @@ const JobDetails = () =>{
                   </div>
                   <div className="job-details-price">
                     <h4 className="title">{item_job.salary} INR <span>/monthly</span></h4>
-                    <button type="button" className="btn-theme">Apply Now</button>
+                    <button type="button" className="btn-theme" onClick={()=>applyJob(item_job.id,user_id)}>Apply Now</button>
                   </div>
                 </div>
               </div>

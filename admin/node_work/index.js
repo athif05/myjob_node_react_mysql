@@ -114,6 +114,24 @@ app.get("/applied-jobs", (req, res)=>{
 /* show all aplied jobs api, end here */
 
 
+
+/* show all aplied jobs by single candidate api, start here */
+app.get("/applied-jobs-by-candidate/:user_id", (req, res)=>{
+
+	var sql = `SELECT job_applied_by_employees.id as id, job_applied_by_employees.user_id as user_id, job_applied_by_employees.job_id as job_id, job_applied_by_employees.status as job_status, candidate_details.name as candidate_name, candidate_details.email as candidate_email, candidate_details.mobile_number as candidate_mobile_number, all_jobs.qualification_ids as qualification_ids, all_jobs.job_title as job_title, all_jobs.ctc as ctc, cities.name as job_location_name, employer_details.company_name as company_name, cts.name as company_location_name, job_applied_by_employees.applied_date as applied_date, working_days.name as working_days_name FROM job_applied_by_employees LEFT JOIN candidate_details on candidate_details.user_id=job_applied_by_employees.user_id LEFT JOIN all_jobs on all_jobs.id=job_applied_by_employees.job_id LEFT JOIN employer_details on employer_details.employer_id=all_jobs.employer_id LEFT JOIN cities on cities.id=all_jobs.job_location_id LEFT JOIN cities as cts on cts.id= employer_details.city_id LEFT JOIN working_days on working_days.id=all_jobs.working_days where job_applied_by_employees.is_deleted='0' and job_applied_by_employees.user_id="${req.params.user_id}"`
+
+	connection.query(sql,(error, result)=>{
+		if(result.length > 0){
+			res.send(result);
+		} else {
+			res.send([{name: "No job found"}]);
+		}
+	});
+});
+/* show all aplied jobs by single candidate api, end here */
+
+
+
 /* update applied job status api, start here */
 app.get("/update-applied-jobs-status/:val/:id", (req, res) =>{
 
@@ -132,8 +150,16 @@ app.get("/update-applied-jobs-status/:val/:id", (req, res) =>{
 /* update candidate details, start here */
 app.post('/update-candidate-details/:id', async (req, res)=>{
 
-	const sql = `UPDATE candidate_details set name="${req.params.name}",email="${req.params.email}",mobile_number="${req.params.mobile_number}",alternate_number="${req.params.alternate_number}",permanent_address="${req.params.permanent_address}",current_address="${req.params.current_address}",state_id="${req.params.state_id}",city_id="${req.params.city_id}",work_experience="${req.params.work_experience}",describe_job_profile="${req.params.describe_job_profile}",skills="${req.params.skills}",notice_period="${req.params.notice_period}",last_ctc="${req.params.last_ctc}",job_title="${req.params.job_title}",job_keywords="${req.params.job_keywords}",job_category="${req.params.job_category}",job_locations="${req.params.job_locations}",english_required="${req.params.english_required}",working_or_not="${req.params.working_or_not}" where id="${req.params.id}"`;
+	/*const newpath = __dirname + "/public_html/uploads/";
+	const file = req.files.file;
+	const filename = file.name;
+	const image_path = "/public_html/uploads/"+filename;*/
+
+	console.log(req.body);
+
+	const sql = `UPDATE candidate_details set name="${req.body.name}",email="${req.body.email}",mobile_number="${req.body.mobile_number}",alternate_number="${req.body.alternate_number}",permanent_address="${req.body.permanent_address}",current_address="${req.body.current_address}",state_id="${req.body.state_id}",city_id="${req.body.city_id}",work_experience="${req.body.work_experience}",describe_job_profile="${req.body.describe_job_profile}",skills="${req.body.skills}",notice_period="${req.body.notice_period}",last_ctc="${req.body.last_ctc}",job_title="${req.body.job_title}",job_keywords="${req.body.job_keywords}",job_categories_id="${req.body.job_category}",job_locations_id="${req.body.job_locations}",english_required_id="${req.body.english_required}",working_or_not="${req.body.working_or_not}" where user_id="${req.params.id}"`;
 	console.log(sql);
+	
 	connection.query(sql, (error, result)=>{
 		if(error) throw error;
 
@@ -385,6 +411,42 @@ app.get("/generic-soft-delete/:tbl/:val/:id", (req, res) =>{
 
 });
 /* generic soft delete api, end here */
+
+
+/* candidate apply job, start here */
+app.get('/candidate-apply-job/:job_id/:user_id', async (req, res)=>{
+    
+    var job_id = req.params.job_id;
+    var user_id=req.params.user_id;
+	var applied_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+
+	connection.query("SELECT id from job_applied_by_employees where job_id=? and user_id=?",[job_id, user_id], (error, result)=>{
+		if(result.length > 0){
+
+			res.send(result);
+
+		} else {
+			
+			var sql = `INSERT INTO job_applied_by_employees (job_id, user_id, applied_date, status) VALUES ("${job_id}","${user_id}","${applied_date}","1")`;
+			//console.log(sql);
+		  	connection.query(sql, function(error, result) {
+				
+				if(error) throw error;
+				
+				res.send(result);
+
+				console.log("1 record inserted");
+
+			});
+		}
+	}); 
+
+
+	
+
+});
+/* candidate apply job, end here */
 
 
 /* fetch all generic data list api, start here */
