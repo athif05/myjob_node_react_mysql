@@ -243,9 +243,10 @@ const EditCandidateDetails = () =>{
             return false;
         }
      
-        console.log(designation);
+        
 
-        let designation=JSON.stringify(designation);
+        var designation=(designation);
+        console.log('Test: '+designation);
 
         const formData = new FormData();
         formData.append("file", file);
