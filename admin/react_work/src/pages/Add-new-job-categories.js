@@ -1,4 +1,5 @@
 import React, { useState, useEffect} from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -62,9 +63,13 @@ const AddNewJobCategories = () => {
                                 
                                 <button type="submit" className="btn btn-primary mr-2" onClick={addJobCategory}>Submit</button>
                                 
-                                <a href="/manage-job-categories">
+                                {/* <a href="/manage-job-categories">
                                     <span className="btn btn-light">Cancel</span>
-                                </a>
+                                </a> */}
+
+                                <Link to="/manage-job-categories">
+                                    <span className="btn btn-light">Cancel</span>
+                                </Link>
 
                             </div>
                             </div>

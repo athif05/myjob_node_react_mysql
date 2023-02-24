@@ -102,10 +102,10 @@ const AllJobLists = () => {
                                                 <tr>
                                                     <td>{index+1}.</td>
                                                     <td>
-                                                        <Link to={"/employer-details/"+item.employer_id} target="_blank" data-tip="Click Here For Show Company Details" className="text-decoration-none">{item.company_name}</Link>
+                                                        <Link to={"/employer-details/"+item.employer_id} data-tip="Click Here For Show Company Details" className="text-decoration-none">{item.company_name}</Link>
                                                     </td>
                                                     <td>
-                                                        <Link to={"/job-details/"+item.id} target="_blank" data-tip="Click Here For Show Job Details" className="text-decoration-none">{item.job_title}</Link>
+                                                        <Link to={"/job-details/"+item.id} data-tip="Click Here For Show Job Details" className="text-decoration-none">{item.job_title}</Link>
                                                         <ReactTooltip />
                                                     </td>
                                                     <td>{item.salary}</td>

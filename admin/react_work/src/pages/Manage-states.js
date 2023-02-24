@@ -65,11 +65,16 @@ const ManageStates = () => {
                                         </div>
 
                                         <div className="col-md-6 text-right">
-                                            <a href="/add-new-state">
+                                            {/* <a href="/add-new-state">
                                                 <button type="button" className="btn btn-primary">
                                                     Add New State
                                                 </button>
-                                            </a>
+                                            </a> */}
+                                            <Link to="/add-new-state">
+                                                <button type="button" className="btn btn-primary">
+                                                    Add New State
+                                                </button>
+                                            </Link>
                                         </div>
 
 

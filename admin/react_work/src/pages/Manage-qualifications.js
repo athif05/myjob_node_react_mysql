@@ -81,11 +81,16 @@ const ManageQualifications = () => {
                                         </div>
 
                                         <div className="col-md-6 text-right" style={styleObj}>
-                                            <a href="/add-new-qualification">
+                                            {/* <a href="/add-new-qualification">
                                                 <button type="button" className="btn btn-primary">
                                                     Add New Qualification
                                                 </button>
-                                            </a>
+                                            </a> */}
+                                            <Link to="/add-new-qualification">
+                                                <button type="button" className="btn btn-primary">
+                                                    Add New Qualification
+                                                </button>
+                                            </Link>
                                         </div>
 
                                     </div>

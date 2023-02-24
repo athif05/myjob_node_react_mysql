@@ -1,5 +1,5 @@
 import React, { useEffect, useState} from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -79,9 +79,13 @@ const EditQualification = () => {
                                 
                                 <button type="submit" className="btn btn-primary mr-2" onClick={updateQualification}>Update</button>
                                 
-                                <a href="/manage-qualifications">
+                                {/* <a href="/manage-qualifications">
                                     <span className="btn btn-light">Cancel</span>
-                                </a>
+                                </a> */}
+
+                                <Link to="/manage-qualifications">
+                                    <span className="btn btn-light">Cancel</span>
+                                </Link>
                                 
                             </div>
                             </div>

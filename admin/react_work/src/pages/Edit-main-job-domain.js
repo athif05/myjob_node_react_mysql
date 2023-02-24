@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -70,9 +70,9 @@ const EditMainJobDomain = () => {
                                 
                                 <button type="submit" className="btn btn-primary mr-2" onClick={updateJobDomain}>Update</button>
                                 
-                                <a href="/manage-job-domains">
+                                <Link to="/manage-job-domains">
                                     <span className="btn btn-light">Cancel</span>
-                                </a>
+                                </Link>
 
                             </div>
                             </div>

@@ -69,11 +69,18 @@ const ManageJobCategories = () => {
                                         </div>
 
                                         <div className="col-md-6 text-right">
-                                            <a href="/add-new-job-categories">
+                                            {/* <a href="/add-new-job-categories">
                                                 <button type="button" className="btn btn-primary">
                                                     Add New Job Categories
                                                 </button>
-                                            </a>
+                                            </a> */}
+
+                                            <Link to="/add-new-job-categories">
+                                                <button type="button" className="btn btn-primary">
+                                                    Add New Job Categories
+                                                </button>
+                                            </Link>
+
                                         </div>
 
 

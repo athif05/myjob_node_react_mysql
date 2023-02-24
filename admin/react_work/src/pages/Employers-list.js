@@ -103,7 +103,7 @@ const EmployersList = () => {
                                             <img src="assests/images/bvc-logo.png" alt="logo"/> 
                                         </td>
                                         <td>
-                                            <Link to={{pathname:`/employer-details/`+item.employer_id}} target="_blank" data-tip="Click Here For Show Employer Details" className="text-decoration-none">{item.company_name}</Link>
+                                            <Link to={{pathname:`/employer-details/`+item.employer_id}} data-tip="Click Here For Show Employer Details" className="text-decoration-none">{item.company_name}</Link>
 
                                             <ReactTooltip />
                                             

@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -61,9 +62,13 @@ const AddNewWorkingDay = () => {
                                 
                                 <button type="submit" className="btn btn-primary mr-2" onClick={addWorkingDay}>Submit</button>
                                 
-                                <a href="/manage-working-days">
+                                {/* <a href="/manage-working-days">
                                     <span className="btn btn-light">Cancel</span>
-                                </a>
+                                </a> */}
+
+                                <Link to="/manage-working-days">
+                                    <span className="btn btn-light">Cancel</span>
+                                </Link>
                                 
                             </div>
                             </div>

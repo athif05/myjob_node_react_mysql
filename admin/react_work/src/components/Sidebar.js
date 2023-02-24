@@ -1,6 +1,6 @@
 import React from "react";
-//import { Link } from 'react-router-dom';
-
+/* import {Route, Link } from 'react-router-dom'; */
+import { BrowserRouter as Router,Routes, Route, Link } from 'react-router-dom';
 const Sidebar = () =>{
     return (
         <div>
@@ -180,23 +180,28 @@ const Sidebar = () =>{
             <nav className="sidebar sidebar-offcanvas" id="sidebar">
                 <ul className="nav">
                     <li className="nav-item">
-                        <a className="nav-link" href="/dashboard">
+                        {/* <a className="nav-link" href="/dashboard">
                         <i className="typcn typcn-device-desktop menu-icon"></i>
                         <span className="menu-title">Dashboard</span>
                         
-                        </a>
+                        </a> */}
 
-                        {/* <Link to="/dashboard">
+                        <Link to="/dashboard" className="nav-link">
                             <i className="typcn typcn-device-desktop menu-icon"></i>
                             <span className="menu-title">Dashboard</span>
-                        </Link> */}
+                        </Link>
                     </li>
                     
                     <li className="nav-item">
-                        <a className="nav-link" href="/all-applied-jobs">
+                        {/* <a className="nav-link" href="/all-applied-jobs">
                         <i className="typcn typcn-document-text menu-icon"></i>
                         <span className="menu-title">All Applied Jobs</span>
-                        </a>
+                        </a> */}
+
+                        <Link to="/all-applied-jobs" className="nav-link">
+                            <i className="typcn typcn-device-desktop menu-icon"></i>
+                            <span className="menu-title">All Applied Jobs</span>
+                        </Link>
                     </li>
                     
                     <li className="nav-item">
@@ -207,8 +212,22 @@ const Sidebar = () =>{
                         </a>
                         <div className="collapse" id="ui-basic">
                         <ul className="nav flex-column sub-menu">
-                            <li className="nav-item"> <a className="nav-link" href="/employes-list">Employes List</a></li>
-                            <li className="nav-item"> <a className="nav-link" href="/manage-qualifications">Qualifications</a></li>
+
+                            {/* <li className="nav-item"> <a className="nav-link" href="/employes-list">Employes List</a></li>
+                            <li className="nav-item"> <a className="nav-link" href="/manage-qualifications">Qualifications</a></li> */}
+
+                            <li>
+                                <Link to="/employes-list" className="nav-link">
+                                    <span className="menu-title">Employes List</span>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/manage-qualifications" className="nav-link">
+                                    <span className="menu-title">Qualifications</span>
+                                </Link>
+                            </li>
+
                         </ul>
                         </div>
                     </li>
@@ -221,8 +240,20 @@ const Sidebar = () =>{
                         </a>
                         <div className="collapse" id="ui-employers">
                         <ul className="nav flex-column sub-menu">
-                            <li className="nav-item"> <a className="nav-link" href="/employers-list">Employers List</a></li>
-                            <li className="nav-item"> <a className="nav-link" href="/manage-company-domains">Company Domains</a></li>
+                            {/* <li className="nav-item"> <a className="nav-link" href="/employers-list">Employers List</a></li>
+                            <li className="nav-item"> <a className="nav-link" href="/manage-company-domains">Company Domains</a></li> */}
+
+                            <li>
+                                <Link to="/employers-list" className="nav-link">
+                                    <span className="menu-title">Employers List</span>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/manage-company-domains" className="nav-link">
+                                    <span className="menu-title">Company Domains</span>
+                                </Link>
+                            </li>
                         </ul>
                         </div>
                     </li>
@@ -235,13 +266,57 @@ const Sidebar = () =>{
                         </a>
                         <div className="collapse" id="ui-jobs">
                         <ul className="nav flex-column sub-menu">
-                            <li className="nav-item"> <a className="nav-link" href="/all-job-lists">Jobs List</a></li>
+                            
+                            {/* <li className="nav-item"> <a className="nav-link" href="/all-job-lists">Jobs List</a></li>
                             <li className="nav-item"> <a className="nav-link" href="/manage-job-categories">Job Category</a></li>
                             <li className="nav-item"> <a className="nav-link" href="/manage-job-domains">Job Domain</a></li>
                             <li className="nav-item"> <a className="nav-link" href="/manage-notice-periods">Notice Periods</a></li>
                             <li className="nav-item"> <a className="nav-link" href="/manage-fee-charge-reasons">Fees charges reasons</a></li>
                             <li className="nav-item"> <a className="nav-link" href="/manage-working-days">Working days</a></li>
-                            <li className="nav-item"> <a className="nav-link" href="/manage-work-experiance">Work experiance</a></li>
+                            <li className="nav-item"> <a className="nav-link" href="/manage-work-experiance">Work experiance</a></li> */}
+
+                            <li>
+                                <Link to="/all-job-lists" className="nav-link">
+                                    <span className="menu-title">Jobs List</span>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/manage-job-categories" className="nav-link">
+                                    <span className="menu-title">Job Category</span>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/manage-job-domains" className="nav-link">
+                                    <span className="menu-title">Job Domain</span>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/manage-notice-periods" className="nav-link">
+                                    <span className="menu-title">Notice Periods</span>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/manage-fee-charge-reasons" className="nav-link">
+                                    <span className="menu-title">Fees charges reasons</span>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/manage-working-days" className="nav-link">
+                                    <span className="menu-title">Working days</span>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/manage-work-experiance" className="nav-link">
+                                    <span className="menu-title">Work experiance</span>
+                                </Link>
+                            </li>
+
                         </ul>
                         </div>
                     </li>
@@ -254,8 +329,21 @@ const Sidebar = () =>{
                         </a>
                         <div className="collapse" id="ui-location">
                         <ul className="nav flex-column sub-menu">
-                            <li className="nav-item"><a className="nav-link" href="/states">Manage State</a></li>
-                            <li className="nav-item"><a className="nav-link" href="/cities">Manage City</a></li>
+                            {/* <li className="nav-item"><a className="nav-link" href="/states">Manage State</a></li>
+                            <li className="nav-item"><a className="nav-link" href="/cities">Manage City</a></li> */}
+
+                            <li>
+                                <Link to="/states" className="nav-link">
+                                    <span className="menu-title">Manage State</span>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/cities" className="nav-link">
+                                    <span className="menu-title">Manage City</span>
+                                </Link>
+                            </li>
+
                         </ul>
                         </div>
                     </li>
@@ -269,18 +357,37 @@ const Sidebar = () =>{
                         </a>
                         <div className="collapse" id="form-user">
                         <ul className="nav flex-column sub-menu">
-                            <li className="nav-item"><a className="nav-link" href="/manage-role">Manage Role</a></li>
-                            <li className="nav-item"><a className="nav-link" href="/manage-admin-account">Manage Account</a></li>
+                            {/* <li className="nav-item"><a className="nav-link" href="/manage-role">Manage Role</a></li>
+                            <li className="nav-item"><a className="nav-link" href="/manage-admin-account">Manage Account</a></li> */}
+
+                            <li>
+                                <Link to="/manage-role" className="nav-link">
+                                    <span className="menu-title">Manage Role</span>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/manage-admin-account" className="nav-link">
+                                    <span className="menu-title">Manage Account</span>
+                                </Link>
+                            </li>
+
                         </ul>
                         </div>
                     </li>
                     
                     
                     <li className="nav-item">
-                        <a className="nav-link" href="/contact-us-emails">
+                        {/* <a className="nav-link" href="/contact-us-emails">
                         <i className="typcn typcn-document-text menu-icon"></i>
                         <span className="menu-title">Contact Message</span>
-                        </a>
+                        </a> */}
+
+                        <Link to="/contact-us-emails" className="nav-link">
+                            <i className="typcn typcn-document-text menu-icon"></i>
+                            <span className="menu-title">Contact Message</span>
+                        </Link>
+
                     </li>
                     
                     <li className="nav-item">
@@ -291,11 +398,41 @@ const Sidebar = () =>{
                         </a>
                         <div className="collapse" id="form-website">
                         <ul className="nav flex-column sub-menu">
-                            <li className="nav-item"><a className="nav-link" href="/about-us">About Us</a></li>
+                            {/* <li className="nav-item"><a className="nav-link" href="/about-us">About Us</a></li>
                             <li className="nav-item"><a className="nav-link" href="/contact-us">Contact Us</a></li>
                             <li className="nav-item"><a className="nav-link" href="/blog-lists">Blog List</a></li>
                             <li className="nav-item"><a className="nav-link" href="/manage-blog-categories">Blog Category</a></li>
-                            <li className="nav-item"><a className="nav-link" href="/manage-blog-authors">Blogs Author</a></li>
+                            <li className="nav-item"><a className="nav-link" href="/manage-blog-authors">Blogs Author</a></li> */}
+
+                            <li>
+                                <Link to="/about-us" className="nav-link">
+                                    <span className="menu-title">About Us</span>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/contact-us" className="nav-link">
+                                    <span className="menu-title">Contact Us</span>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/blog-lists" className="nav-link">
+                                    <span className="menu-title">Blog List</span>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/manage-blog-categories" className="nav-link">
+                                    <span className="menu-title">Blog Category</span>
+                                </Link>
+                            </li>
+
+                            <li>
+                                <Link to="/manage-blog-authors" className="nav-link">
+                                    <span className="menu-title">Blogs Author</span>
+                                </Link>
+                            </li>
                         </ul>
                         </div>
                     </li>

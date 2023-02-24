@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -60,9 +61,12 @@ const AddNewRole = () => {
 
                                         <button type="submit" className="btn btn-primary mr-2" onClick={addRole}>Submit</button>
 
-                                        <a href="/manage-role">
+                                        {/* <a href="/manage-role">
                                             <span className="btn btn-light">Cancel</span>
-                                        </a>
+                                        </a> */}
+                                        <Link to="/manage-role">
+                                            <span className="btn btn-light">Cancel</span>
+                                        </Link>
 
                                 </div>
                             </div>

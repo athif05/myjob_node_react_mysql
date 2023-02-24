@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -78,9 +78,9 @@ const EditJobCategory = () => {
                                 
                                 <button type="submit" className="btn btn-primary mr-2" onClick={updateJobCategory}>Update</button>
                                 
-                                <a href="/manage-job-categories">
+                                <Link to="/manage-job-categories">
                                     <span className="btn btn-light">Cancel</span>
-                                </a>
+                                </Link>
 
                             </div>
                             </div>

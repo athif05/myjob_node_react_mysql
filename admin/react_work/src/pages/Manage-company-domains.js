@@ -70,11 +70,18 @@ const ManageCompanyDomains = () => {
                                         </div>
 
                                         <div className="col-md-6 text-right">
-                                            <a href="/add-new-company-domain">
+                                            {/* <a href="/add-new-company-domain">
                                                 <button type="button" className="btn btn-primary">
                                                     Add New Company Domain
                                                 </button>
-                                            </a>
+                                            </a> */}
+
+                                            <Link to="/add-new-company-domain">
+                                                <button type="button" className="btn btn-primary">
+                                                    Add New Company Domain
+                                                </button>
+                                            </Link>
+
                                         </div>
 
 

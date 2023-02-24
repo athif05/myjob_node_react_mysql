@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -56,9 +57,13 @@ const AddNewMainJobDomain = () => {
                                 
                                 <button type="submit" className="btn btn-primary mr-2" onClick={addJobDomain}>Submit</button>
                                 
-                                <a href="/manage-job-domains">
+                                {/* <a href="/manage-job-domains">
                                     <span className="btn btn-light">Cancel</span>
-                                </a>
+                                </a> */}
+
+                                <Link to="/manage-job-domains">
+                                    <span className="btn btn-light">Cancel</span>
+                                </Link>
                                 
                             </div>
                             </div>

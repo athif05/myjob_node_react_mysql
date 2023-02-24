@@ -67,11 +67,16 @@ const ManageRole = () => {
                                         </div>
 
                                         <div className="col-md-6 text-right">
-                                            <a href="/add-new-role">
+                                            {/* <a href="/add-new-role">
                                                 <button type="button" className="btn btn-primary">
                                                     Add New Role
                                                 </button>
-                                            </a>
+                                            </a> */}
+                                            <Link to="/add-new-role">
+                                                <button type="button" className="btn btn-primary">
+                                                    Add New Role
+                                                </button>
+                                            </Link>
                                         </div>
 
 

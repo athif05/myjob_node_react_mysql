@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -72,9 +72,9 @@ const EditRole = () => {
 
                                         <button type="submit" className="btn btn-primary mr-2" onClick={updateRole}>Update</button>
 
-                                        <a href="/manage-role">
+                                        <Link to="/manage-role">
                                             <span className="btn btn-light">Cancel</span>
-                                        </a>
+                                        </Link>
 
                                 </div>
                             </div>

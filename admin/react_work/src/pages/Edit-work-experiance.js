@@ -1,5 +1,5 @@
 import React, { useEffect, useState} from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -75,9 +75,9 @@ const EditWorkExperiance = () => {
                                 
                                 <button type="submit" className="btn btn-primary mr-2" onClick={updateWorkingExperiance}>Update</button>
                                 
-                                <a href="/manage-work-experiance">
+                                <Link to="/manage-work-experiance">
                                     <span className="btn btn-light">Cancel</span>
-                                </a>
+                                </Link>
                                 
                             </div>
                             </div>

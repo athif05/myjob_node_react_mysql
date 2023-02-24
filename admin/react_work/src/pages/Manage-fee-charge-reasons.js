@@ -65,11 +65,17 @@ const ManageFeeChargeReasons = () => {
                                         </div>
 
                                         <div className="col-md-6 text-right">
-                                            <a href="/add-new-fee-charge-reason">
+                                            {/* <a href="/add-new-fee-charge-reason">
                                                 <button type="button" className="btn btn-primary">
                                                     Add New Fee Charge
                                                 </button>
-                                            </a>
+                                            </a> */}
+                                            <Link to="/add-new-fee-charge-reason">
+                                                <button type="button" className="btn btn-primary">
+                                                    Add New Fee Charge
+                                                </button>
+                                            </Link>
+
                                         </div>
 
 

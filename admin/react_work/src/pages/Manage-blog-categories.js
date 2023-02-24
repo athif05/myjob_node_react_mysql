@@ -65,11 +65,16 @@ const ManageBlogCategories = () => {
                                         </div>
 
                                         <div className="col-md-6 text-right">
-                                            <a href="/add-new-blog-category">
+                                            {/* <a href="/add-new-blog-category">
                                                 <button type="button" className="btn btn-primary">
                                                     Add New Blog Category
                                                 </button>
-                                            </a>
+                                            </a> */}
+                                            <Link to="/add-new-blog-category">
+                                                <button type="button" className="btn btn-primary">
+                                                    Add New Blog Category
+                                                </button>
+                                            </Link>
                                         </div>
 
 

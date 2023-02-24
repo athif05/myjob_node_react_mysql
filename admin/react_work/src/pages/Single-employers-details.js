@@ -212,7 +212,7 @@ const SingleEmployersDetails = () => {
                                                         <tr>
                                                             <td>
                                                                 
-                                                                <Link to={{pathname:`/job-details/`+item_job.id}} target="_blank" data-tip="Click Here For Show Job Details" className="text-decoration-none">{item_job.job_title}</Link>
+                                                                <Link to={{pathname:`/job-details/`+item_job.id}} data-tip="Click Here For Show Job Details" className="text-decoration-none">{item_job.job_title}</Link>
                                                                 <ReactTooltip />
                                                             </td>
                                                             <td>{item_job.salary}</td>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState} from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -71,9 +71,12 @@ const EditCompanyDomain = () => {
 
                                         <button type="submit" className="btn btn-primary mr-2" onClick={updateDomain}>Update</button>
 
-                                        <a href="/manage-company-domains">
+                                        {/* <a href="/manage-company-domains">
                                             <span className="btn btn-light">Cancel</span>
-                                        </a>
+                                        </a> */}
+                                        <Link to="/manage-company-domains">
+                                            <span className="btn btn-light">Cancel</span>
+                                        </Link>
 
                                 </div>
                             </div>

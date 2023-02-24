@@ -68,11 +68,18 @@ const ManageNoticePeriods = () => {
                                         </div>
 
                                         <div className="col-md-6 text-right">
-                                            <a href="/add-new-notice-period">
+                                            {/* <a href="/add-new-notice-period">
                                                 <button type="button" className="btn btn-primary">
                                                     Add New Notice Periods
                                                 </button>
-                                            </a>
+                                            </a> */}
+
+                                            <Link to="/add-new-notice-period">
+                                                <button type="button" className="btn btn-primary">
+                                                    Add New Notice Periods
+                                                </button>
+                                            </Link>
+
                                         </div>
 
 

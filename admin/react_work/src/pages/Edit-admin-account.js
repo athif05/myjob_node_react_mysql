@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -132,9 +132,9 @@ const EditAdminAccount = () => {
 
                                         <button type="submit" className="btn btn-primary mr-2" onClick={updateAdminAccount}>Update</button>
 
-                                        <a href="/manage-admin-account">
+                                        <Link to="/manage-admin-account">
                                             <span className="btn btn-light">Cancel</span>
-                                        </a>
+                                        </Link>
 
                                 </div>
                             </div>

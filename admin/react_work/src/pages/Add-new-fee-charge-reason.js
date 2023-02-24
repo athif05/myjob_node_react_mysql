@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -58,9 +59,13 @@ const AddNewFeeChargeReason = () => {
                                 
                                 <button type="submit" className="btn btn-primary mr-2" onClick={addFeeChargeReason}>Submit</button>
                                 
-                                <a href="/manage-fee-charge-reasons">
+                                {/* <a href="/manage-fee-charge-reasons">
                                     <span className="btn btn-light">Cancel</span>
-                                </a>
+                                </a> */}
+
+                                <Link to="/manage-fee-charge-reasons">
+                                    <span className="btn btn-light">Cancel</span>
+                                </Link>
 
                             </div>
                             </div>

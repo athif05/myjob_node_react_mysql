@@ -99,7 +99,7 @@ const EmployesList = () => {
                                                 <tr>
                                                     <td>{index+1}.</td>
                                                     <td>
-                                                    <Link to={"/candidate-details/"+item.user_id} target="_blank" data-tip="Click Here For Show Candidate Details" className="text-decoration-none">{item.name}</Link>
+                                                    <Link to={"/candidate-details/"+item.user_id}  data-tip="Click Here For Show Candidate Details" className="text-decoration-none">{item.name}</Link>
                                                     <ReactTooltip />
                                                     </td>
                                                     <td>{item.email}</td>

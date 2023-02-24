@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -123,9 +124,12 @@ const AddNewAdminAccount = () => {
 
                                         <button type="submit" className="btn btn-primary mr-2" onClick={addAdminAccount}>Submit</button>
 
-                                        <a href="/manage-admin-account">
+                                        {/* <a href="/manage-admin-account">
                                             <span className="btn btn-light">Cancel</span>
-                                        </a>
+                                        </a> */}
+                                        <Link to="/manage-admin-account">
+                                            <span className="btn btn-light">Cancel</span>
+                                        </Link>
 
                                 </div>
                             </div>

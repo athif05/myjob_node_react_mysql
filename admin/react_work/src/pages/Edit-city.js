@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -100,9 +100,9 @@ const EditCity = () => {
 
                                         <button type="submit" className="btn btn-primary mr-2" onClick={updateCity}>Update</button>
 
-                                        <a href="/cities">
+                                        <Link to="/cities">
                                             <span className="btn btn-light">Cancel</span>
-                                        </a>
+                                        </Link>
 
                                 </div>
                             </div>

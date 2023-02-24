@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from "react";
+import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -88,9 +89,12 @@ const AddNewCity = () => {
 
                                         <button type="submit" className="btn btn-primary mr-2" onClick={addCity}>Submit</button>
 
-                                        <a href="/cities">
+                                        {/* <a href="/cities">
                                             <span className="btn btn-light">Cancel</span>
-                                        </a>
+                                        </a> */}
+                                        <Link to="/cities">
+                                            <span className="btn btn-light">Cancel</span>
+                                        </Link>
 
                                 </div>
                             </div>
