@@ -76,8 +76,7 @@ const ManageAdminAccount = () => {
                                                 </button>
                                             </Link>
                                         </div>
-
-
+                                        
                                     </div>
                                 </div>
 
