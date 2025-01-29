@@ -23,7 +23,9 @@
     "start": "set PORT=3001 && react-scripts start",
     "build": "set PORT=3001 && react-scripts build",
     "test": "set PORT=3001 && react-scripts test",
-    "eject": "set PORT=3001 && react-scripts eject"
+    "eject": "set PORT=3001 && react-scripts eject",
+	"predeploy": "npm run build",
+	"deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -45,6 +47,9 @@
   },
   "devDependencies": {
     "css-loader": "^6.7.1",
+    "gh-pages": "^6.3.0",
     "style-loader": "^3.3.1"
   }
 }
+
+"homepage": "https://athif05.github.io/myjob_node_react_mysql"
