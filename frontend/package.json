@@ -49,6 +49,6 @@
     "css-loader": "^6.7.1",
     "gh-pages": "^6.3.0",
     "style-loader": "^3.3.1"
-  }
+  },
+  "homepage": "https://athif05.github.io/myjob_node_react_mysql"
 }
-"homepage": "https://athif05.github.io/myjob_node_react_mysql"
